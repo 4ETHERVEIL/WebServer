@@ -147,7 +147,7 @@ body::before {
   border: 3px solid rgba(60, 224, 195, 0.3);
   border-radius: 16px;
   padding: 30px;
-  max-width: 480px;
+  max-width: 520px;
   width: 100%;
   text-align:center;
   box-shadow: 
@@ -249,6 +249,43 @@ input[type="file"] {
   border: 2px dashed rgba(60, 224, 195, 0.3);
 }
 
+input[type="range"] {
+  padding: 0;
+  height: 20px;
+  -webkit-appearance: none;
+  background: var(--box);
+  border-radius: 10px;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(60, 224, 195, 0.5);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 10px rgba(60, 224, 195, 0.5);
+}
+
+.size-display {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+  font-size: 10px;
+  color: var(--muted);
+}
+
 button{
   transition: all .3s ease;
   position: relative;
@@ -312,6 +349,7 @@ button:hover{
   box-shadow: 0 0 20px rgba(0,0,0,0.5);
   background: white;
   overflow: hidden;
+  transition: all 0.3s ease;
 }
 
 canvas{
@@ -441,6 +479,10 @@ canvas:hover {
     width: 100%;
     height: auto;
   }
+  
+  .size-display {
+    font-size: 9px;
+  }
 }
 </style>
 </head>
@@ -474,6 +516,16 @@ canvas:hover {
         <option value="square">Kotak</option>
         <option value="dots">Titik</option>
       </select>
+    </div>
+    
+    <div class="input-group">
+      <label for="sizeInput">UKURAN QR</label>
+      <input type="range" id="sizeInput" min="128" max="512" step="32" value="256">
+      <div class="size-display">
+        <span>128px</span>
+        <span id="sizeValue">256px</span>
+        <span>512px</span>
+      </div>
     </div>
     
     <div class="input-group">
@@ -575,6 +627,8 @@ const textInput = document.getElementById('textInput');
 const colorInput = document.getElementById('colorInput');
 const bgInput = document.getElementById('bgInput');
 const styleSelect = document.getElementById('styleSelect');
+const sizeInput = document.getElementById('sizeInput');
+const sizeValue = document.getElementById('sizeValue');
 const logoInput = document.getElementById('logoInput');
 const logoPreview = document.getElementById('logoPreview');
 const generateBtn = document.getElementById('generateBtn');
@@ -583,6 +637,11 @@ const backBtn = document.getElementById('backBtn');
 const canvas = document.getElementById('qrCanvas');
 
 let logoImage = null;
+
+// Update size display
+sizeInput.addEventListener('input', function() {
+  sizeValue.textContent = this.value + 'px';
+});
 
 // Handle logo upload
 logoInput.addEventListener('change', function(e) {
@@ -609,9 +668,22 @@ logoInput.addEventListener('change', function(e) {
 });
 
 function generateQR(){
+  // Get current size
+  const size = parseInt(sizeInput.value);
+  
+  // Set canvas size
+  canvas.width = size;
+  canvas.height = size;
+  
+  // Update container size
+  const container = canvas.parentElement;
+  container.style.width = size + 'px';
+  container.style.height = size + 'px';
+  
   const options = {
     errorCorrectionLevel: 'H',
     type: 'canvas',
+    width: size,
     color: {
       dark: colorInput.value,
       light: bgInput.value
@@ -636,13 +708,16 @@ function generateQR(){
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
       // Draw dots
-      for(let y=0; y<canvas.height; y+=8){
-        for(let x=0; x<canvas.width; x+=8){
+      const dotSize = Math.max(2, Math.floor(size / 32));
+      const step = Math.max(4, Math.floor(size / 64) * 4);
+      
+      for(let y=0; y<canvas.height; y+=step){
+        for(let x=0; x<canvas.width; x+=step){
           const i = (y*canvas.width + x)*4;
           if(imgData.data[i]===0){
             ctx.fillStyle = colorInput.value;
             ctx.beginPath();
-            ctx.arc(x+4, y+4, 3, 0, Math.PI*2);
+            ctx.arc(x+step/2, y+step/2, dotSize, 0, Math.PI*2);
             ctx.fill();
           }
         }
@@ -652,9 +727,9 @@ function generateQR(){
     // Add logo if available
     if(logoImage) {
       const ctx = canvas.getContext('2d');
-      const logoSize = Math.min(canvas.width, canvas.height) * 0.25; // 25% of canvas size
-      const x = (canvas.width - logoSize) / 2;
-      const y = (canvas.height - logoSize) / 2;
+      const logoSize = size * 0.25; // 25% of canvas size
+      const x = (size - logoSize) / 2;
+      const y = (size - logoSize) / 2;
       
       // Draw a white circle background for the logo
       ctx.beginPath();

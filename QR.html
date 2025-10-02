@@ -147,7 +147,7 @@ body::before {
   border: 3px solid rgba(60, 224, 195, 0.3);
   border-radius: 16px;
   padding: 30px;
-  max-width: 420px;
+  max-width: 480px;
   width: 100%;
   text-align:center;
   box-shadow: 
@@ -199,6 +199,22 @@ h1::after {
   border-radius: 3px;
 }
 
+.input-group {
+  margin: 12px 0;
+  width: 85%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+label {
+  display: block;
+  text-align: left;
+  margin-bottom: 6px;
+  font-size: 10px;
+  color: var(--accent-2);
+  text-shadow: 0 0 5px rgba(124, 92, 255, 0.3);
+}
+
 input, select, button{
   font-family:"Press Start 2P";
   margin:8px 0;
@@ -208,10 +224,8 @@ input, select, button{
   background: linear-gradient(to bottom, var(--box), #0d1420);
   color:var(--accent-2);
   font-size:12px;
-  width:85%;
+  width:100%;
   display:block;
-  margin-left:auto;
-  margin-right:auto;
   cursor:pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 10px rgba(0,0,0,0.3);
@@ -227,6 +241,12 @@ input[type="color"] {
   height: 45px;
   padding: 5px;
   cursor: pointer;
+}
+
+input[type="file"] {
+  padding: 8px;
+  background: var(--box);
+  border: 2px dashed rgba(60, 224, 195, 0.3);
 }
 
 button{
@@ -283,13 +303,20 @@ button:hover{
   box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
 }
 
-canvas{
-  margin:20px 0;
-  border:4px solid var(--accent);
-  image-rendering:pixelated;
+.canvas-container {
+  position: relative;
+  display: inline-block;
+  margin: 20px 0;
+  border: 4px solid var(--accent);
   border-radius: 8px;
   box-shadow: 0 0 20px rgba(0,0,0,0.5);
   background: white;
+  overflow: hidden;
+}
+
+canvas{
+  display: block;
+  image-rendering: pixelated;
   max-width: 100%;
   height: auto;
   transition: transform 0.3s ease;
@@ -321,6 +348,31 @@ canvas:hover {
 @keyframes scan {
   0% { top: -100%; }
   100% { top: 100%; }
+}
+
+/* Logo preview */
+.logo-preview {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  margin: 10px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--box);
+  overflow: hidden;
+}
+
+.logo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.logo-preview span {
+  color: var(--muted);
+  font-size: 10px;
 }
 
 /* Decorative elements */
@@ -381,6 +433,10 @@ canvas:hover {
     padding: 8px;
   }
   
+  .input-group {
+    width: 90%;
+  }
+  
   canvas {
     width: 100%;
     height: auto;
@@ -396,17 +452,46 @@ canvas:hover {
   
   <div class="container">
     <h1>QR CODE GENERATOR</h1>
-    <input type="text" id="textInput" placeholder="Masukkan teks atau URL">
-    <input type="color" id="colorInput" value="#3ce0c3">
-    <input type="color" id="bgInput" value="#ffffff">
-    <select id="styleSelect">
-      <option value="square">Kotak</option>
-      <option value="dots">Titik</option>
-    </select>
-    <button id="generateBtn">GENERATE QR</button>
-    <div class="qr-container">
-      <canvas id="qrCanvas" width="256" height="256"></canvas>
+    
+    <div class="input-group">
+      <label for="textInput">TEKS/URL</label>
+      <input type="text" id="textInput" placeholder="Masukkan teks atau URL">
     </div>
+    
+    <div class="input-group">
+      <label for="colorInput">WARNA QR</label>
+      <input type="color" id="colorInput" value="#3ce0c3">
+    </div>
+    
+    <div class="input-group">
+      <label for="bgInput">WARNA LATAR</label>
+      <input type="color" id="bgInput" value="#ffffff">
+    </div>
+    
+    <div class="input-group">
+      <label for="styleSelect">GAYA QR</label>
+      <select id="styleSelect">
+        <option value="square">Kotak</option>
+        <option value="dots">Titik</option>
+      </select>
+    </div>
+    
+    <div class="input-group">
+      <label for="logoInput">LOGO (Opsional)</label>
+      <input type="file" id="logoInput" accept="image/*">
+      <div class="logo-preview" id="logoPreview">
+        <span>+</span>
+      </div>
+    </div>
+    
+    <button id="generateBtn">GENERATE QR</button>
+    
+    <div class="qr-container">
+      <div class="canvas-container">
+        <canvas id="qrCanvas" width="256" height="256"></canvas>
+      </div>
+    </div>
+    
     <button id="downloadBtn">DOWNLOAD PNG</button>
     <button id="backBtn">KEMBALI</button>
   </div>
@@ -490,10 +575,38 @@ const textInput = document.getElementById('textInput');
 const colorInput = document.getElementById('colorInput');
 const bgInput = document.getElementById('bgInput');
 const styleSelect = document.getElementById('styleSelect');
+const logoInput = document.getElementById('logoInput');
+const logoPreview = document.getElementById('logoPreview');
 const generateBtn = document.getElementById('generateBtn');
 const downloadBtn = document.getElementById('downloadBtn');
 const backBtn = document.getElementById('backBtn');
 const canvas = document.getElementById('qrCanvas');
+
+let logoImage = null;
+
+// Handle logo upload
+logoInput.addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const img = new Image();
+      img.onload = function() {
+        logoImage = img;
+        // Update preview
+        logoPreview.innerHTML = '';
+        const previewImg = document.createElement('img');
+        previewImg.src = event.target.result;
+        logoPreview.appendChild(previewImg);
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  } else {
+    logoImage = null;
+    logoPreview.innerHTML = '<span>+</span>';
+  }
+});
 
 function generateQR(){
   const options = {
@@ -511,8 +624,9 @@ function generateQR(){
   
   QRCode.toCanvas(canvas, textInput.value || ' ', options, function (error) {
     if (error) console.error(error);
-    // jika style dots
-    if(styleSelect.value==='dots'){
+    
+    // Apply dot style if selected
+    if(styleSelect.value === 'dots'){
       const ctx = canvas.getContext('2d');
       const imgData = ctx.getImageData(0,0,canvas.width,canvas.height);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -533,6 +647,23 @@ function generateQR(){
           }
         }
       }
+    }
+    
+    // Add logo if available
+    if(logoImage) {
+      const ctx = canvas.getContext('2d');
+      const logoSize = Math.min(canvas.width, canvas.height) * 0.25; // 25% of canvas size
+      const x = (canvas.width - logoSize) / 2;
+      const y = (canvas.height - logoSize) / 2;
+      
+      // Draw a white circle background for the logo
+      ctx.beginPath();
+      ctx.arc(x + logoSize/2, y + logoSize/2, logoSize/2 + 5, 0, Math.PI * 2);
+      ctx.fillStyle = bgInput.value;
+      ctx.fill();
+      
+      // Draw the logo
+      ctx.drawImage(logoImage, x, y, logoSize, logoSize);
     }
   });
 }

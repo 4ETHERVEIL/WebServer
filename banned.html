@@ -3,38 +3,148 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Akses Diblokir — KENTANGCLOUD</title>
+<title>Akses Diblokir — NoxiusCloud</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
 <style>
-  :root{
-    --bg:#070707;
-    --panel:#0f0f0f;
-    --accent:#ff0044;
-    --muted:#cfcfcf;
-    --neon:#ff4d4d;
+  :root {
+    --bg: #070707;
+    --panel: #0f0f0f;
+    --accent: #ff0044;
+    --muted: #cfcfcf;
+    --neon: #ff4d4d;
+    --warning: #ffcc00;
   }
-  html,body{height:100%;margin:0;font-family:"Press Start 2P",monospace;background:linear-gradient(180deg,#030303 0%,#0b0b0b 50%,#050505 100%);color:var(--muted);overflow:hidden;}
-  .center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(920px,92%);background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:6px solid #fff;border-radius:8px;padding:28px;box-shadow:0 10px 0 rgba(0,0,0,0.6),8px 8px 0 rgba(0,0,0,0.4);text-align:center;animation:neonFlicker 1.8s linear infinite;}
-  .title{color:var(--neon);font-size:18px;margin-bottom:12px;}
-  .big{font-size:13px;color:#fff;margin-bottom:14px;}
-  .reason{font-size:10px;margin-bottom:18px;}
-  .countdown{font-size:12px;color:#ffcc00;padding:12px 18px;border:4px solid #ffcc00;display:inline-block;border-radius:6px;background:#111;margin-bottom:14px;}
-  .hint{font-size:9px;color:#9a9a9a;margin-top:10px;}
-  @keyframes neonFlicker{0%{box-shadow:0 0 6px rgba(255,77,77,0.35);}50%{box-shadow:0 0 18px rgba(255,77,77,0.65);}100%{box-shadow:0 0 6px rgba(255,77,77,0.35);}}
-  .fall-container{pointer-events:none;position:fixed;inset:0;overflow:hidden;z-index:10;}
-  .emoji{position:absolute;top:-10%;font-size:28px;filter:drop-shadow(0 6px 6px rgba(0,0,0,0.7));animation-name:fall,sway,fade;animation-timing-function:linear;animation-iteration-count:1;}
-  @keyframes fall{0%{transform:translateY(-120vh) rotate(0deg);}100%{transform:translateY(120vh) rotate(720deg);}}
-  @keyframes sway{0%{transform:translateX(0);}50%{transform:translateX(30px);}100%{transform:translateX(-10px);}}
-  @keyframes fade{0%{opacity:0;transform:scale(0.6);}10%{opacity:1;transform:scale(1);}80%{opacity:1;}100%{opacity:0;transform:scale(1.3);}}
+  html, body {
+    height: 100%;
+    margin: 0;
+    font-family: "Press Start 2P", monospace;
+    background: linear-gradient(180deg, #030303 0%, #0b0b0b 50%, #050505 100%);
+    color: var(--muted);
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .center {
+    position: relative;
+    width: min(920px, 92%);
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    border: 6px solid #fff;
+    border-radius: 8px;
+    padding: 32px;
+    box-shadow:
+      0 10px 0 rgba(0,0,0,0.6),
+      8px 8px 0 rgba(0,0,0,0.4),
+      0 0 12px rgba(255,77,77,0.4);
+    text-align: center;
+    animation: neonFlicker 2s ease-in-out infinite;
+    z-index: 5;
+  }
+  .title {
+    color: var(--neon);
+    font-size: 20px;
+    margin-bottom: 16px;
+    text-shadow: 0 0 8px rgba(255,77,77,0.7);
+  }
+  .big {
+    font-size: 14px;
+    color: #fff;
+    margin-bottom: 18px;
+    line-height: 1.4;
+  }
+  .reason {
+    font-size: 10px;
+    margin-bottom: 24px;
+    color: #aaa;
+    line-height: 1.5;
+  }
+  .countdown {
+    font-size: 13px;
+    color: var(--warning);
+    padding: 14px 20px;
+    border: 4px solid var(--warning);
+    display: inline-block;
+    border-radius: 6px;
+    background: #111;
+    margin: 20px 0;
+    font-weight: bold;
+    text-shadow: 0 0 6px rgba(255,204,0,0.5);
+  }
+  .hint {
+    font-size: 9px;
+    color: #888;
+    margin-top: 16px;
+    line-height: 1.4;
+  }
+  .btn {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 10px 20px;
+    border-radius: 6px;
+    background: var(--neon);
+    color: #fff;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 12px;
+    border: 0;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .btn:hover {
+    opacity: 0.9;
+  }
+  .btn-secondary {
+    background: #444;
+    border: 2px solid #666;
+    color: #fff;
+  }
 
-  /* tombol & input (tambahkan "1" agar tidak tabrakan) */
-  .btn1 { display:inline-block;margin-top:12px;padding:10px 14px;border-radius:6px;background:var(--neon);color:#fff;text-decoration:none;font-family:inherit;font-size:12px;border:0;cursor:pointer; }
-  .btn-secondary1 { background:#444;color:#fff;border:2px solid #666; }
-  .input1 { display:inline-block;margin-top:10px;padding:10px 8px;border-radius:6px;background:#111;border:2px solid #333;color:var(--muted);font-family:inherit;font-size:12px; width:220px; text-align:center; }
-  .msg1 { margin-top:10px;color:#ff9999;font-size:12px; min-height:18px; }
-  @media(max-width:480px){ .title{font-size:14px} .countdown{font-size:11px} .emoji{font-size:22px} .input1{width:160px} }
+  @keyframes neonFlicker {
+    0%, 100% { box-shadow: 0 0 8px rgba(255,77,77,0.4); }
+    50% { box-shadow: 0 0 20px rgba(255,77,77,0.8); }
+  }
+
+  .fall-container {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    z-index: 1;
+  }
+  .emoji {
+    position: absolute;
+    top: -10%;
+    font-size: 28px;
+    filter: drop-shadow(0 6px 6px rgba(0,0,0,0.7));
+    animation-name: fall, sway, fade;
+    animation-timing-function: linear;
+    animation-iteration-count: 1;
+  }
+  @keyframes fall {
+    0% { transform: translateY(-120vh) rotate(0deg); }
+    100% { transform: translateY(120vh) rotate(720deg); }
+  }
+  @keyframes sway {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(30px); }
+    100% { transform: translateX(-10px); }
+  }
+  @keyframes fade {
+    0% { opacity: 0; transform: scale(0.6); }
+    10% { opacity: 1; transform: scale(1); }
+    80% { opacity: 1; }
+    100% { opacity: 0; transform: scale(1.3); }
+  }
+
+  @media (max-width: 480px) {
+    .title { font-size: 14px; }
+    .big { font-size: 12px; }
+    .countdown { font-size: 11px; padding: 10px 16px; }
+    .emoji { font-size: 22px; }
+    .center { padding: 20px; }
+  }
 </style>
 </head>
 <body>
@@ -43,177 +153,93 @@
   <div class="center" role="alert" aria-live="assertive">
     <div class="title">⚠️ AKSES DIBLOKIR</div>
     <div class="big">Situs ini diblokir sementara</div>
-    <div class="reason" id="reasonText">Terlalu banyak percobaan akses developer tools / tindakan mencurigakan terdeteksi.</div>
+    <div class="reason" id="reasonText">Terlalu banyak percobaan akses developer tools atau aktivitas mencurigakan terdeteksi.</div>
     <div class="countdown" id="countdown">Memuat waktu...</div>
-    <div id="actionArea" class="hint">Halaman akan otomatis kembali normal setelah blokir berakhir.</div>
+    <div class="hint">Halaman akan otomatis kembali normal setelah blokir berakhir.</div>
+    <button class="btn btn-secondary" id="btnBack" style="display:none;">Kembali ke Beranda</button>
   </div>
 
 <script>
-/*
-  banned.html:
-  - Membaca localStorage.blockedUntil (diset oleh guard page)
-  - Jika ada, tampilkan countdown + form password untuk unlock
-  - Jika tidak ada -> tombol kembali
-  - Submit password: POST ke ../api/check-password.js { key, password }
-    - jika success -> hapus blockedUntil, redirect ke index.html
-    - jika fail -> tampil pesan error
-*/
-
-// emoji tetap
+// Emoji untuk efek jatuh
 const emojis = ['⚠️','❌','💀','💣','☠️'];
 
-// util
 const qs = id => document.getElementById(id);
 const formatTime = ms => {
-  if(ms <= 0) return '0 menit 0 detik';
-  const m = Math.floor(ms / (1000*60));
-  const s = Math.floor((ms % (1000*60)) / 1000);
+  if (ms <= 0) return '0 menit 0 detik';
+  const m = Math.floor(ms / (1000 * 60));
+  const s = Math.floor((ms % (1000 * 60)) / 1000);
   return `${m} menit ${s} detik`;
 };
 
 const countdownEl = qs('countdown');
-const actionArea = qs('actionArea');
+const btnBack = qs('btnBack');
 
-// read blockedUntil (guard harus menyet ini)
+// Baca waktu blokir dari localStorage
 let raw = localStorage.getItem('blockedUntil');
-if(!raw){
-  // tidak ada data blokir
+
+if (!raw) {
+  // Tidak ada data blokir
   countdownEl.textContent = 'Tidak ada data blokir.';
-  actionArea.innerHTML = '<button class="btn1 btn-secondary1" id="btnBack">Kembali ke Beranda</button>';
-  qs('btnBack').addEventListener('click', ()=>{ window.location.href = 'index.html'; });
+  btnBack.style.display = 'inline-block';
 } else {
   let blockedUntil = parseInt(raw, 10);
-  if(isNaN(blockedUntil) || blockedUntil <= Date.now()){
-    // expired / invalid
+  if (isNaN(blockedUntil) || blockedUntil <= Date.now()) {
+    // Sudah kadaluarsa
     localStorage.removeItem('blockedUntil');
-    countdownEl.textContent = 'Blokir tidak ditemukan atau sudah berakhir.';
-    actionArea.innerHTML = '<button class="btn1" id="btnBack2">Kembali ke Beranda</button>';
-    qs('btnBack2').addEventListener('click', ()=>{ window.location.href = 'index.html'; });
+    countdownEl.textContent = '✅ Blokir telah berakhir.';
+    btnBack.style.display = 'inline-block';
   } else {
-    // valid: tampilkan countdown + input password
-    actionArea.innerHTML = `
-      <div>
-        <input id="pwInput1" class="input1" type="password" placeholder="Masukkan password unlock" aria-label="Password unlock" />
-      </div>
-      <div>
-        <button id="pwOk1" class="btn1">OK</button>
-        <button id="pwCancel1" class="btn1 btn-secondary1">Batal</button>
-      </div>
-      <div class="msg1" id="pwMsg1"></div>
-    `;
-
-    // countdown loop
+    // Masih aktif: countdown
     let intervalId = null;
-    function update(){
+    const update = () => {
       const rem = blockedUntil - Date.now();
-      if(rem <= 0){
+      if (rem <= 0) {
         clearInterval(intervalId);
         localStorage.removeItem('blockedUntil');
         countdownEl.textContent = '✅ Blokir selesai — Anda dapat kembali.';
-        actionArea.innerHTML = '<button class="btn1" id="btnReturn1">Kembali ke Beranda</button>';
-        qs('btnReturn1').addEventListener('click', ()=> window.location.href = 'index.html');
+        btnBack.style.display = 'inline-block';
         return;
       }
       countdownEl.textContent = formatTime(rem);
-    }
+    };
     update();
     intervalId = setInterval(update, 1000);
-
-    // handlers for password input
-    const pwOk = qs('pwOk1');
-    const pwCancel = qs('pwCancel1');
-    const pwInput = qs('pwInput1');
-    const pwMsg = qs('pwMsg1');
-
-    // key used by your API (must match ../api/check-password.js)
-    const KEY = 'ddos';
-
-    pwOk.addEventListener('click', submitPassword);
-    pwInput.addEventListener('keydown', e => { if(e.key === 'Enter') submitPassword(); });
-
-    pwCancel.addEventListener('click', ()=> {
-      pwInput.value = '';
-      pwMsg.textContent = '';
-    });
-
-    let pending = false;
-    function setPending(v){
-      pending = v;
-      pwOk.disabled = v;
-      pwCancel.disabled = v;
-      pwInput.disabled = v;
-      pwOk.style.opacity = v ? '0.6' : '1';
-      pwCancel.style.opacity = v ? '0.6' : '1';
-    }
-
-    async function submitPassword(){
-      if(pending) return;
-      const pass = (pwInput.value || '').trim();
-      if(!pass){
-        pwMsg.textContent = 'Masukkan password terlebih dahulu.';
-        return;
-      }
-      setPending(true);
-      pwMsg.textContent = 'Memeriksa...';
-      try {
-        const resp = await fetch('../api/pew_error.js', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ key: KEY, password: pass })
-        });
-        // server returns 200 with {status:"success"} or {status:"fail"}
-        if(!resp.ok){
-          pwMsg.textContent = 'Server error. Coba lagi nanti.';
-          setPending(false);
-          return;
-        }
-        const data = await resp.json();
-        if(data && data.status === 'success'){
-          // unlock: hapus blockedUntil dan redirect
-          localStorage.removeItem('blockedUntil');
-          pwMsg.textContent = '✅ Password benar — sedang diarahkan...';
-          setTimeout(()=> window.location.href = 'index.html', 700);
-        } else {
-          pwMsg.textContent = '❌ Password salah.';
-          setPending(false);
-        }
-      } catch(err){
-        pwMsg.textContent = 'Gagal koneksi. Coba lagi.';
-        setPending(false);
-      }
-    }
   }
 }
 
-// falling emoji effect (non-blocking)
+btnBack.addEventListener('click', () => {
+  window.location.href = 'index.html';
+});
+
+// Efek emoji jatuh
 const fallContainer = qs('fall');
-function spawnEmoji(){
+function spawnEmoji() {
   const el = document.createElement('div');
   el.className = 'emoji';
   el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-  el.style.left = (Math.random()*100) + 'vw';
-  el.style.fontSize = (18 + Math.random()*28) + 'px';
-  const dur = 3500 + Math.random()*6000;
-  el.style.animationDuration = (dur/1000) + 's';
-  el.style.animationDelay = (Math.random()*0.6) + 's';
+  el.style.left = Math.random() * 100 + 'vw';
+  el.style.fontSize = (18 + Math.random() * 28) + 'px';
+  const dur = 3500 + Math.random() * 6000;
+  el.style.animationDuration = dur / 1000 + 's';
+  el.style.animationDelay = Math.random() * 0.6 + 's';
   fallContainer.appendChild(el);
-  el.addEventListener('animationend', ()=> el.remove());
+  el.addEventListener('animationend', () => el.remove());
 }
-(function loop(){
-  const burst = 1 + Math.floor(Math.random()*3);
-  for(let i=0;i<burst;i++) spawnEmoji();
-  setTimeout(loop, 350 + Math.random()*1200);
+
+(function loop() {
+  const burst = 1 + Math.floor(Math.random() * 3);
+  for (let i = 0; i < burst; i++) spawnEmoji();
+  setTimeout(loop, 350 + Math.random() * 1200);
 })();
 
-// proteksi ringan: cegah F12 / Ctrl+U di halaman banned
-document.addEventListener('keydown', function(e){
-  if(e.key === 'F12' || (e.ctrlKey && e.key.toLowerCase() === 'u')) {
+// Proteksi ringan: cegah F12 / Ctrl+U
+document.addEventListener('keydown', e => {
+  if (e.key === 'F12' || (e.ctrlKey && e.key.toLowerCase() === 'u')) {
     e.preventDefault();
-    // beri feedback singkat (kedip)
-    countdownEl.style.opacity = '0.9';
-    setTimeout(()=> countdownEl.style.opacity = '1', 200);
+    countdownEl.style.opacity = '0.7';
+    setTimeout(() => countdownEl.style.opacity = '1', 200);
   }
-}, {capture:true, passive:false});
+}, { capture: true, passive: false });
 </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login — Pixel Art</title>
+  <title>Menu Pilihan — Pixel Art</title>
   <link rel="icon" href="foto/foto.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
@@ -13,157 +13,281 @@
       --accent: #3ce0c3;
       --accent-2: #7c5cff;
       --muted: #b6c0d6;
+      --box: #121826;
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; background: #0b1220; color: var(--muted); font-family: "Press Start 2P", monospace; display: flex; align-items: center; justify-content: center; }
-    .login-container {
-      background: rgba(15, 23, 36, 0.8);
-      padding: 24px;
-      border: 3px solid var(--accent-2);
-      border-radius: 8px;
-      width: 90%;
-      max-width: 400px;
-      text-align: center;
+    html, body { height: 100%; }
+
+    /* Background gambar */
+    body {
+      font-family: "Press Start 2P", monospace;
+      background: url('https://i.imgur.com/nvdnNzi.jpeg') center/cover no-repeat fixed;
+      color: var(--muted);
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .login-container h2 {
-      color: var(--accent);
-      margin-bottom: 20px;
-      font-size: 16px;
-    }
-    .login-container input {
+
+    .container {
       width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      background: #071022;
-      border: 2px solid #3a4566;
-      color: white;
-      font-family: "Press Start 2P", monospace;
-      font-size: 10px;
+      max-width: 1100px;
+      background: rgba(11, 18, 32, 0.65);
+      border: 4px solid #071022;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
     }
-    .login-container button {
-      background: var(--accent-2);
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      margin-top: 16px;
-      font-family: "Press Start 2P", monospace;
-      font-size: 10px;
+
+    /* Glitch pada judul */
+    header h1 {
+      margin: 0 0 8px;
+      font-size: clamp(14px, 4vw, 18px); /* <-- INI VERSI LAMA (4vw, max 18px) */
+      color: var(--accent);
+      text-align: center;
+      position: relative;
+    }
+
+    header h1::before,
+    header h1::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    header h1::before {
+      color: #ff00c8;
+      clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+      animation: glitch-1 3s infinite;
+      opacity: 0.6;
+    }
+
+    header h1::after {
+      color: #00ffe5;
+      clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+      animation: glitch-2 3.2s infinite;
+      opacity: 0.6;
+    }
+
+    @keyframes glitch-1 {
+      0%, 95%, 100% { transform: translateX(0); }
+      96% { transform: translateX(-2px); }
+      98% { transform: translateX(2px); }
+    }
+
+    @keyframes glitch-2 {
+      0%, 95%, 100% { transform: translateX(0); }
+      96% { transform: translateX(2px); }
+      98% { transform: translateX(-2px); }
+    }
+
+    header p {
+      text-align: center;
+      font-size: clamp(7px, 2.4vw, 9px);
+      color: #93a0c0;
+      margin-bottom: 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 14px;
+    }
+
+    .box {
+      background: #0f1625;
+      border: 3px solid #071022;
+      border-radius: 6px;
+      padding: 14px;
+      height: 140px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.4);
     }
-    .error {
-      color: #ff5555;
+
+    .box:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent-2);
+      box-shadow: 0 6px 12px rgba(124, 92, 255, 0.3);
+    }
+
+    .box:hover .icon {
+      animation: glitch-icon 0.6s;
+    }
+
+    @keyframes glitch-icon {
+      0%, 100% { filter: hue-rotate(0deg); }
+      20% { filter: hue-rotate(10deg); }
+      40% { filter: hue-rotate(-10deg); }
+      60% { filter: hue-rotate(5deg); }
+    }
+
+    .icon {
+      font-size: 28px;
+      margin-bottom: 8px;
+      color: var(--accent-2);
+    }
+
+    .title {
+      font-size: clamp(8px, 2.6vw, 10px);
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .subtitle {
+      font-size: clamp(7px, 2.2vw, 8px);
+      color: #9fb1d6;
+      margin-top: 4px;
+    }
+
+    footer {
+      margin-top: 16px;
+      text-align: center;
+      font-size: clamp(7px, 2vw, 8px);
+      color: #8ea0c6;
+    }
+
+    @media (max-width: 360px) {
+      .box { height: 120px; padding: 10px; }
+      .icon { font-size: 24px; }
+    }
+
+    /* Popup */
+    #warningPopup1 {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    #warningPopup1 .popup-box1 {
+      background: #0f1625;
+      color: white;
+      padding: 18px;
+      border: 2px solid var(--accent-2);
+      border-radius: 8px;
+      max-width: 280px;
+      width: 90%;
+      text-align: center;
+      font-family: "Press Start 2P", monospace;
+      font-size: 10px;
+    }
+    #warningPopup1 button1 {
+      background: var(--accent-2);
+      border: none;
+      padding: 5px 10px;
+      color: white;
+      border-radius: 4px;
+      font-family: "Press Start 2P", monospace;
       font-size: 9px;
-      margin-top: 8px;
+      margin-top: 10px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div class="login-container">
-    <h2>LOGIN — NOXIUS PANEL</h2>
-    <input type="text" id="username" placeholder="Username" autocomplete="off">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">MASUK</button>
-    <div id="error" class="error"></div>
+
+  <div class="container" role="main">
+    <header>
+      <h1 data-text="PILIHAN — PIXEL PANEL">PILIHAN — PIXEL PANEL</h1>
+      <p>Pilih box untuk membuka file terkait. (Klik / tekan Enter pada kotak fokus)</p>
+    </header>
+
+    <div class="grid" id="menuGrid">
+      <div class="box" tabindex="0" data-target="QR.html">
+        <div class="icon">🗺️</div>
+        <div class="title">QR Generator</div>
+      </div>
+
+      <div class="box" tabindex="0" data-target="fake-tweet.html">
+        <div class="icon">🐦</div>
+        <div class="title">Fake Tweet</div>
+      </div>
+
+      <div class="box" tabindex="0" data-target="fake-iphone.html">
+        <div class="icon">💬</div>
+        <div class="title">eChat</div>
+        <div class="subtitle">Fake iPhone</div>
+      </div>
+
+      <div class="box" tabindex="0" data-target="spam-NGL.html">
+        <div class="icon">✉️</div>
+        <div class="title">Spam NGL</div>
+        <div class="subtitle">Anonymous Q&A</div>
+      </div>
+    </div>
+
+    <footer>
+      2025 Pixel Art Project<br>KentangDev.
+    </footer>
   </div>
 
-  <!-- Menu utama (sembunyikan dulu) -->
-  <div id="mainMenu" style="display:none;">
-    <!-- Isi dengan konten menu utama Anda di sini -->
+  <!-- Popup Peringatan -->
+  <div id="warningPopup1">
+    <div class="popup-box1">
+      <h21>⚠️ Peringatan!</h21>
+      <p1 id="warningMessage1"></p1>
+      <button1 onclick="closeWarning1()">OK</button1>
+    </div>
   </div>
 
   <script>
-    // Simpan menu utama sebagai string (copy dari body lama)
-    const mainMenuHTML = `
-      <div class="container" role="main">
-        <header>
-          <h1 data-text="PILIHAN — NOXIUS PANEL">PILIHAN — NOXIUS PANEL</h1>
-          <p>Pilih box untuk membuka file terkait. (Klik / tekan Enter pada kotak fokus)</p>
-        </header>
-        <div class="grid" id="menuGrid">
-          <div class="box" tabindex="0" data-target="QR.html">
-            <div class="icon">🗺️</div>
-            <div class="title">QR Generator</div>
-          </div>
-          <div class="box" tabindex="0" data-target="fake-tweet.html">
-            <div class="icon">🐦</div>
-            <div class="title">Fake Tweet</div>
-          </div>
-          <div class="box" tabindex="0" data-target="fake-iphone.html">
-            <div class="icon">💬</div>
-            <div class="title">eChat</div>
-            <div class="subtitle">Fake iPhone</div>
-          </div>
-          <div class="box" tabindex="0" data-target="spam-NGL.html">
-            <div class="icon">✉️</div>
-            <div class="title">Spam NGL</div>
-            <div class="subtitle">Anonymous Q&A</div>
-          </div>
-        </div>
-        <footer>2025 Pixel Art Project<br>NoxiusDev.</footer>
-      </div>
-    `;
-
-    async function login() {
-      const user = document.getElementById('username').value.trim();
-      const pass = document.getElementById('password').value;
-      const errorEl = document.getElementById('error');
-
-      if (!user || !pass) {
-        errorEl.textContent = "Username dan password wajib diisi!";
-        return;
-      }
-
-      // Generate device fingerprint (sederhana)
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      ctx.textBaseline = "top";
-      ctx.font = "14px Arial";
-      ctx.fillText("noxius-fp", 2, 2);
-      const fp = canvas.toDataURL();
-
-      const res = await fetch('https://tools-noxius.vercel.app/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: user, password: pass, fingerprint: fp })
-      });
-
-      const data = await res.json();
-
-      if (res.ok && data.uid) {
-        localStorage.setItem('noxius_uid', data.uid);
-        localStorage.setItem('noxius_user', user);
-        document.querySelector('.login-container').style.display = 'none';
-        document.getElementById('mainMenu').innerHTML = mainMenuHTML;
-        document.getElementById('mainMenu').style.display = 'block';
-
-        // Pasang event listener untuk menu
-        document.querySelectorAll('.box').forEach(box => {
-          box.addEventListener('click', () => {
-            const t = box.dataset.target;
-            if (t) window.location.href = t;
-          });
-          box.addEventListener('keydown', e => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              const t = box.dataset.target;
-              if (t) window.location.href = t;
-            }
-          });
-        });
-
-        // Anti-inspect (opsional, bisa dipindahkan ke main menu)
-        document.addEventListener('contextmenu', e => { e.preventDefault(); alert('Dilarang!'); });
+    const MAX_ATTEMPTS = 3;
+    function getAttempts() {
+      return parseInt(localStorage.getItem("inspectAttempts") || "0", 10);
+    }
+    function setAttempts(val) {
+      localStorage.setItem("inspectAttempts", val);
+    }
+    function addAttempt() {
+      let a = getAttempts() + 1;
+      setAttempts(a);
+      if (a >= MAX_ATTEMPTS) {
+        localStorage.setItem("blockedUntil", Date.now() + 120000);
+        window.location.href = "banned.html";
       } else {
-        errorEl.textContent = data.message || "Login gagal!";
+        document.getElementById("warningMessage1").innerText = `Peringatan (${a}/${MAX_ATTEMPTS})`;
+        document.getElementById("warningPopup1").style.display = "flex";
       }
     }
-
-    // Jika sudah login sebelumnya
-    if (localStorage.getItem('noxius_user')) {
-      document.querySelector('.login-container').style.display = 'none';
-      document.getElementById('mainMenu').innerHTML = mainMenuHTML;
-      document.getElementById('mainMenu').style.display = 'block';
+    function closeWarning1() {
+      document.getElementById("warningPopup1").style.display = "none";
     }
+
+    document.addEventListener('contextmenu', e => { e.preventDefault(); addAttempt(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'F12' || 
+          (e.ctrlKey && e.shiftKey && ['I','J'].includes(e.key.toUpperCase())) || 
+          (e.ctrlKey && e.key.toUpperCase() === 'U')) {
+        e.preventDefault(); addAttempt();
+      }
+    });
+
+    document.querySelectorAll('.box').forEach(box => {
+      box.addEventListener('click', () => {
+        const t = box.dataset.target;
+        if (t) window.location.href = t;
+      });
+      box.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const t = box.dataset.target;
+          if (t) window.location.href = t;
+        }
+      });
+    });
   </script>
 </body>
 </html>

@@ -247,7 +247,7 @@
     }
 
     /* Popup Peringatan */
-    #warningPopup1 {
+    #warningPopup1, #successPopup {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.7);
@@ -256,11 +256,11 @@
       justify-content: center;
       z-index: 9999;
     }
-    #warningPopup1 .popup-box1 {
+    #warningPopup1 .popup-box1,
+    #successPopup .popup-box {
       background: #0f1625;
       color: white;
       padding: 18px;
-      border: 2px solid var(--accent-2);
       border-radius: 8px;
       max-width: 280px;
       width: 90%;
@@ -268,8 +268,14 @@
       font-family: "Press Start 2P", monospace;
       font-size: 10px;
     }
-    #warningPopup1 button1 {
-      background: var(--accent-2);
+    #warningPopup1 .popup-box1 {
+      border: 2px solid var(--accent-2);
+    }
+    #successPopup .popup-box {
+      border: 2px solid var(--accent);
+    }
+    #warningPopup1 button1,
+    #successPopup button {
       border: none;
       padding: 5px 10px;
       color: white;
@@ -278,6 +284,12 @@
       font-size: 9px;
       margin-top: 10px;
       cursor: pointer;
+    }
+    #warningPopup1 button1 {
+      background: var(--accent-2);
+    }
+    #successPopup button {
+      background: var(--accent);
     }
   </style>
 </head>
@@ -380,6 +392,15 @@
       <h21>⚠️ Peringatan!</h21>
       <p1 id="warningMessage1"></p1>
       <button1 onclick="closeWarning1()">OK</button1>
+    </div>
+  </div>
+
+  <!-- Notifikasi Sukses Reset Password -->
+  <div id="successPopup">
+    <div class="popup-box">
+      <h2>✅ Sukses!</h2>
+      <p id="successMessage"></p>
+      <button onclick="closeSuccessPopup()">Oke</button>
     </div>
   </div>
 
@@ -489,8 +510,7 @@
 
       auth.sendPasswordResetEmail(email)
         .then(() => {
-          alert("✅ Link reset password telah dikirim ke email Anda.\nPeriksa folder spam jika tidak muncul.");
-          showLogin();
+          showSuccess("Link reset password telah dikirim ke email Anda.\nPeriksa folder spam jika tidak muncul.");
         })
         .catch(err => {
           let msg = "Gagal mengirim email reset.";
@@ -505,6 +525,21 @@
 
     function logout() {
       auth.signOut().then(() => showLogin());
+    }
+
+    // === POPUP FUNCTIONS ===
+    function closeWarning1() {
+      document.getElementById("warningPopup1").style.display = "none";
+    }
+
+    function showSuccess(message) {
+      document.getElementById("successMessage").textContent = message;
+      document.getElementById("successPopup").style.display = "flex";
+    }
+
+    function closeSuccessPopup() {
+      document.getElementById("successPopup").style.display = "none";
+      showLogin();
     }
 
     // === ON AUTH STATE CHANGE ===
@@ -541,9 +576,6 @@
         document.getElementById("warningMessage1").innerText = `Peringatan (${a}/${MAX_ATTEMPTS})`;
         document.getElementById("warningPopup1").style.display = "flex";
       }
-    }
-    function closeWarning1() {
-      document.getElementById("warningPopup1").style.display = "none";
     }
 
     document.addEventListener('contextmenu', e => { e.preventDefault(); addAttempt(); });

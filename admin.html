@@ -37,7 +37,7 @@
 
     .container {
       width: 100%;
-      max-width: 1000px;
+      max-width: 1100px;
       background: rgba(11, 18, 32, 0.75);
       border: 4px solid #071022;
       padding: 20px;
@@ -57,7 +57,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 9px;
+      font-size: 8px;
     }
 
     th, td {
@@ -78,10 +78,10 @@
       background: var(--accent-2);
       color: white;
       border: none;
-      padding: 4px 8px;
+      padding: 3px 6px;
       font-family: "Press Start 2P", monospace;
-      font-size: 8px;
-      border-radius: 4px;
+      font-size: 7px;
+      border-radius: 3px;
       cursor: pointer;
       transition: transform 0.1s;
     }
@@ -155,6 +155,16 @@
       font-size: 9px;
       margin-top: 8px;
     }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-size: 7px;
+      background: #0f1625;
+      border: 1px solid var(--accent-2);
+    }
+    .verified { border-color: var(--accent); }
   </style>
 </head>
 <body>
@@ -162,16 +172,16 @@
   <!-- Login Admin -->
   <div id="loginContainer">
     <div class="login-box">
-      <h1>ADMIN LOGIN</h1>
+      <h1>🔐 ADMIN LOGIN</h1>
       <div class="form-group">
-        <label for="adminEmail">EMAIL</label>
+        <label for="adminEmail">EMAIL ADMIN</label>
         <input type="email" id="adminEmail" placeholder="admin@noxius.dev" autocomplete="off" />
       </div>
       <div class="form-group">
-        <label for="adminPassword">PASSWORD</label>
-        <input type="password" id="adminPassword" />
+        <label for="adminPassword">PASSWORD ADMIN</label>
+        <input type="password" id="adminPassword" placeholder="••••••••" />
       </div>
-      <button class="btn" onclick="adminLogin()">LOGIN</button>
+      <button class="btn" onclick="adminLogin()">MASUK</button>
       <div id="adminError" class="error"></div>
     </div>
   </div>
@@ -185,7 +195,9 @@
         <tr>
           <th>UID</th>
           <th>EMAIL</th>
-          <th>UID Khusus</th>
+          <th>UID KHUSUS</th>
+          <th>PROVIDER</th>
+          <th>VERIFIED</th>
           <th>TGL DAFTAR</th>
           <th>AKSI</th>
         </tr>
@@ -196,6 +208,15 @@
     </table>
 
     <button class="logout-btn" onclick="adminLogout()">[LOGOUT]</button>
+  </div>
+
+  <!-- Popup Peringatan (Opsional) -->
+  <div id="warningPopup" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:9999;">
+    <div style="background:#0f1625;color:white;padding:18px;border:2px solid var(--accent-2);border-radius:8px;max-width:280px;width:90%;text-align:center;font-family:'Press Start 2P',monospace;font-size:10px;">
+      <h2 style="margin:0;">⚠️ Peringatan!</h2>
+      <p id="warningMessage"></p>
+      <button onclick="closeWarning()" style="background:var(--accent-2);border:none;padding:5px 10px;color:white;border-radius:4px;font-family:'Press Start 2P';font-size:9px;margin-top:10px;cursor:pointer;">OK</button>
+    </div>
   </div>
 
   <script>
@@ -214,19 +235,54 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
+    // === PROTEKSI DEVELOPER TOOLS (Opsional) ===
+    const MAX_ATTEMPTS = 3;
+    function getAttempts() {
+      return parseInt(localStorage.getItem("adminInspectAttempts") || "0", 10);
+    }
+    function setAttempts(val) {
+      localStorage.setItem("adminInspectAttempts", val);
+    }
+    function addAttempt() {
+      let a = getAttempts() + 1;
+      setAttempts(a);
+      if (a >= MAX_ATTEMPTS) {
+        document.getElementById("warningMessage").innerText = "Akses diblokir sementara.";
+        document.getElementById("warningPopup").style.display = "flex";
+        setTimeout(() => {
+          window.location.href = "../"; // Redirect ke halaman utama
+        }, 3000);
+      } else {
+        document.getElementById("warningMessage").innerText = `Peringatan (${a}/${MAX_ATTEMPTS})`;
+        document.getElementById("warningPopup").style.display = "flex";
+      }
+    }
+    function closeWarning() {
+      document.getElementById("warningPopup").style.display = "none";
+    }
+
+    document.addEventListener('contextmenu', e => { e.preventDefault(); addAttempt(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'F12' || 
+          (e.ctrlKey && e.shiftKey && ['I','J'].includes(e.key.toUpperCase())) || 
+          (e.ctrlKey && e.key.toUpperCase() === 'U')) {
+        e.preventDefault(); addAttempt();
+      }
+    });
+
     // === ADMIN LOGIN ===
     function adminLogin() {
       const email = document.getElementById("adminEmail").value.trim();
       const password = document.getElementById("adminPassword").value;
       if (!email || !password) {
-        showError("adminError", "Isi email & password!");
+        showError("adminError", "Isi email & password admin!");
         return;
       }
 
       auth.signInWithEmailAndPassword(email, password)
         .then(user => {
-          // Cek apakah email admin (opsional, bisa ditambah di rules)
-          if (user.user.email === "admin@noxius.dev") { // GANTI DENGAN EMAIL ADMIN ANDA
+          // ✅ Hanya izinkan email admin tertentu
+          if (user.user.email === "admin@noxius.dev") { // 🔑 GANTI DENGAN EMAIL ADMIN ANDA
             loadUsers();
           } else {
             showError("adminError", "Akses ditolak. Bukan admin.");
@@ -235,9 +291,11 @@
         })
         .catch(err => {
           let msg = "Login gagal!";
-          if (err.code === "auth/user-not-found") msg = "Akun tidak ditemukan.";
-          else if (err.code === "auth/wrong-password") msg = "Password salah.";
+          if (err.code === "auth/user-not-found") msg = "Akun admin tidak ditemukan.";
+          else if (err.code === "auth/wrong-password") msg = "Password admin salah.";
+          else if (err.code === "auth/invalid-email") msg = "Format email tidak valid.";
           showError("adminError", msg);
+          addAttempt(); // Tambah peringatan jika gagal login
         });
     }
 
@@ -246,6 +304,7 @@
         document.getElementById("loginContainer").style.display = "flex";
         document.getElementById("dashboard").style.display = "none";
         document.getElementById("userList").innerHTML = "";
+        document.getElementById("adminError").textContent = "";
       });
     }
 
@@ -253,7 +312,7 @@
       document.getElementById(id).textContent = msg;
     }
 
-    // === LOAD USERS FROM FIRESTORE ===
+    // === LOAD USERS ===
     async function loadUsers() {
       try {
         const snapshot = await db.collection("user_uids").get();
@@ -261,7 +320,7 @@
         userList.innerHTML = "";
 
         if (snapshot.empty) {
-          userList.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#9fb1d6;">Tidak ada pengguna</td></tr>`;
+          userList.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#9fb1d6;">Tidak ada pengguna</td></tr>`;
           document.getElementById("loginContainer").style.display = "none";
           document.getElementById("dashboard").style.display = "block";
           return;
@@ -270,10 +329,13 @@
         snapshot.forEach(doc => {
           const data = doc.data();
           const row = document.createElement("tr");
+          const isVerified = data.emailVerified ? "✅" : "❌";
           row.innerHTML = `
             <td title="${doc.id}">${doc.id.substring(0,8)}...</td>
             <td>${data.email || "–"}</td>
             <td>${data.shortUID || "–"}</td>
+            <td><span class="tag">email/password</span></td>
+            <td><span class="tag ${data.emailVerified ? 'verified' : ''}">${isVerified}</span></td>
             <td>${data.createdAt ? new Date(data.createdAt.toDate()).toLocaleDateString() : "–"}</td>
             <td>
               <button class="btn btn-delete" onclick="deleteUser('${doc.id}')">HAPUS</button>
@@ -286,23 +348,21 @@
         document.getElementById("dashboard").style.display = "block";
       } catch (err) {
         console.error("Gagal memuat data:", err);
-        showError("adminError", "Gagal memuat data pengguna.");
+        showError("adminError", "Gagal memuat data. Coba lagi.");
         auth.signOut();
       }
     }
 
-    // === HAPUS USER (Hanya untuk demo) ===
+    // === HAPUS USER ===
     async function deleteUser(uid) {
-      if (!confirm("Hapus akun ini? Tindakan tidak bisa dibatalkan!")) return;
+      if (!confirm("⚠️ Hapus akun ini?\nTindakan tidak bisa dibatalkan!")) return;
 
       try {
-        // Hapus data di Firestore
         await db.collection("user_uids").doc(uid).delete();
-        // Opsional: Hapus akun Firebase (butuh Cloud Function untuk aman)
-        alert("Data pengguna dihapus.");
-        loadUsers(); // Refresh
+        alert("✅ Data pengguna dihapus.");
+        loadUsers();
       } catch (err) {
-        alert("Gagal menghapus: " + err.message);
+        alert("❌ Gagal menghapus: " + err.message);
       }
     }
 

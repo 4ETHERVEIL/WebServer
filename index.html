@@ -121,7 +121,7 @@
       ctx.fillText("noxius-fp", 2, 2);
       const fp = canvas.toDataURL();
 
-      const res = await fetch('https://your-vercel-project.vercel.app/api/login', {
+      const res = await fetch('https://tools-noxius.vercel.app/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: user, password: pass, fingerprint: fp })

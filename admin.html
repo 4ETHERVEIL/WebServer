@@ -175,7 +175,7 @@
       <h1>🔐 ADMIN LOGIN</h1>
       <div class="form-group">
         <label for="adminEmail">EMAIL ADMIN</label>
-        <input type="email" id="adminEmail" placeholder="admin@noxius.dev" autocomplete="off" />
+        <input type="email" id="adminEmail" placeholder="zycho@noxius.dev" autocomplete="off" />
       </div>
       <div class="form-group">
         <label for="adminPassword">PASSWORD ADMIN</label>
@@ -282,7 +282,7 @@
       auth.signInWithEmailAndPassword(email, password)
         .then(user => {
           // ✅ Hanya izinkan email admin tertentu
-          if (user.user.email === "admin@noxius.dev") { // 🔑 GANTI DENGAN EMAIL ADMIN ANDA
+          if (user.user.email === "zycho@noxius.dev") { // 🔑 GANTI DENGAN EMAIL ADMIN ANDA
             loadUsers();
           } else {
             showError("adminError", "Akses ditolak. Bukan admin.");
@@ -368,7 +368,7 @@
 
     // === CEK STATUS LOGIN SAAT HALAMAN DIMUAT ===
     auth.onAuthStateChanged(user => {
-      if (user && user.email === "admin@noxius.dev") {
+      if (user && user.email === "zycho@noxius.dev") {
         loadUsers();
       } else {
         document.getElementById("loginContainer").style.display = "flex";

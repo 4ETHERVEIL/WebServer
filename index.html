@@ -246,7 +246,7 @@
       text-decoration: underline;
     }
 
-    /* Popup Peringatan */
+    /* Popup Peringatan & Sukses */
     #warningPopup1, #successPopup {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -377,13 +377,53 @@
       </div>
     </div>
 
-    <footer>
-      2025 Pixel Art Project<br>
-      NoxiusDev. | 
-      UID: <span id="uidDisplay"></span> • 
-      <span id="emailDisplay"></span><br>
-      <button style="background:transparent;border:none;color:var(--accent);font-family:'Press Start 2P';font-size:8px;margin-top:8px;cursor:pointer;" onclick="logout()">[LOGOUT]</button>
-    </footer>
+    <!-- UID & Email Container -->
+    <div style="margin-top:16px;display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;">
+
+      <!-- UID + Salin Button -->
+      <div style="display:flex;align-items:center;gap:8px;background:#0f1625;border:2px solid var(--accent-2);padding:8px 12px;border-radius:6px;width:90%;max-width:300px;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:4px;font-size:clamp(7px,2vw,8px);color:#9fb1d6;">
+          🔑 <span id="uidDisplay"></span>
+        </div>
+        <button 
+          onclick="copyUID()" 
+          style="background:var(--accent-2);color:white;border:none;padding:2px 6px;border-radius:4px;font-family:'Press Start 2P';font-size:7px;cursor:pointer;transition:all 0.2s;"
+          onmouseover="this.style.transform='scale(1.1)'" 
+          onmouseout="this.style.transform='scale(1)'">
+          SALIN
+        </button>
+      </div>
+
+      <!-- Email + Toggle Hide -->
+      <div style="display:flex;align-items:center;gap:8px;background:#0f1625;border:2px solid var(--accent-2);padding:8px 12px;border-radius:6px;width:90%;max-width:300px;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:4px;font-size:clamp(7px,2vw,8px);color:#9fb1d6;">
+          📧 <span id="emailDisplay" style="word-break:break-all;"></span>
+        </div>
+        <button 
+          onclick="toggleEmailVisibility()" 
+          style="background:transparent;border:1px solid var(--accent);color:var(--accent);padding:2px 6px;border-radius:4px;font-family:'Press Start 2P';font-size:7px;cursor:pointer;transition:all 0.2s;"
+          onmouseover="this.style.backgroundColor='rgba(124,92,255,0.2)'" 
+          onmouseout="this.style.backgroundColor='transparent'">
+          <span id="hideEmailText">HIDE</span>
+        </button>
+      </div>
+
+      <!-- Logout Button -->
+      <button 
+        onclick="logout()" 
+        style="background:transparent;border:none;color:var(--accent);font-family:'Press Start 2P';font-size:8px;margin-top:8px;cursor:pointer;padding:4px 8px;border:1px solid var(--accent);border-radius:4px;transition:all 0.2s;"
+        onmouseover="this.style.backgroundColor='rgba(124,92,255,0.2)'" 
+        onmouseout="this.style.backgroundColor='transparent'">
+        [LOGOUT]
+      </button>
+
+      <!-- Copyright -->
+      <div style="font-size:clamp(7px,2vw,8px);color:#8ea0c6;text-align:center;margin-top:8px;">
+        2025 Pixel Art Project<br>
+        NoxiusDev.
+      </div>
+
+    </div>
   </div>
 
   <!-- Popup Peringatan -->
@@ -395,7 +435,7 @@
     </div>
   </div>
 
-  <!-- Notifikasi Sukses Reset Password -->
+  <!-- Notifikasi Sukses -->
   <div id="successPopup">
     <div class="popup-box">
       <h2>✅ Sukses!</h2>
@@ -525,6 +565,33 @@
 
     function logout() {
       auth.signOut().then(() => showLogin());
+    }
+
+    // === FITUR BARU ===
+    function copyUID() {
+      const uid = document.getElementById("uidDisplay").textContent;
+      if (!uid) return;
+      navigator.clipboard.writeText(uid).then(() => {
+        showSuccess("✅ UID telah disalin ke clipboard!");
+      }).catch(() => {
+        showError("loginError", "Gagal menyalin UID.");
+      });
+    }
+
+    let isEmailHidden = false;
+    function toggleEmailVisibility() {
+      const emailEl = document.getElementById("emailDisplay");
+      const hideBtn = document.getElementById("hideEmailText");
+
+      if (isEmailHidden) {
+        emailEl.style.display = "inline";
+        hideBtn.textContent = "HIDE";
+        isEmailHidden = false;
+      } else {
+        emailEl.style.display = "none";
+        hideBtn.textContent = "SHOW";
+        isEmailHidden = true;
+      }
     }
 
     // === POPUP FUNCTIONS ===

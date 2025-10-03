@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Dashboard — Noxius Tools</title>
+  <link rel="icon" href="foto/foto.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #0f1724;
+      --accent: #3ce0c3;
+      --accent-2: #7c5cff;
+      --muted: #b6c0d6;
+      --box: #121826;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+
+    body {
+      font-family: "Press Start 2P", monospace;
+      background: url('https://i.imgur.com/nvdnNzi.jpeg') center/cover no-repeat fixed;
+      color: var(--muted);
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1000px;
+      background: rgba(11, 18, 32, 0.75);
+      border: 4px solid #071022;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+    }
+
+    h1 {
+      color: var(--accent);
+      font-size: clamp(14px, 4vw, 18px);
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9px;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #071022;
+    }
+
+    th {
+      color: var(--accent-2);
+    }
+
+    tr:hover {
+      background: rgba(124, 92, 255, 0.1);
+    }
+
+    .btn {
+      background: var(--accent-2);
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      font-family: "Press Start 2P", monospace;
+      font-size: 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+    }
+
+    .btn-delete {
+      background: #ff5555;
+    }
+
+    .logout-btn {
+      display: block;
+      margin: 16px auto 0;
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 4px 12px;
+      font-family: "Press Start 2P", monospace;
+      font-size: 9px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    /* Login Form */
+    #loginContainer {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .login-box {
+      background: rgba(11, 18, 32, 0.8);
+      border: 4px solid #071022;
+      padding: 24px;
+      border-radius: 8px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      backdrop-filter: blur(5px);
+    }
+    .form-group {
+      margin: 12px 0;
+    }
+    label {
+      display: block;
+      font-size: 10px;
+      margin-bottom: 6px;
+      color: #9fb1d6;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      background: #0f1625;
+      border: 2px solid #071022;
+      color: var(--muted);
+      font-family: "Press Start 2P", monospace;
+      font-size: 10px;
+      border-radius: 4px;
+      outline: none;
+    }
+    input:focus {
+      border-color: var(--accent-2);
+    }
+    .error {
+      color: #ff5555;
+      font-size: 9px;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Login Admin -->
+  <div id="loginContainer">
+    <div class="login-box">
+      <h1>ADMIN LOGIN</h1>
+      <div class="form-group">
+        <label for="adminEmail">EMAIL</label>
+        <input type="email" id="adminEmail" placeholder="admin@noxius.dev" autocomplete="off" />
+      </div>
+      <div class="form-group">
+        <label for="adminPassword">PASSWORD</label>
+        <input type="password" id="adminPassword" />
+      </div>
+      <button class="btn" onclick="adminLogin()">LOGIN</button>
+      <div id="adminError" class="error"></div>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard" class="container" style="display:none;">
+    <h1>NOXIUS TOOLS — ADMIN DASHBOARD</h1>
+    
+    <table id="userTable">
+      <thead>
+        <tr>
+          <th>UID</th>
+          <th>EMAIL</th>
+          <th>UID Khusus</th>
+          <th>TGL DAFTAR</th>
+          <th>AKSI</th>
+        </tr>
+      </thead>
+      <tbody id="userList">
+        <!-- Data akan diisi oleh JavaScript -->
+      </tbody>
+    </table>
+
+    <button class="logout-btn" onclick="adminLogout()">[LOGOUT]</button>
+  </div>
+
+  <script>
+    // ✅ KONFIGURASI FIREBASE ANDA
+    const firebaseConfig = {
+      apiKey: "AIzaSyC5HS7vsJVs9dtarPkzhQmiqNaeCKkJw_A",
+      authDomain: "noxius-panel.firebaseapp.com",
+      projectId: "noxius-panel",
+      storageBucket: "noxius-panel.firebasestorage.app",
+      messagingSenderId: "873696240519",
+      appId: "1:873696240519:web:401f9efb0d71b32363a922",
+      measurementId: "G-YNC6NQT179"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // === ADMIN LOGIN ===
+    function adminLogin() {
+      const email = document.getElementById("adminEmail").value.trim();
+      const password = document.getElementById("adminPassword").value;
+      if (!email || !password) {
+        showError("adminError", "Isi email & password!");
+        return;
+      }
+
+      auth.signInWithEmailAndPassword(email, password)
+        .then(user => {
+          // Cek apakah email admin (opsional, bisa ditambah di rules)
+          if (user.user.email === "admin@noxius.dev") { // GANTI DENGAN EMAIL ADMIN ANDA
+            loadUsers();
+          } else {
+            showError("adminError", "Akses ditolak. Bukan admin.");
+            auth.signOut();
+          }
+        })
+        .catch(err => {
+          let msg = "Login gagal!";
+          if (err.code === "auth/user-not-found") msg = "Akun tidak ditemukan.";
+          else if (err.code === "auth/wrong-password") msg = "Password salah.";
+          showError("adminError", msg);
+        });
+    }
+
+    function adminLogout() {
+      auth.signOut().then(() => {
+        document.getElementById("loginContainer").style.display = "flex";
+        document.getElementById("dashboard").style.display = "none";
+        document.getElementById("userList").innerHTML = "";
+      });
+    }
+
+    function showError(id, msg) {
+      document.getElementById(id).textContent = msg;
+    }
+
+    // === LOAD USERS FROM FIRESTORE ===
+    async function loadUsers() {
+      try {
+        const snapshot = await db.collection("user_uids").get();
+        const userList = document.getElementById("userList");
+        userList.innerHTML = "";
+
+        if (snapshot.empty) {
+          userList.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#9fb1d6;">Tidak ada pengguna</td></tr>`;
+          document.getElementById("loginContainer").style.display = "none";
+          document.getElementById("dashboard").style.display = "block";
+          return;
+        }
+
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td title="${doc.id}">${doc.id.substring(0,8)}...</td>
+            <td>${data.email || "–"}</td>
+            <td>${data.shortUID || "–"}</td>
+            <td>${data.createdAt ? new Date(data.createdAt.toDate()).toLocaleDateString() : "–"}</td>
+            <td>
+              <button class="btn btn-delete" onclick="deleteUser('${doc.id}')">HAPUS</button>
+            </td>
+          `;
+          userList.appendChild(row);
+        });
+
+        document.getElementById("loginContainer").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+      } catch (err) {
+        console.error("Gagal memuat data:", err);
+        showError("adminError", "Gagal memuat data pengguna.");
+        auth.signOut();
+      }
+    }
+
+    // === HAPUS USER (Hanya untuk demo) ===
+    async function deleteUser(uid) {
+      if (!confirm("Hapus akun ini? Tindakan tidak bisa dibatalkan!")) return;
+
+      try {
+        // Hapus data di Firestore
+        await db.collection("user_uids").doc(uid).delete();
+        // Opsional: Hapus akun Firebase (butuh Cloud Function untuk aman)
+        alert("Data pengguna dihapus.");
+        loadUsers(); // Refresh
+      } catch (err) {
+        alert("Gagal menghapus: " + err.message);
+      }
+    }
+
+    // === CEK STATUS LOGIN SAAT HALAMAN DIMUAT ===
+    auth.onAuthStateChanged(user => {
+      if (user && user.email === "admin@noxius.dev") {
+        loadUsers();
+      } else {
+        document.getElementById("loginContainer").style.display = "flex";
+        document.getElementById("dashboard").style.display = "none";
+      }
+    });
+  </script>
+</body>
+</html>

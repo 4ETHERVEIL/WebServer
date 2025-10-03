@@ -3,9 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Menu Pilihan — Noxius Tools</title>
+  <title>Login — Noxius Tools</title>
   <link rel="icon" href="foto/foto.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
   <style>
     :root {
       --bg: #0b1220;
@@ -19,7 +24,6 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
 
-    /* Background gambar */
     body {
       font-family: "Press Start 2P", monospace;
       background: url('https://i.imgur.com/nvdnNzi.jpeg') center/cover no-repeat fixed;
@@ -32,218 +36,271 @@
 
     .container {
       width: 100%;
-      max-width: 1100px;
-      background: rgba(11, 18, 32, 0.65);
+      max-width: 400px;
+      background: rgba(11, 18, 32, 0.75);
       border: 4px solid #071022;
-      padding: 20px;
+      padding: 24px;
       border-radius: 8px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(5px);
       -webkit-backdrop-filter: blur(5px);
+      text-align: center;
     }
 
-    /* Glitch pada judul */
-    header h1 {
-      margin: 0 0 8px;
-      font-size: clamp(14px, 4vw, 18px); /* <-- INI VERSI LAMA (4vw, max 18px) */
+    h1 {
       color: var(--accent);
-      text-align: center;
-      position: relative;
+      font-size: clamp(14px, 4vw, 18px);
+      margin-bottom: 20px;
     }
 
-    header h1::before,
-    header h1::after {
-      content: attr(data-text);
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+    .form-group {
+      margin: 12px 0;
     }
 
-    header h1::before {
-      color: #ff00c8;
-      clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
-      animation: glitch-1 3s infinite;
-      opacity: 0.6;
-    }
-
-    header h1::after {
-      color: #00ffe5;
-      clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
-      animation: glitch-2 3.2s infinite;
-      opacity: 0.6;
-    }
-
-    @keyframes glitch-1 {
-      0%, 95%, 100% { transform: translateX(0); }
-      96% { transform: translateX(-2px); }
-      98% { transform: translateX(2px); }
-    }
-
-    @keyframes glitch-2 {
-      0%, 95%, 100% { transform: translateX(0); }
-      96% { transform: translateX(2px); }
-      98% { transform: translateX(-2px); }
-    }
-
-    header p {
-      text-align: center;
-      font-size: clamp(7px, 2.4vw, 9px);
-      color: #93a0c0;
-      margin-bottom: 16px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-      gap: 14px;
-    }
-
-    .box {
-      background: #0f1625;
-      border: 3px solid #071022;
-      border-radius: 6px;
-      padding: 14px;
-      height: 140px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.4);
-    }
-
-    .box:hover {
-      transform: translateY(-4px);
-      border-color: var(--accent-2);
-      box-shadow: 0 6px 12px rgba(124, 92, 255, 0.3);
-    }
-
-    .box:hover .icon {
-      animation: glitch-icon 0.6s;
-    }
-
-    @keyframes glitch-icon {
-      0%, 100% { filter: hue-rotate(0deg); }
-      20% { filter: hue-rotate(10deg); }
-      40% { filter: hue-rotate(-10deg); }
-      60% { filter: hue-rotate(5deg); }
-    }
-
-    .icon {
-      font-size: 28px;
-      margin-bottom: 8px;
-      color: var(--accent-2);
-    }
-
-    .title {
-      font-size: clamp(8px, 2.6vw, 10px);
-      text-align: center;
-      color: var(--muted);
-    }
-
-    .subtitle {
-      font-size: clamp(7px, 2.2vw, 8px);
+    label {
+      display: block;
+      font-size: 10px;
+      margin-bottom: 6px;
       color: #9fb1d6;
-      margin-top: 4px;
     }
 
-    footer {
-      margin-top: 16px;
-      text-align: center;
-      font-size: clamp(7px, 2vw, 8px);
-      color: #8ea0c6;
-    }
-
-    @media (max-width: 360px) {
-      .box { height: 120px; padding: 10px; }
-      .icon { font-size: 24px; }
-    }
-
-    /* Popup */
-    #warningPopup1 {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.7);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-    }
-    #warningPopup1 .popup-box1 {
+    input {
+      width: 100%;
+      padding: 8px;
       background: #0f1625;
-      color: white;
-      padding: 18px;
-      border: 2px solid var(--accent-2);
-      border-radius: 8px;
-      max-width: 280px;
-      width: 90%;
-      text-align: center;
+      border: 2px solid #071022;
+      color: var(--muted);
       font-family: "Press Start 2P", monospace;
       font-size: 10px;
-    }
-    #warningPopup1 button1 {
-      background: var(--accent-2);
-      border: none;
-      padding: 5px 10px;
-      color: white;
       border-radius: 4px;
-      font-family: "Press Start 2P", monospace;
-      font-size: 9px;
-      margin-top: 10px;
-      cursor: pointer;
+      outline: none;
     }
+
+    input:focus {
+      border-color: var(--accent-2);
+    }
+
+    button {
+      background: var(--accent-2);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      font-family: "Press Start 2P", monospace;
+      font-size: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 16px;
+      width: 100%;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .error {
+      color: #ff5555;
+      font-size: 9px;
+      margin-top: 8px;
+    }
+
+    .link {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 9px;
+      display: block;
+      margin-top: 8px;
+    }
+
+    .link:hover {
+      text-decoration: underline;
+    }
+
+    /* Menu */
+    #menuContainer { display: none; }
+    #loginContainer, #registerContainer { display: none; }
   </style>
 </head>
 <body>
 
-  <div class="container" role="main">
+  <!-- Login Form -->
+  <div id="loginContainer" class="container">
+    <h1>NOXIUS TOOLS</h1>
+    <div class="form-group">
+      <label for="email">EMAIL</label>
+      <input type="email" id="email" placeholder="user@example.com" autocomplete="off" />
+    </div>
+    <div class="form-group">
+      <label for="password">PASSWORD</label>
+      <input type="password" id="password" />
+    </div>
+    <button onclick="login()">LOGIN</button>
+    <div id="loginError" class="error"></div>
+    <a href="#" class="link" onclick="showRegister()">Buat Akun Baru</a>
+  </div>
+
+  <!-- Register Form -->
+  <div id="registerContainer" class="container">
+    <h1>DAFTAR</h1>
+    <div class="form-group">
+      <label for="regEmail">EMAIL</label>
+      <input type="email" id="regEmail" placeholder="user@example.com" autocomplete="off" />
+    </div>
+    <div class="form-group">
+      <label for="regPassword">PASSWORD</label>
+      <input type="password" id="regPassword" />
+    </div>
+    <button onclick="register()">DAFTAR</button>
+    <div id="registerError" class="error"></div>
+    <a href="#" class="link" onclick="showLogin()">Sudah Punya Akun?</a>
+  </div>
+
+  <!-- Menu Utama -->
+  <div id="menuContainer" class="container" role="main">
     <header>
       <h1 data-text="PILIHAN — NOXIUS TOOLS">PILIHAN — NOXIUS TOOLS</h1>
-      <p>Pilih box untuk membuka file terkait. (Klik / tekan Enter pada kotak fokus)</p>
+      <p>Pilih box untuk membuka file terkait.</p>
     </header>
 
-    <div class="grid" id="menuGrid">
+    <div class="grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 14px;">
       <div class="box" tabindex="0" data-target="QR.html">
-        <div class="icon">🗺️</div>
-        <div class="title">QR Generator</div>
+        <div class="icon" style="font-size:28px;margin-bottom:8px;color:var(--accent-2);">🗺️</div>
+        <div class="title" style="font-size:clamp(8px, 2.6vw, 10px);color:var(--muted);">QR Generator</div>
       </div>
 
       <div class="box" tabindex="0" data-target="fake-tweet.html">
-        <div class="icon">🐦</div>
-        <div class="title">Fake Tweet</div>
+        <div class="icon" style="font-size:28px;margin-bottom:8px;color:var(--accent-2);">🐦</div>
+        <div class="title" style="font-size:clamp(8px, 2.6vw, 10px);color:var(--muted);">Fake Tweet</div>
       </div>
 
       <div class="box" tabindex="0" data-target="fake-iphone.html">
-        <div class="icon">💬</div>
-        <div class="title">eChat</div>
-        <div class="subtitle">Fake iPhone</div>
+        <div class="icon" style="font-size:28px;margin-bottom:8px;color:var(--accent-2);">💬</div>
+        <div class="title" style="font-size:clamp(8px, 2.6vw, 10px);color:var(--muted);">eChat</div>
+        <div class="subtitle" style="font-size:clamp(7px, 2.2vw, 8px);color:#9fb1d6;margin-top:4px;">Fake iPhone</div>
       </div>
 
       <div class="box" tabindex="0" data-target="spam-NGL.html">
-        <div class="icon">✉️</div>
-        <div class="title">Spam NGL</div>
-        <div class="subtitle">Anonymous Q&A</div>
+        <div class="icon" style="font-size:28px;margin-bottom:8px;color:var(--accent-2);">✉️</div>
+        <div class="title" style="font-size:clamp(8px, 2.6vw, 10px);color:var(--muted);">Spam NGL</div>
+        <div class="subtitle" style="font-size:clamp(7px, 2.2vw, 8px);color:#9fb1d6;margin-top:4px;">Anonymous Q&A</div>
       </div>
     </div>
 
-    <footer>
-      2025 Pixel Art Project<br>NoxiusDev.
+    <footer id="footerWithUID" style="margin-top:16px;text-align:center;font-size:clamp(7px, 2vw, 8px);color:#8ea0c6;">
+      2025 Pixel Art Project<br>
+      NoxiusDev. | UID: <span id="uidDisplay"></span><br>
+      <button onclick="logout()" style="background:transparent;border:none;color:var(--accent);font-family:'Press Start 2P';font-size:8px;margin-top:8px;cursor:pointer;">[LOGOUT]</button>
     </footer>
   </div>
 
   <!-- Popup Peringatan -->
-  <div id="warningPopup1">
-    <div class="popup-box1">
-      <h21>⚠️ Peringatan!</h21>
-      <p1 id="warningMessage1"></p1>
-      <button1 onclick="closeWarning1()">OK</button1>
+  <div id="warningPopup1" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:9999;">
+    <div style="background:#0f1625;color:white;padding:18px;border:2px solid var(--accent-2);border-radius:8px;max-width:280px;width:90%;text-align:center;font-family:'Press Start 2P',monospace;font-size:10px;">
+      <h2 style="margin:0;">⚠️ Peringatan!</h2>
+      <p id="warningMessage1"></p>
+      <button onclick="closeWarning1()" style="background:var(--accent-2);border:none;padding:5px 10px;color:white;border-radius:4px;font-family:'Press Start 2P';font-size:9px;margin-top:10px;cursor:pointer;">OK</button>
     </div>
   </div>
 
   <script>
+    // ✅ KONFIGURASI FIREBASE ANDA — SUDAH LENGKAP!
+    const firebaseConfig = {
+      apiKey: "AIzaSyC5HS7vsJVs9dtarPkzhQmiqNaeCKkJw_A",
+      authDomain: "noxius-panel.firebaseapp.com",
+      projectId: "noxius-panel",
+      storageBucket: "noxius-panel.firebasestorage.app",
+      messagingSenderId: "873696240519",
+      appId: "1:873696240519:web:401f9efb0d71b32363a922",
+      measurementId: "G-YNC6NQT179"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // === Dapatkan atau buat angka 6 digit tetap per user-perangkat ===
+    function getOrCreateDeviceSuffix(firebaseUID) {
+      const key = `noxius_device_suffix_${firebaseUID}`;
+      let suffix = localStorage.getItem(key);
+      if (!suffix) {
+        suffix = Math.floor(100000 + Math.random() * 900000).toString();
+        localStorage.setItem(key, suffix);
+      }
+      return suffix;
+    }
+
+    function getDisplayUID(firebaseUID) {
+      const suffix = getOrCreateDeviceSuffix(firebaseUID);
+      return `${firebaseUID}_${suffix}`;
+    }
+
+    // === UI ===
+    function showLogin() {
+      document.getElementById("loginContainer").style.display = "block";
+      document.getElementById("registerContainer").style.display = "none";
+      document.getElementById("menuContainer").style.display = "none";
+      document.getElementById("loginError").textContent = "";
+    }
+
+    function showRegister() {
+      document.getElementById("registerContainer").style.display = "block";
+      document.getElementById("loginContainer").style.display = "none";
+      document.getElementById("menuContainer").style.display = "none";
+      document.getElementById("registerError").textContent = "";
+    }
+
+    function showMenu(displayUID) {
+      document.getElementById("uidDisplay").textContent = displayUID;
+      document.getElementById("loginContainer").style.display = "none";
+      document.getElementById("registerContainer").style.display = "none";
+      document.getElementById("menuContainer").style.display = "block";
+    }
+
+    function showError(id, msg) {
+      document.getElementById(id).textContent = msg;
+    }
+
+    // === AUTH ===
+    function login() {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      if (!email || !password) return showError("loginError", "Isi email & password!");
+      auth.signInWithEmailAndPassword(email, password)
+        .catch(err => {
+          let msg = "Login gagal!";
+          if (err.code === "auth/user-not-found") msg = "Akun tidak ditemukan.";
+          else if (err.code === "auth/wrong-password") msg = "Password salah.";
+          else if (err.code === "auth/invalid-email") msg = "Email tidak valid.";
+          showError("loginError", msg);
+        });
+    }
+
+    function register() {
+      const email = document.getElementById("regEmail").value.trim();
+      const password = document.getElementById("regPassword").value;
+      if (!email || password.length < 6) return showError("registerError", "Password minimal 6 karakter!");
+      auth.createUserWithEmailAndPassword(email, password)
+        .catch(err => {
+          let msg = "Pendaftaran gagal!";
+          if (err.code === "auth/email-already-in-use") msg = "Email sudah terdaftar.";
+          showError("registerError", msg);
+        });
+    }
+
+    function logout() {
+      auth.signOut().then(() => showLogin());
+    }
+
+    // === ON AUTH STATE CHANGE ===
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        const displayUID = getDisplayUID(user.uid);
+        showMenu(displayUID);
+      } else {
+        showLogin();
+      }
+    });
+
+    // === PROTEKSI DEVELOPER TOOLS ===
     const MAX_ATTEMPTS = 3;
     function getAttempts() {
       return parseInt(localStorage.getItem("inspectAttempts") || "0", 10);
@@ -275,6 +332,7 @@
       }
     });
 
+    // Event klik menu
     document.querySelectorAll('.box').forEach(box => {
       box.addEventListener('click', () => {
         const t = box.dataset.target;

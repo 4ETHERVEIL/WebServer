@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Akses Diblokir — NoxiusCloud</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #070707;
+    --panel: #0f0f0f;
+    --accent: #ff0044;
+    --muted: #7c5cff;
+    --neon: #ff4d4d;
+    --warning: #ffcc00;
+  }
+  html, body {
+    height: 100%;
+    margin: 0;
+    font-family: "Press Start 2P", monospace;
+    background: linear-gradient(180deg, #030303 0%, #0b0b0b 50%, #050505 100%);
+    color: var(--muted);
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .center {
+    position: relative;
+    width: min(920px, 92%);
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    border: 6px solid #fff;
+    border-radius: 8px;
+    padding: 32px;
+    box-shadow:
+      0 10px 0 rgba(0,0,0,0.6),
+      8px 8px 0 rgba(0,0,0,0.4),
+      0 0 12px rgba(255,77,77,0.4);
+    text-align: center;
+    animation: neonFlicker 2s ease-in-out infinite;
+    z-index: 5;
+  }
+  .title {
+    color: var(--neon);
+    font-size: 20px;
+    margin-bottom: 16px;
+    text-shadow: 0 0 8px rgba(255,77,77,0.7);
+  }
+  .big {
+    font-size: 14px;
+    color: #fff;
+    margin-bottom: 18px;
+    line-height: 1.4;
+  }
+  .reason {
+    font-size: 10px;
+    margin-bottom: 24px;
+    color: #aaa;
+    line-height: 1.5;
+  }
+  .countdown {
+    font-size: 13px;
+    color: var(--warning);
+    padding: 14px 20px;
+    border: 4px solid var(--warning);
+    display: inline-block;
+    border-radius: 6px;
+    background: #111;
+    margin: 20px 0;
+    font-weight: bold;
+    text-shadow: 0 0 6px rgba(255,204,0,0.5);
+  }
+  .hint {
+    font-size: 9px;
+    color: #888;
+    margin-top: 16px;
+    line-height: 1.4;
+  }
+  .btn {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 10px 20px;
+    border-radius: 6px;
+    background: var(--neon);
+    color: #fff;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 12px;
+    border: 0;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .btn:hover {
+    opacity: 0.9;
+  }
+  .btn-secondary {
+    background: #444;
+    border: 2px solid #666;
+    color: #fff;
+  }
+
+  @keyframes neonFlicker {
+    0%, 100% { box-shadow: 0 0 8px rgba(255,77,77,0.4); }
+    50% { box-shadow: 0 0 20px rgba(255,77,77,0.8); }
+  }
+
+  .fall-container {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    z-index: 1;
+  }
+  .emoji {
+    position: absolute;
+    top: -10%;
+    font-size: 28px;
+    filter: drop-shadow(0 6px 6px rgba(0,0,0,0.7));
+    animation-name: fall, sway, fade;
+    animation-timing-function: linear;
+    animation-iteration-count: 1;
+  }
+  @keyframes fall {
+    0% { transform: translateY(-120vh) rotate(0deg); }
+    100% { transform: translateY(120vh) rotate(720deg); }
+  }
+  @keyframes sway {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(30px); }
+    100% { transform: translateX(-10px); }
+  }
+  @keyframes fade {
+    0% { opacity: 0; transform: scale(0.6); }
+    10% { opacity: 1; transform: scale(1); }
+    80% { opacity: 1; }
+    100% { opacity: 0; transform: scale(1.3); }
+  }
+
+  @media (max-width: 480px) {
+    .title { font-size: 14px; }
+    .big { font-size: 12px; }
+    .countdown { font-size: 11px; padding: 10px 16px; }
+    .emoji { font-size: 22px; }
+    .center { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+  <div class="fall-container" id="fall"></div>
+
+  <div class="center" role="alert" aria-live="assertive">
+    <div class="title">⚠️ AKSES DIBLOKIR</div>
+    <div class="big">Situs ini diblokir sementara</div>
+    <div class="reason" id="reasonText">Terlalu banyak percobaan akses developer tools atau aktivitas mencurigakan terdeteksi.</div>
+    <div class="countdown" id="countdown">Memuat waktu...</div>
+    <div class="hint">Halaman akan otomatis kembali normal setelah blokir berakhir.</div>
+    <button class="btn btn-secondary" id="btnBack" style="display:none;">Kembali ke Beranda</button>
+  </div>
+
+<script>
+// Emoji untuk efek jatuh
+const emojis = ['⚠️','❌','💀','💣','☠️'];
+
+const qs = id => document.getElementById(id);
+const formatTime = ms => {
+  if (ms <= 0) return '0 menit 0 detik';
+  const m = Math.floor(ms / (1000 * 60));
+  const s = Math.floor((ms % (1000 * 60)) / 1000);
+  return `${m} menit ${s} detik`;
+};
+
+const countdownEl = qs('countdown');
+const btnBack = qs('btnBack');
+
+// Baca waktu blokir dari localStorage
+let raw = localStorage.getItem('blockedUntil');
+
+if (!raw) {
+  // Tidak ada data blokir
+  countdownEl.textContent = 'Tidak ada data blokir.';
+  btnBack.style.display = 'inline-block';
+} else {
+  let blockedUntil = parseInt(raw, 10);
+  if (isNaN(blockedUntil) || blockedUntil <= Date.now()) {
+    // Sudah kadaluarsa
+    localStorage.removeItem('blockedUntil');
+    countdownEl.textContent = '✅ Blokir telah berakhir.';
+    btnBack.style.display = 'inline-block';
+  } else {
+    // Masih aktif: countdown
+    let intervalId = null;
+    const update = () => {
+      const rem = blockedUntil - Date.now();
+      if (rem <= 0) {
+        clearInterval(intervalId);
+        localStorage.removeItem('blockedUntil');
+        countdownEl.textContent = '✅ Blokir selesai — Anda dapat kembali.';
+        btnBack.style.display = 'inline-block';
+        return;
+      }
+      countdownEl.textContent = formatTime(rem);
+    };
+    update();
+    intervalId = setInterval(update, 1000);
+  }
+}
+
+btnBack.addEventListener('click', () => {
+  window.location.href = 'index.html';
+});
+
+// Efek emoji jatuh
+const fallContainer = qs('fall');
+function spawnEmoji() {
+  const el = document.createElement('div');
+  el.className = 'emoji';
+  el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+  el.style.left = Math.random() * 100 + 'vw';
+  el.style.fontSize = (18 + Math.random() * 28) + 'px';
+  const dur = 3500 + Math.random() * 6000;
+  el.style.animationDuration = dur / 1000 + 's';
+  el.style.animationDelay = Math.random() * 0.6 + 's';
+  fallContainer.appendChild(el);
+  el.addEventListener('animationend', () => el.remove());
+}
+
+(function loop() {
+  const burst = 1 + Math.floor(Math.random() * 3);
+  for (let i = 0; i < burst; i++) spawnEmoji();
+  setTimeout(loop, 350 + Math.random() * 1200);
+})();
+
+// Proteksi ringan: cegah F12 / Ctrl+U
+document.addEventListener('keydown', e => {
+  if (e.key === 'F12' || (e.ctrlKey && e.key.toLowerCase() === 'u')) {
+    e.preventDefault();
+    countdownEl.style.opacity = '0.7';
+    setTimeout(() => countdownEl.style.opacity = '1', 200);
+  }
+}, { capture: true, passive: false });
+</script>
+</body>
+</html>

@@ -433,7 +433,7 @@
         });
     }
 
-    // === RENDER MENU DENGAN TOMBOL ACCOUNT DI TENGAH BAWAH ===
+    // === RENDER MENU DENGAN DETEKSI ADMIN ===
     async function renderMenu() {
       const user = auth.currentUser;
       if (!user) {
@@ -456,6 +456,15 @@
       } catch (err) {
         console.error("Gagal muat UID:", err);
         displayUid = "ERROR";
+      }
+
+      // Cek apakah admin
+      let isAdmin = false;
+      try {
+        const adminDoc = await db.collection('admins').doc(uid).get();
+        isAdmin = adminDoc.exists && adminDoc.data().role === "admin";
+      } catch (err) {
+        console.error("Gagal cek role admin:", err);
       }
 
       mainContainer.innerHTML = `
@@ -485,6 +494,12 @@
           </div>
         </div>
 
+        ${isAdmin ? `
+        <button id="adminBtn" style="background:#ffaa00; color:black; border:none; padding:6px 12px; border-radius:4px; font-family:'Press Start 2P', monospace; font-size:9px; cursor:pointer; margin:16px auto 0; display:block; width:140px; text-align:center;">
+          🛡️ Admin Panel
+        </button>
+        ` : ''}
+
         <button id="accountBtn" style="background:#7c5cff; color:white; border:none; padding:6px 12px; border-radius:4px; font-family:'Press Start 2P', monospace; font-size:9px; cursor:pointer; margin:16px auto 0; display:block; width:140px; text-align:center;">
           👤 Account
         </button>
@@ -494,7 +509,14 @@
         </footer>
       `;
 
-      // Buka popup account
+      // Admin button
+      if (isAdmin) {
+        document.getElementById('adminBtn').addEventListener('click', () => {
+          window.location.href = "admin.html";
+        });
+      }
+
+      // Account button
       document.getElementById('accountBtn').addEventListener('click', () => {
         document.getElementById('popupUserUid').textContent = displayUid;
         document.getElementById('accountPopup').style.display = 'flex';

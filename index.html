@@ -45,6 +45,7 @@
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(5px);
       -webkit-backdrop-filter: blur(5px);
+      position: relative;
     }
 
     header h1 {
@@ -98,55 +99,40 @@
       margin-bottom: 16px;
     }
 
-    /* ACCOUNT BOX */
-    .account-box {
+    /* TOP RIGHT BOX */
+    .top-right-box {
+      position: absolute;
+      top: 20px;
+      right: 20px;
       background: #0f1625;
-      border: 2px solid var(--accent);
-      border-radius: 6px;
-      padding: 16px;
-      margin: 16px 0;
+      border: 1px solid var(--accent);
+      border-radius: 4px;
+      padding: 8px;
+      width: 80px;
       text-align: center;
-      font-size: 10px;
+      font-size: 8px;
+      z-index: 999;
     }
 
-    .account-box #userUid {
+    .top-right-box #userUid {
       font-family: monospace;
       color: white;
-      font-size: 16px;
-      letter-spacing: 2px;
-      margin: 8px 0;
-    }
-
-    .account-box button {
-      background: var(--accent);
-      color: black;
-      border: none;
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-family: "Press Start 2P", monospace;
-      font-size: 9px;
-      cursor: pointer;
-      margin: 6px 0;
-    }
-
-    .account-box #copyStatus {
-      color: var(--accent);
-      font-size: 8px;
-      margin-top: 4px;
-      height: 12px;
-    }
-
-    .logout-btn {
-      width: 100%;
-      margin-top: 12px;
-      background: #ff5555 !important;
-      color: white !important;
-      border: none;
-      padding: 6px;
-      border-radius: 4px;
-      font-family: "Press Start 2P", monospace;
       font-size: 10px;
+      letter-spacing: 1px;
+      margin: 4px 0;
+    }
+
+    .top-right-box button {
+      width: 100%;
+      background: #ff5555;
+      color: white;
+      border: none;
+      padding: 2px 4px;
+      border-radius: 2px;
+      font-family: "Press Start 2P", monospace;
+      font-size: 7px;
       cursor: pointer;
+      margin-top: 4px;
     }
 
     .grid {
@@ -215,7 +201,7 @@
     @media (max-width: 360px) {
       .box { height: 120px; padding: 10px; }
       .icon { font-size: 24px; }
-      .account-box #userUid { font-size: 14px; }
+      .top-right-box { right: 10px; top: 10px; width: 70px; }
     }
 
     /* Popup */
@@ -427,7 +413,7 @@
         });
     }
 
-    // === RENDER MENU DENGAN ACCOUNT BOX ===
+    // === RENDER MENU DENGAN TOP RIGHT BOX ===
     async function renderMenu() {
       const user = auth.currentUser;
       if (!user) {
@@ -458,17 +444,14 @@
           <p>Pilih box untuk membuka file terkait.</p>
         </header>
 
-        <div class="account-box">
-          <div style="display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:8px;">
-            <span>🆔</span>
-            <span>ID Akun Anda:</span>
-          </div>
+        <!-- TOP RIGHT BOX -->
+        <div class="top-right-box">
+          <div style="font-size:8px; color:#b6c0d6; margin-bottom:4px;">ID:</div>
           <div id="userUid">${displayUid}</div>
-          <button id="copyUidBtn">Salin ID</button>
-          <div id="copyStatus"></div>
-          <button class="logout-btn" id="logoutBtn">🚪 LOGOUT</button>
+          <button id="logoutBtn">🚪 LOGOUT</button>
         </div>
 
+        <!-- MENU GRID -->
         <div class="grid" id="menuGrid">
           <div class="box" tabindex="0" data-target="QR.html">
             <div class="icon">🗺️</div>
@@ -495,16 +478,13 @@
         </footer>
       `;
 
-      // Salin UID
-      document.getElementById('copyUidBtn').addEventListener('click', async () => {
-        const statusEl = document.getElementById('copyStatus');
+      // Salin UID saat klik di ID
+      document.getElementById('userUid').addEventListener('click', async () => {
         try {
           await navigator.clipboard.writeText(displayUid);
-          statusEl.textContent = "✅ Disalin!";
-          setTimeout(() => statusEl.textContent = "", 2000);
+          alert("✅ ID disalin!");
         } catch (err) {
-          statusEl.textContent = "❌ Gagal";
-          setTimeout(() => statusEl.textContent = "", 2000);
+          alert("❌ Gagal menyalin");
         }
       });
 

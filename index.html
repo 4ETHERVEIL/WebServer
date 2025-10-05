@@ -391,4 +391,60 @@
       // Fungsi tambah percobaan
       async function addAttempt() {
         const now = Date.now();
-     
+        const doc = await attemptsRef.get();
+        let attempts = 0;
+
+        if (doc.exists) {
+          const d = doc.data();
+          if (d.blockedUntil && now < d.blockedUntil) {
+            window.location.href = "banned.html";
+            return;
+          }
+          attempts = d.attempts || 0;
+        }
+
+        const newAttempts = attempts + 1;
+        if (newAttempts >= MAX_ATTEMPTS) {
+          await attemptsRef.set({
+            attempts: newAttempts,
+            blockedUntil: now + BLOCK_DURATION,
+            lastAttempt: now
+          }, { merge: true });
+          window.location.href = "banned.html";
+        } else {
+          await attemptsRef.set({
+            attempts: newAttempts,
+            lastAttempt: now
+          }, { merge: true });
+          document.getElementById("warningMessage1").innerText = `Peringatan (${newAttempts}/${MAX_ATTEMPTS})`;
+          document.getElementById("warningPopup1").style.display = "flex";
+        }
+      }
+
+      // Event listener
+      document.addEventListener('contextmenu', async (e) => {
+        e.preventDefault();
+        await addAttempt();
+      });
+
+      document.addEventListener('keydown', async (e) => {
+        if (e.key === 'F12' || 
+            (e.ctrlKey && e.shiftKey && ['I','J'].includes(e.key.toUpperCase())) || 
+            (e.ctrlKey && e.key.toUpperCase() === 'U')) {
+          e.preventDefault();
+          await addAttempt();
+        }
+      });
+    }
+
+    // === CEK LOGIN SAAT HALAMAN DIMUAT ===
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        renderMenu();
+      } else {
+        renderLogin();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -196,7 +196,7 @@
 <body>
 
   <div class="container" id="mainContainer">
-    <!-- Akan diisi oleh JS: login form atau menu -->
+    <!-- Akan diisi oleh JS -->
   </div>
 
   <!-- Firebase SDK -->
@@ -205,7 +205,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
   <script>
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyC5HS7vsJVs9dtarPkzhQmiqNaeCKkJw_A",
   authDomain: "noxius-panel.firebaseapp.com",
@@ -216,15 +216,10 @@ const firebaseConfig = {
   measurementId: "G-YNC6NQT179"
 };
 
-
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // === State ===
-    let currentView = 'login'; // 'login', 'register', 'menu'
-
-    // === Helper Functions ===
     function generate9DigitUID() {
       return Math.floor(100000000 + Math.random() * 900000000).toString();
     }
@@ -283,7 +278,12 @@ const firebaseConfig = {
       popup.id = "accountPopup";
       popup.innerHTML = `
         <div style="position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 9999;">
-          <div style="background: #0f1625; color: white; padding: 16px; border: 2px solid var(--accent-2); border-radius: 8px; max-width: 280px; width: 90%; text-align: center; font-family: 'Press Start 2P', monospace; font-size: 10px;">
+          <div style="background: #0f1625; color: white; padding: 16px; border: 2px solid var(--accent-2); border-radius: 8px; max-width: 280px; width: 90%; text-align: center; font-family: 'Press Start 2P', monospace; font-size: 10px; position: relative;">
+            <button onclick="document.getElementById('accountPopup').remove()" 
+                    style="position: absolute; top: 8px; right: 8px; background: #333; color: white; border: none; width: 20px; height: 20px; border-radius: 50%; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+              ✕
+            </button>
+            
             <h3>AKUN</h3>
             <p>ID: <strong>${uid9}</strong></p>
             <button id="copyBtn" style="background: var(--accent); border: none; padding: 4px 8px; color: black; border-radius: 4px; font-size: 9px; margin: 6px 0;">Salin UID</button><br>
@@ -301,7 +301,6 @@ const firebaseConfig = {
       });
     }
 
-    // === Render Views ===
     function renderLogin() {
       document.getElementById("mainContainer").innerHTML = `
         <div class="auth-form">
@@ -329,7 +328,18 @@ const firebaseConfig = {
       `;
     }
 
-    function renderMenu(uid9) {
+    // ✅ DIPERBARUI: TERIMA ROLE DAN TAMPILKAN TOMBOL ADMIN JIKA SESUAI
+    function renderMenu(uid9, role) {
+      const isAdmin = (role === "admin");
+      const adminButton = isAdmin ? `
+        <br>
+        <button id="adminBtn" style="
+          background: gold; border: none; padding: 4px 8px; color: black;
+          border-radius: 4px; font-family: 'Press Start 2P', monospace; font-size: 8px;
+          cursor: pointer; margin-top: 6px;
+        ">Admin Panel</button>
+      ` : '';
+
       document.getElementById("mainContainer").innerHTML = `
         <div role="main">
           <header>
@@ -364,12 +374,12 @@ const firebaseConfig = {
               border-radius: 4px; font-family: 'Press Start 2P', monospace; font-size: 8px;
               cursor: pointer;
             ">Account</button>
+            ${adminButton}
             <br>2025 Pixel Art Project<br>KentangDev.
           </footer>
         </div>
       `;
 
-      // Event untuk box
       document.querySelectorAll('.box').forEach(box => {
         box.addEventListener('click', () => {
           const t = box.dataset.target;
@@ -384,11 +394,15 @@ const firebaseConfig = {
         });
       });
 
-      // Tombol account
       document.getElementById("accountBtn").addEventListener("click", () => showAccountPopup(uid9));
+
+      if (isAdmin) {
+        document.getElementById("adminBtn").addEventListener("click", () => {
+          window.location.href = "admin.html";
+        });
+      }
     }
 
-    // === Auth Handlers ===
     async function handleLogin() {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
@@ -425,10 +439,9 @@ const firebaseConfig = {
       }
     }
 
-    // === Observasi Auth State ===
+    // ✅ DIPERBARUI: AMBIL ROLE DARI FIRESTORE
     auth.onAuthStateChanged(async (user) => {
       if (user) {
-        // Cek banned
         const userDoc = await db.collection("users").doc(user.uid).get();
         if (userDoc.exists) {
           const data = userDoc.data();
@@ -437,18 +450,19 @@ const firebaseConfig = {
             showBannedPopup(bannedUntil.toDate());
             return;
           }
+          const uid9 = await ensureUserUID(user);
+          const role = data.role || "user";
+          renderMenu(uid9, role);
+        } else {
+          const uid9 = await ensureUserUID(user);
+          renderMenu(uid9, "user");
         }
-
-        // Pastikan UID 9 digit ada
-        const uid9 = await ensureUserUID(user);
-        renderMenu(uid9);
       } else {
         renderLogin();
       }
     });
 
-    // Render awal
     renderLogin();
   </script>
 </body>
-</html>l
+</html>

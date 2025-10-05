@@ -20,24 +20,38 @@
       padding: 16px;
       margin: 0;
       min-height: 100vh;
+      display: flex;
+      justify-content: center;
     }
     .container {
+      width: 100%;
       max-width: 800px;
-      margin: 0 auto;
-      background: rgba(15, 23, 36, 0.7);
+      background: rgba(11, 18, 32, 0.65);
+      border: 4px solid #071022;
       padding: 20px;
-      border: 2px solid #071022;
       border-radius: 8px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
     }
     h2 {
       text-align: center;
       color: gold;
-      margin-bottom: 20px;
+      margin: 0 0 20px;
+      font-size: 18px;
+    }
+    .back-btn {
+      display: inline-block;
+      background: var(--accent-2);
+      color: white;
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 10px;
+      margin-bottom: 16px;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 16px;
       font-size: 10px;
     }
     th, td {
@@ -52,23 +66,14 @@
       padding: 4px 8px;
       border: none;
       border-radius: 4px;
-      font-family: inherit;
+      font-family: "Press Start 2P", monospace;
       font-size: 9px;
       cursor: pointer;
     }
     .ban-btn { background: #ff4d4d; color: white; }
     .unban-btn { background: #3ce0c3; color: black; }
     .admin-tag { color: gold; font-weight: bold; }
-    .back-btn {
-      background: var(--accent-2);
-      color: white;
-      padding: 6px 12px;
-      font-size: 10px;
-      margin-bottom: 16px;
-      display: inline-block;
-      text-decoration: none;
-    }
-    .banned-cell { color: #ff6666; font-weight: bold; }
+    .banned-yes { color: #ff6666; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -98,7 +103,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
   <script>
-    // 🔥 GANTI DENGAN KONFIGURASI FIREBASE ANDA (sama seperti index.html)
+    // 🔥 GANTI DENGAN KONFIGURASI FIREBASE ANDA (sama seperti di index.html)
     const firebaseConfig = {
       apiKey: "YOUR_API_KEY",
       authDomain: "YOUR_PROJECT.firebaseapp.com",
@@ -112,7 +117,7 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Cek apakah user adalah admin
+    // Cek akses admin
     auth.onAuthStateChanged(async (user) => {
       if (!user) {
         alert("Silakan login terlebih dahulu!");
@@ -133,30 +138,34 @@
     async function loadUsers() {
       const list = document.getElementById("userList");
       try {
-        const snapshot = await db.collection("users").get();
+        const snapshot = await db.collection("users").orderBy("createdAt", "asc").get();
+        list.innerHTML = "";
+        
         if (snapshot.empty) {
-          list.innerHTML = `<tr><td colspan="5">Tidak ada user.</td></tr>`;
+          list.innerHTML = `<tr><td colspan="5">Belum ada user.</td></tr>`;
           return;
         }
 
-        list.innerHTML = "";
         snapshot.forEach(doc => {
           const d = doc.data();
           const isBanned = d.bannedUntil && d.bannedUntil.toDate() > new Date();
-          const bannedText = isBanned 
-            ? `Ya (sampai ${d.bannedUntil.toDate().toLocaleTimeString()})` 
-            : "Tidak";
+          let bannedDisplay = "Tidak";
+          if (isBanned) {
+            const endTime = d.bannedUntil.toDate();
+            const timeStr = endTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            bannedDisplay = `Ya (sampai ${timeStr})`;
+          }
 
           const row = document.createElement("tr");
           row.innerHTML = `
             <td>${d.uid9 || '—'}</td>
             <td>${d.email || '—'}</td>
             <td>${d.role === "admin" ? '<span class="admin-tag">ADMIN</span>' : 'user'}</td>
-            <td class="${isBanned ? 'banned-cell' : ''}">${bannedText}</td>
+            <td class="${isBanned ? 'banned-yes' : ''}">${bannedDisplay}</td>
             <td>
               ${isBanned ? 
                 `<button class="unban-btn" onclick="unban('${doc.id}')">Unban</button>` :
-                `<input type="number" id="min-${doc.id}" value="10" min="1" max="1440" style="width:60px;font-size:9px;"> 
+                `<input type="number" id="min-${doc.id}" value="10" min="1" max="1440" style="width:60px;font-size:9px;background:#0a111e;border:1px solid #333;color:white;text-align:center;"> 
                  <button class="ban-btn" onclick="ban('${doc.id}', document.getElementById('min-${doc.id}').value)">Ban</button>`
               }
             </td>
@@ -164,7 +173,7 @@
           list.appendChild(row);
         });
       } catch (e) {
-        console.error("Error loading users:", e);
+        console.error("Error:", e);
         list.innerHTML = `<tr><td colspan="5">Gagal memuat data.</td></tr>`;
       }
     }
@@ -172,7 +181,7 @@
     async function ban(uid, minutesStr) {
       const minutes = parseInt(minutesStr);
       if (isNaN(minutes) || minutes < 1) {
-        alert("Masukkan durasi banned minimal 1 menit!");
+        alert("Durasi banned minimal 1 menit!");
         return;
       }
       try {

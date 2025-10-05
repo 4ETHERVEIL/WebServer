@@ -25,7 +25,7 @@
     }
     .container {
       width: 100%;
-      max-width: 800px;
+      max-width: 850px;
       background: rgba(11, 18, 32, 0.65);
       border: 4px solid #071022;
       padding: 20px;
@@ -52,28 +52,42 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 10px;
+      font-size: 9px;
     }
     th, td {
       border: 1px solid #333;
-      padding: 10px;
+      padding: 8px;
       text-align: center;
     }
     th {
       background: #0a111e;
     }
     button {
-      padding: 4px 8px;
+      padding: 4px 6px;
       border: none;
-      border-radius: 4px;
+      border-radius: 3px;
       font-family: "Press Start 2P", monospace;
-      font-size: 9px;
+      font-size: 8px;
       cursor: pointer;
+    }
+    input, select {
+      background: #0a111e;
+      border: 1px solid #333;
+      color: white;
+      font-family: "Press Start 2P", monospace;
+      font-size: 8px;
+      text-align: center;
     }
     .ban-btn { background: #ff4d4d; color: white; }
     .unban-btn { background: #3ce0c3; color: black; }
     .admin-tag { color: gold; font-weight: bold; }
     .banned-yes { color: #ff6666; font-weight: bold; }
+    .note-cell {
+      font-size: 7px;
+      color: #aaa;
+      max-width: 120px;
+      word-wrap: break-word;
+    }
   </style>
 </head>
 <body>
@@ -88,11 +102,12 @@
           <th>Email</th>
           <th>Role</th>
           <th>Banned?</th>
+          <th>Catatan</th>
           <th>Aksi</th>
         </tr>
       </thead>
       <tbody id="userList">
-        <tr><td colspan="5">Memuat data...</td></tr>
+        <tr><td colspan="6">Memuat data...</td></tr>
       </tbody>
     </table>
   </div>
@@ -103,22 +118,21 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
   <script>
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyC5HS7vsJVs9dtarPkzhQmiqNaeCKkJw_A",
-  authDomain: "noxius-panel.firebaseapp.com",
-  projectId: "noxius-panel",
-  storageBucket: "noxius-panel.firebasestorage.app",
-  messagingSenderId: "873696240519",
-  appId: "1:873696240519:web:401f9efb0d71b32363a922",
-  measurementId: "G-YNC6NQT179"
-};
+    // 🔥 KONFIGURASI FIREBASE ANDA
+    const firebaseConfig = {
+      apiKey: "AIzaSyC5HS7vsJVs9dtarPkzhQmiqNaeCKkJw_A",
+      authDomain: "noxius-panel.firebaseapp.com",
+      projectId: "noxius-panel",
+      storageBucket: "noxius-panel.firebasestorage.app",
+      messagingSenderId: "873696240519",
+      appId: "1:873696240519:web:401f9efb0d71b32363a922",
+      measurementId: "G-YNC6NQT179"
+    };
 
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Cek akses admin
     auth.onAuthStateChanged(async (user) => {
       if (!user) {
         alert("Silakan login terlebih dahulu!");
@@ -143,7 +157,7 @@ const firebaseConfig = {
         list.innerHTML = "";
         
         if (snapshot.empty) {
-          list.innerHTML = `<tr><td colspan="5">Belum ada user.</td></tr>`;
+          list.innerHTML = `<tr><td colspan="6">Belum ada user.</td></tr>`;
           return;
         }
 
@@ -163,11 +177,20 @@ const firebaseConfig = {
             <td>${d.email || '—'}</td>
             <td>${d.role === "admin" ? '<span class="admin-tag">ADMIN</span>' : 'user'}</td>
             <td class="${isBanned ? 'banned-yes' : ''}">${bannedDisplay}</td>
+            <td class="note-cell">${d.banNote || '—'}</td>
             <td>
               ${isBanned ? 
                 `<button class="unban-btn" onclick="unban('${doc.id}')">Unban</button>` :
-                `<input type="number" id="min-${doc.id}" value="10" min="1" max="1440" style="width:60px;font-size:9px;background:#0a111e;border:1px solid #333;color:white;text-align:center;"> 
-                 <button class="ban-btn" onclick="ban('${doc.id}', document.getElementById('min-${doc.id}').value)">Ban</button>`
+                `
+                <select id="unit-${doc.id}" style="width:60px;" onchange="toggleCustomInput('${doc.id}')">
+                  <option value="min">Menit</option>
+                  <option value="hour">Jam</option>
+                  <option value="custom">Custom</option>
+                </select>
+                <input type="number" id="dur-${doc.id}" value="10" min="1" style="width:60px;"> 
+                <input type="text" id="note-${doc.id}" placeholder="Catatan" style="width:80px;font-size:7px;padding:2px;">
+                <button class="ban-btn" onclick="banWithNote('${doc.id}')">Ban</button>
+                `
               }
             </td>
           `;
@@ -175,21 +198,58 @@ const firebaseConfig = {
         });
       } catch (e) {
         console.error("Error:", e);
-        list.innerHTML = `<tr><td colspan="5">Gagal memuat data.</td></tr>`;
+        list.innerHTML = `<tr><td colspan="6">Gagal memuat data.</td></tr>`;
       }
     }
 
-    async function ban(uid, minutesStr) {
-      const minutes = parseInt(minutesStr);
-      if (isNaN(minutes) || minutes < 1) {
-        alert("Durasi banned minimal 1 menit!");
+    function toggleCustomInput(uid) {
+      const select = document.getElementById(`unit-${uid}`);
+      const input = document.getElementById(`dur-${uid}`);
+      if (select.value === "custom") {
+        input.min = "1";
+        input.placeholder = "Menit";
+        input.value = "60"; // default 1 jam
+      } else if (select.value === "hour") {
+        input.min = "1";
+        input.max = "24";
+        input.placeholder = "Jam";
+        input.value = Math.min(input.value, 24);
+      } else {
+        input.min = "1";
+        input.max = "1440";
+        input.placeholder = "Menit";
+        input.value = Math.min(input.value, 1440);
+      }
+    }
+
+    async function banWithNote(uid) {
+      const unit = document.getElementById(`unit-${uid}`).value;
+      const durStr = document.getElementById(`dur-${uid}`).value;
+      const note = (document.getElementById(`note-${uid}`).value || "Dibanned oleh admin").trim();
+      
+      const dur = parseInt(durStr);
+      if (isNaN(dur) || dur < 1) {
+        alert("Durasi harus minimal 1!");
         return;
       }
+
+      let minutes;
+      if (unit === "hour") {
+        minutes = dur * 60;
+      } else if (unit === "min") {
+        minutes = dur;
+      } else if (unit === "custom") {
+        // Custom = input langsung dalam menit, tanpa batas atas
+        minutes = dur;
+        // Tidak ada batas maksimal
+      }
+
       try {
         const banUntil = new Date();
         banUntil.setMinutes(banUntil.getMinutes() + minutes);
         await db.collection("users").doc(uid).update({
-          bannedUntil: firebase.firestore.Timestamp.fromDate(banUntil)
+          bannedUntil: firebase.firestore.Timestamp.fromDate(banUntil),
+          banNote: note
         });
         loadUsers();
       } catch (e) {
@@ -200,7 +260,8 @@ const firebaseConfig = {
     async function unban(uid) {
       try {
         await db.collection("users").doc(uid).update({
-          bannedUntil: null
+          bannedUntil: null,
+          banNote: null
         });
         loadUsers();
       } catch (e) {

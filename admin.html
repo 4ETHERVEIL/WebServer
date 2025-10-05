@@ -50,7 +50,7 @@
       margin-bottom: 16px;
     }
     
-    /* === Menu Navigasi Admin === */
+    /* Menu Navigasi */
     .admin-menu {
       display: flex;
       gap: 10px;
@@ -73,7 +73,7 @@
       color: black;
     }
 
-    /* === Panel Konten === */
+    /* Panel Konten */
     .panel {
       display: none;
     }
@@ -81,7 +81,7 @@
       display: block;
     }
 
-    /* === Tabel User === */
+    /* Tabel User */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -114,7 +114,37 @@
       word-wrap: break-word;
     }
 
-    /* === Popup Umum === */
+    /* Daftar Menu Items */
+    #menuList, #fileList {
+      margin-top: 16px;
+    }
+    .menu-item, .file-item {
+      background: #0f1625;
+      border: 1px solid #333;
+      padding: 10px;
+      margin-bottom: 8px;
+      border-radius: 4px;
+      font-size: 10px;
+    }
+    .menu-item-header, .file-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .menu-item-title, .file-name {
+      font-weight: bold;
+      color: var(--accent);
+    }
+    .menu-item-actions button, .file-actions button {
+      margin-left: 4px;
+      padding: 3px 6px;
+      font-size: 8px;
+    }
+    .edit-btn { background: var(--accent); color: black; }
+    .delete-btn { background: #ff4d4d; color: white; }
+
+    /* Popup Umum */
     .popup-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -174,6 +204,25 @@
       background: var(--accent-2);
       color: white;
     }
+    .delete-confirm-btn {
+      background: #ff4d4d;
+      color: white;
+    }
+
+    /* Progress Upload */
+    .upload-progress {
+      height: 6px;
+      background: #333;
+      border-radius: 3px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.2s;
+    }
   </style>
 </head>
 <body>
@@ -184,7 +233,8 @@
     <!-- Menu Navigasi -->
     <div class="admin-menu">
       <button class="menu-btn active" data-panel="users">Kelola User</button>
-      <button class="menu-btn" data-panel="upload">Upload Box Baru</button>
+      <button class="menu-btn" data-panel="menu">Kelola Menu</button>
+      <button class="menu-btn" data-panel="files">File Manager</button>
     </div>
 
     <!-- Panel: Kelola User -->
@@ -206,16 +256,25 @@
       </table>
     </div>
 
-    <!-- Panel: Upload Box Baru -->
-    <div id="upload-panel" class="panel">
-      <p style="text-align:center; font-size:10px; margin-bottom:16px;">
-        Tambahkan item baru ke menu utama pengguna.
-      </p>
-      <button class="confirm-btn" onclick="openUploadPopup()" style="width:100%; padding:8px; font-size:10px;">
-        + Buat Box Baru
+    <!-- Panel: Kelola Menu -->
+    <div id="menu-panel" class="panel">
+      <button class="confirm-btn" onclick="openUploadMenuPopup()" style="width:100%; padding:8px; font-size:10px; margin-bottom:16px;">
+        + Tambah Box Baru
       </button>
-      <h3 style="margin-top:20px; font-size:12px;">Daftar Box Saat Ini:</h3>
-      <div id="menuList" style="font-size:9px; margin-top:8px;">
+      <h3 style="margin-bottom:12px; font-size:12px;">Daftar Box:</h3>
+      <div id="menuList">
+        Memuat...
+      </div>
+    </div>
+
+    <!-- Panel: File Manager -->
+    <div id="files-panel" class="panel">
+      <input type="file" id="fileInput" style="width:100%; margin-bottom:10px; font-size:10px;">
+      <button class="confirm-btn" onclick="uploadFile()" style="width:100%; padding:8px; font-size:10px; margin-bottom:16px;">
+        📤 Upload File
+      </button>
+      <h3 style="margin-bottom:12px; font-size:12px;">File yang Diupload:</h3>
+      <div id="fileList">
         Memuat...
       </div>
     </div>
@@ -242,10 +301,10 @@
     </div>
   </div>
 
-  <!-- Popup: Upload Box Baru -->
-  <div id="uploadPopup" class="popup-overlay">
+  <!-- Popup: Tambah/Edit Menu -->
+  <div id="menuPopup" class="popup-overlay">
     <div class="popup-content">
-      <h3>➕ UPLOAD BOX BARU</h3>
+      <h3 id="menuPopupTitle">➕ TAMBAH BOX BARU</h3>
       <label for="boxTitle">Judul:</label>
       <input type="text" id="boxTitle" placeholder="Contoh: Game Baru" required>
       
@@ -258,9 +317,25 @@
       <label for="boxSubtitle">Deskripsi (opsional):</label>
       <input type="text" id="boxSubtitle" placeholder="Opsional">
       
+      <input type="hidden" id="editMenuId">
+      
       <div class="popup-buttons">
-        <button class="confirm-btn" onclick="submitNewBox()">Simpan</button>
-        <button class="cancel-btn" onclick="closeUploadPopup()">Batal</button>
+        <button class="confirm-btn" onclick="submitMenu()">Simpan</button>
+        <button class="cancel-btn" onclick="closeMenuPopup()">Batal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup: Konfirmasi Hapus -->
+  <div id="deletePopup" class="popup-overlay">
+    <div class="popup-content">
+      <h3>🗑️ HAPUS ITEM</h3>
+      <p id="deleteMessage">Yakin ingin menghapus item ini?</p>
+      <input type="hidden" id="deleteType">
+      <input type="hidden" id="deleteId">
+      <div class="popup-buttons">
+        <button class="delete-confirm-btn" onclick="confirmDelete()">Hapus</button>
+        <button class="cancel-btn" onclick="closeDeletePopup()">Batal</button>
       </div>
     </div>
   </div>
@@ -269,6 +344,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 
   <script>
     // 🔥 KONFIGURASI FIREBASE ANDA
@@ -285,6 +361,7 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
+    const storage = firebase.storage();
 
     // Navigasi Menu
     document.querySelectorAll('.menu-btn').forEach(btn => {
@@ -295,8 +372,10 @@
         const panelId = btn.dataset.panel;
         document.getElementById(panelId + '-panel').classList.add('active');
         
-        if (panelId === 'upload') {
+        if (panelId === 'menu') {
           loadMenuItems();
+        } else if (panelId === 'files') {
+          listFiles();
         }
       });
     });
@@ -412,40 +491,65 @@
     async function loadMenuItems() {
       const container = document.getElementById("menuList");
       try {
-        const snapshot = await db.collection("menuItems").orderBy("createdAt", "desc").get();
+        const snapshot = await db.collection("menuItems").orderBy("createdAt", "asc").get();
         if (snapshot.empty) {
           container.innerHTML = "<p>Belum ada box.</p>";
           return;
         }
-        let html = "<ul style='padding-left:16px;'>";
+        let html = "";
         snapshot.forEach(doc => {
           const d = doc.data();
-          html += `<li><strong>${d.title}</strong> → ${d.target} ${d.subtitle ? `(${d.subtitle})` : ''}</li>`;
+          html += `
+            <div class="menu-item">
+              <div class="menu-item-header">
+                <span class="menu-item-title">${d.title}</span>
+                <span>${d.icon}</span>
+              </div>
+              <div>File: ${d.target}</div>
+              ${d.subtitle ? `<div>Deskripsi: ${d.subtitle}</div>` : ''}
+              <div class="menu-item-actions">
+                <button class="edit-btn" onclick="openEditMenuPopup('${doc.id}', ${JSON.stringify(d).replace(/'/g, "\\'")})">Edit</button>
+                <button class="delete-btn" onclick="openDeletePopup('menu', '${doc.id}')">Hapus</button>
+              </div>
+            </div>
+          `;
         });
-        html += "</ul>";
         container.innerHTML = html;
       } catch (e) {
         container.innerHTML = "<p>Gagal memuat daftar box.</p>";
       }
     }
 
-    function openUploadPopup() {
+    function openUploadMenuPopup() {
+      document.getElementById("menuPopupTitle").textContent = "➕ TAMBAH BOX BARU";
       document.getElementById("boxTitle").value = "";
       document.getElementById("boxIcon").value = "";
       document.getElementById("boxTarget").value = "";
       document.getElementById("boxSubtitle").value = "";
-      document.getElementById("uploadPopup").style.display = "flex";
+      document.getElementById("editMenuId").value = "";
+      document.getElementById("menuPopup").style.display = "flex";
     }
 
-    function closeUploadPopup() {
-      document.getElementById("uploadPopup").style.display = "none";
+    function openEditMenuPopup(id, data) {
+      document.getElementById("menuPopupTitle").textContent = "✏️ EDIT BOX";
+      document.getElementById("boxTitle").value = data.title;
+      document.getElementById("boxIcon").value = data.icon;
+      document.getElementById("boxTarget").value = data.target;
+      document.getElementById("boxSubtitle").value = data.subtitle || "";
+      document.getElementById("editMenuId").value = id;
+      document.getElementById("menuPopup").style.display = "flex";
     }
 
-    async function submitNewBox() {
+    function closeMenuPopup() {
+      document.getElementById("menuPopup").style.display = "none";
+    }
+
+    async function submitMenu() {
       const title = document.getElementById("boxTitle").value.trim();
       const icon = document.getElementById("boxIcon").value.trim();
       const target = document.getElementById("boxTarget").value.trim();
       const subtitle = document.getElementById("boxSubtitle").value.trim();
+      const editId = document.getElementById("editMenuId").value;
 
       if (!title || !icon || !target) {
         alert("Judul, ikon, dan file target wajib diisi!");
@@ -458,18 +562,118 @@
       }
 
       try {
-        await db.collection("menuItems").add({
-          title: title,
-          icon: icon,
-          target: target,
-          subtitle: subtitle || null,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        closeUploadPopup();
+        if (editId) {
+          await db.collection("menuItems").doc(editId).update({
+            title: title,
+            icon: icon,
+            target: target,
+            subtitle: subtitle || null
+          });
+        } else {
+          await db.collection("menuItems").add({
+            title: title,
+            icon: icon,
+            target: target,
+            subtitle: subtitle || null,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        }
+        closeMenuPopup();
         loadMenuItems();
-        alert("Box baru berhasil ditambahkan!");
+        alert(editId ? "Box berhasil diperbarui!" : "Box baru berhasil ditambahkan!");
       } catch (e) {
         alert("Gagal menyimpan box: " + e.message);
+      }
+    }
+
+    // === FILE MANAGEMENT ===
+    async function listFiles() {
+      const container = document.getElementById("fileList");
+      try {
+        const listRef = storage.ref();
+        const res = await listRef.listAll();
+        if (res.items.length === 0) {
+          container.innerHTML = "<p>Belum ada file.</p>";
+          return;
+        }
+        let html = "";
+        res.items.forEach(itemRef => {
+          const name = itemRef.name;
+          const url = `https://firebasestorage.googleapis.com/v0/b/${firebaseConfig.storageBucket}/o/${encodeURIComponent(name)}?alt=media`;
+          html += `
+            <div class="file-item">
+              <div class="file-header">
+                <span class="file-name">${name}</span>
+                <a href="${url}" target="_blank" style="color:var(--accent); text-decoration:underline; font-size:8px;">Lihat</a>
+              </div>
+              <div class="file-actions">
+                <button class="delete-btn" onclick="openDeletePopup('file', '${name}')">Hapus</button>
+              </div>
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+      } catch (e) {
+        console.error("Error listing files:", e);
+        container.innerHTML = "<p>Gagal memuat daftar file.</p>";
+      }
+    }
+
+    async function uploadFile() {
+      const fileInput = document.getElementById("fileInput");
+      const file = fileInput.files[0];
+      if (!file) {
+        alert("Pilih file terlebih dahulu!");
+        return;
+      }
+
+      const fileName = file.name;
+      const fileRef = storage.ref(fileName);
+
+      try {
+        await fileRef.put(file);
+        alert("File berhasil diupload!");
+        fileInput.value = "";
+        listFiles();
+      } catch (e) {
+        alert("Gagal upload file: " + e.message);
+      }
+    }
+
+    // === HAPUS UMUM ===
+    function openDeletePopup(type, id) {
+      document.getElementById("deleteType").value = type;
+      document.getElementById("deleteId").value = id;
+      const message = type === 'menu' 
+        ? "Yakin ingin menghapus item menu ini?" 
+        : "Yakin ingin menghapus file ini? Tindakan ini tidak bisa dibatalkan.";
+      document.getElementById("deleteMessage").textContent = message;
+      document.getElementById("deletePopup").style.display = "flex";
+    }
+
+    function closeDeletePopup() {
+      document.getElementById("deletePopup").style.display = "none";
+    }
+
+    async function confirmDelete() {
+      const type = document.getElementById("deleteType").value;
+      const id = document.getElementById("deleteId").value;
+      try {
+        if (type === 'menu') {
+          await db.collection("menuItems").doc(id).delete();
+        } else if (type === 'file') {
+          const fileRef = storage.ref(id);
+          await fileRef.delete();
+        }
+        closeDeletePopup();
+        if (type === 'menu') {
+          loadMenuItems();
+        } else {
+          listFiles();
+        }
+        alert("Item berhasil dihapus!");
+      } catch (e) {
+        alert("Gagal menghapus item: " + e.message);
       }
     }
 

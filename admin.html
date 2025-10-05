@@ -467,7 +467,6 @@
         let html = "";
         snapshot.forEach(doc => {
           const d = doc.data();
-          // Encode data sebagai base64 untuk keamanan
           const safeData = btoa(unescape(encodeURIComponent(JSON.stringify(d))));
           html += `
             <div class="menu-item">
@@ -567,9 +566,7 @@
     function openDeletePopup(type, id) {
       document.getElementById("deleteType").value = type;
       document.getElementById("deleteId").value = id;
-      const message = type === 'menu' 
-        ? "Yakin ingin menghapus item menu ini?" 
-        : "Yakin ingin menghapus item ini?";
+      const message = "Yakin ingin menghapus item ini?";
       document.getElementById("deleteMessage").textContent = message;
       document.getElementById("deletePopup").style.display = "flex";
     }
@@ -579,16 +576,11 @@
     }
 
     async function confirmDelete() {
-      const type = document.getElementById("deleteType").value;
       const id = document.getElementById("deleteId").value;
       try {
-        if (type === 'menu') {
-          await db.collection("menuItems").doc(id).delete();
-        }
+        await db.collection("menuItems").doc(id).delete();
         closeDeletePopup();
-        if (type === 'menu') {
-          loadMenuItems();
-        }
+        loadMenuItems();
         alert("Item berhasil dihapus!");
       } catch (e) {
         alert("Gagal menghapus item: " + e.message);

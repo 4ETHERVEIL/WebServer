@@ -3,16 +3,23 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Menu Pilihan — Pixel Art</title>
+  <title>Login — Pixel Art</title>
   <link rel="icon" href="foto/foto.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
   <style>
     :root {
-      --matrix: #00ff41;
-      --dark: #000000;
-      --darker: #000a00;
-      --muted: #00aa33;
-      --border: #003311;
+      --bg: #0b1220;
+      --panel: #0f1724;
+      --accent: #3ce0c3;
+      --accent-2: #7c5cff;
+      --muted: #b6c0d6;
+      --box: #121826;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -20,8 +27,8 @@
 
     body {
       font-family: "Press Start 2P", monospace;
-      background-color: var(--dark);
-      color: var(--matrix);
+      background: url('https://i.imgur.com/nvdnNzi.jpeg') center/cover no-repeat fixed;
+      color: var(--muted);
       padding: 16px;
       display: flex;
       align-items: center;
@@ -31,22 +38,21 @@
     .container {
       width: 100%;
       max-width: 1100px;
-      background: rgba(0, 10, 0, 0.85);
-      border: 2px solid var(--matrix);
+      background: rgba(11, 18, 32, 0.65);
+      border: 4px solid #071022;
       padding: 20px;
-      border-radius: 4px;
-      box-shadow: 0 0 12px rgba(0, 255, 65, 0.2);
-      backdrop-filter: blur(2px);
-      -webkit-backdrop-filter: blur(2px);
+      border-radius: 8px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
     }
 
     header h1 {
       margin: 0 0 8px;
       font-size: clamp(14px, 4vw, 18px);
-      color: var(--matrix);
+      color: var(--accent);
       text-align: center;
       position: relative;
-      text-shadow: 0 0 4px rgba(0, 255, 65, 0.6);
     }
 
     header h1::before,
@@ -57,37 +63,38 @@
       left: 0;
       width: 100%;
       height: 100%;
-      opacity: 0.3;
     }
 
     header h1::before {
-      color: #008822;
+      color: #ff00c8;
       clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
-      animation: glitch-1 4s infinite;
+      animation: glitch-1 3s infinite;
+      opacity: 0.6;
     }
 
     header h1::after {
-      color: #00cc33;
+      color: #00ffe5;
       clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
-      animation: glitch-2 4.2s infinite;
+      animation: glitch-2 3.2s infinite;
+      opacity: 0.6;
     }
 
     @keyframes glitch-1 {
       0%, 95%, 100% { transform: translateX(0); }
-      96% { transform: translateX(-1px); }
-      98% { transform: translateX(1px); }
+      96% { transform: translateX(-2px); }
+      98% { transform: translateX(2px); }
     }
 
     @keyframes glitch-2 {
       0%, 95%, 100% { transform: translateX(0); }
-      96% { transform: translateX(1px); }
-      98% { transform: translateX(-1px); }
+      96% { transform: translateX(2px); }
+      98% { transform: translateX(-2px); }
     }
 
     header p {
       text-align: center;
       font-size: clamp(7px, 2.4vw, 9px);
-      color: #00aa33;
+      color: #93a0c0;
       margin-bottom: 16px;
     }
 
@@ -98,9 +105,9 @@
     }
 
     .box {
-      background: rgba(0, 15, 0, 0.7);
-      border: 2px solid var(--border);
-      border-radius: 4px;
+      background: #0f1625;
+      border: 3px solid #071022;
+      border-radius: 6px;
       padding: 14px;
       height: 140px;
       display: flex;
@@ -108,12 +115,14 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: transform 0.2s, border-color 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.4);
     }
 
     .box:hover {
       transform: translateY(-4px);
-      border-color: var(--matrix);
+      border-color: var(--accent-2);
+      box-shadow: 0 6px 12px rgba(124, 92, 255, 0.3);
     }
 
     .box:hover .icon {
@@ -121,25 +130,27 @@
     }
 
     @keyframes glitch-icon {
-      0%, 100% { filter: brightness(1); }
-      50% { filter: brightness(1.3); }
+      0%, 100% { filter: hue-rotate(0deg); }
+      20% { filter: hue-rotate(10deg); }
+      40% { filter: hue-rotate(-10deg); }
+      60% { filter: hue-rotate(5deg); }
     }
 
     .icon {
       font-size: 28px;
       margin-bottom: 8px;
-      color: var(--matrix);
+      color: var(--accent-2);
     }
 
     .title {
       font-size: clamp(8px, 2.6vw, 10px);
       text-align: center;
-      color: var(--matrix);
+      color: var(--muted);
     }
 
     .subtitle {
       font-size: clamp(7px, 2.2vw, 8px);
-      color: #00aa33;
+      color: #9fb1d6;
       margin-top: 4px;
     }
 
@@ -147,7 +158,7 @@
       margin-top: 16px;
       text-align: center;
       font-size: clamp(7px, 2vw, 8px);
-      color: #007722;
+      color: #8ea0c6;
     }
 
     @media (max-width: 360px) {
@@ -159,30 +170,30 @@
     #warningPopup1 {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.9);
+      background: rgba(0,0,0,0.7);
       display: none;
       align-items: center;
       justify-content: center;
       z-index: 9999;
     }
     #warningPopup1 .popup-box1 {
-      background: rgba(0, 10, 0, 0.95);
-      color: var(--matrix);
+      background: #0f1625;
+      color: white;
       padding: 18px;
-      border: 2px solid var(--matrix);
-      border-radius: 4px;
+      border: 2px solid var(--accent-2);
+      border-radius: 8px;
       max-width: 280px;
       width: 90%;
       text-align: center;
       font-family: "Press Start 2P", monospace;
       font-size: 10px;
     }
-    #warningPopup1 button1 {
-      background: transparent;
-      border: 1px solid var(--matrix);
+    #warningPopup1 button {
+      background: var(--accent-2);
+      border: none;
       padding: 5px 10px;
-      color: var(--matrix);
-      border-radius: 3px;
+      color: white;
+      border-radius: 4px;
       font-family: "Press Start 2P", monospace;
       font-size: 9px;
       margin-top: 10px;
@@ -192,95 +203,192 @@
 </head>
 <body>
 
-  <div class="container" role="main">
-    <header>
-      <h1 data-text="PILIHAN — PIXEL PANEL">PILIHAN — PIXEL PANEL</h1>
-      <p>Pilih box untuk membuka file terkait. (Klik / tekan Enter pada kotak fokus)</p>
-    </header>
-
-    <div class="grid" id="menuGrid">
-      <div class="box" tabindex="0" data-target="QR.html">
-        <div class="icon">🗺️</div>
-        <div class="title">QR Generator</div>
-      </div>
-
-      <div class="box" tabindex="0" data-target="fake-tweet.html">
-        <div class="icon">🐦</div>
-        <div class="title">Fake Tweet</div>
-      </div>
-
-      <div class="box" tabindex="0" data-target="fake-iphone.html">
-        <div class="icon">💬</div>
-        <div class="title">eChat</div>
-        <div class="subtitle">Fake iPhone</div>
-      </div>
-
-      <div class="box" tabindex="0" data-target="spam-NGL.html">
-        <div class="icon">✉️</div>
-        <div class="title">Spam NGL</div>
-        <div class="subtitle">Anonymous Q&A</div>
-      </div>
-    </div>
-
-    <footer>
-      2025 Pixel Art Project<br>KentangDev.
-    </footer>
+  <div class="container" id="mainContainer" role="main">
+    <!-- Akan diisi dinamis -->
   </div>
 
   <!-- Popup Peringatan -->
   <div id="warningPopup1">
     <div class="popup-box1">
-      <h21>⚠️ Peringatan!</h21>
-      <p1 id="warningMessage1"></p1>
-      <button1 onclick="closeWarning1()">OK</button1>
+      <h2>⚠️ Peringatan!</h2>
+      <p id="warningMessage1"></p>
+      <button onclick="closeWarning1()">OK</button>
     </div>
   </div>
 
   <script>
-    const MAX_ATTEMPTS = 3;
-    function getAttempts() {
-      return parseInt(localStorage.getItem("inspectAttempts") || "0", 10);
-    }
-    function setAttempts(val) {
-      localStorage.setItem("inspectAttempts", val);
-    }
-    function addAttempt() {
-      let a = getAttempts() + 1;
-      setAttempts(a);
-      if (a >= MAX_ATTEMPTS) {
-        localStorage.setItem("blockedUntil", Date.now() + 120000);
-        window.location.href = "banned.html";
-      } else {
-        document.getElementById("warningMessage1").innerText = `Peringatan (${a}/${MAX_ATTEMPTS})`;
-        document.getElementById("warningPopup1").style.display = "flex";
-      }
-    }
-    function closeWarning1() {
+    // === FIREBASE CONFIG ===
+    const firebaseConfig = {
+      apiKey: "AIzaSyC5HS7vsJVs9dtarPkzhQmiqNaeCKkJw_A",
+      authDomain: "noxius-panel.firebaseapp.com",
+      projectId: "noxius-panel",
+      storageBucket: "noxius-panel.firebasestorage.app",
+      messagingSenderId: "873696240519",
+      appId: "1:873696240519:web:401f9efb0d71b32363a922",
+      measurementId: "G-YNC6NQT179"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // DOM
+    const mainContainer = document.getElementById('mainContainer');
+
+    // === POPUP ===
+    window.closeWarning1 = () => {
       document.getElementById("warningPopup1").style.display = "none";
+    };
+
+    // === RENDER LOGIN ===
+    function renderLogin() {
+      mainContainer.innerHTML = `
+        <header>
+          <h1 data-text="LOGIN — PIXEL PANEL">LOGIN — PIXEL PANEL</h1>
+          <p>Masukkan email dan password untuk melanjutkan.</p>
+        </header>
+        <div style="max-width: 320px; margin: 20px auto; padding: 16px;">
+          <input type="email" id="email" placeholder="Email" style="width:100%; padding:8px; margin:6px 0; border-radius:4px; border:1px solid #3ce0c3; background:#0f1625; color:white; font-family:'Press Start 2P', monospace; font-size:10px;">
+          <input type="password" id="password" placeholder="Password" style="width:100%; padding:8px; margin:6px 0; border-radius:4px; border:1px solid #3ce0c3; background:#0f1625; color:white; font-family:'Press Start 2P', monospace; font-size:10px;">
+          <button id="loginBtn" style="width:100%; padding:8px; margin-top:10px; background:#7c5cff; color:white; border:none; border-radius:4px; font-family:'Press Start 2P', monospace; font-size:10px; cursor:pointer;">
+            LOGIN
+          </button>
+          <button id="resetBtn" style="width:100%; padding:6px; margin-top:8px; background:transparent; color:#3ce0c3; border:1px solid #3ce0c3; border-radius:4px; font-family:'Press Start 2P', monospace; font-size:9px; cursor:pointer;">
+            🔑 Lupa Password?
+          </button>
+          <p id="loginError" style="color:#ff5555; margin-top:10px; font-size:9px; text-align:center;"></p>
+        </div>
+        <footer>
+          2025 Pixel Art Project<br>KentangDev.
+        </footer>
+      `;
+
+      document.getElementById('loginBtn').addEventListener('click', () => {
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const errorEl = document.getElementById('loginError');
+
+        if (!email || !password) {
+          errorEl.textContent = "Email dan password wajib diisi!";
+          return;
+        }
+
+        auth.signInWithEmailAndPassword(email, password)
+          .then(() => {
+            renderMenu();
+          })
+          .catch(err => {
+            let msg = "Email atau password salah.";
+            if (err.code === "auth/too-many-requests") msg = "Terlalu banyak percobaan. Coba lagi nanti.";
+            errorEl.textContent = "❌ " + msg;
+          });
+      });
+
+      document.getElementById('resetBtn').addEventListener('click', () => {
+        const email = document.getElementById('email').value.trim();
+        const errorEl = document.getElementById('loginError');
+
+        if (!email) {
+          errorEl.textContent = "Masukkan email terlebih dahulu!";
+          return;
+        }
+
+        auth.sendPasswordResetEmail(email)
+          .then(() => {
+            errorEl.style.color = "#3ce0c3";
+            errorEl.innerHTML = "✅ Link reset password telah dikirim!";
+          })
+          .catch(err => {
+            let msg = "Gagal mengirim email reset.";
+            if (err.code === "auth/user-not-found") msg = "Email tidak terdaftar.";
+            errorEl.textContent = "❌ " + msg;
+          });
+      });
     }
 
-    document.addEventListener('contextmenu', e => { e.preventDefault(); addAttempt(); });
-    document.addEventListener('keydown', e => {
-      if (e.key === 'F12' || 
-          (e.ctrlKey && e.shiftKey && ['I','J'].includes(e.key.toUpperCase())) || 
-          (e.ctrlKey && e.key.toUpperCase() === 'U')) {
-        e.preventDefault(); addAttempt();
-      }
-    });
+    // === RENDER MENU ===
+    function renderMenu() {
+      mainContainer.innerHTML = `
+        <header>
+          <h1 data-text="PILIHAN — PIXEL PANEL">PILIHAN — PIXEL PANEL</h1>
+          <p>Pilih box untuk membuka file terkait.</p>
+        </header>
 
-    document.querySelectorAll('.box').forEach(box => {
-      box.addEventListener('click', () => {
-        const t = box.dataset.target;
-        if (t) window.location.href = t;
-      });
-      box.addEventListener('keydown', e => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
+        <div class="grid" id="menuGrid">
+          <div class="box" tabindex="0" data-target="QR.html">
+            <div class="icon">🗺️</div>
+            <div class="title">QR Generator</div>
+          </div>
+          <div class="box" tabindex="0" data-target="fake-tweet.html">
+            <div class="icon">🐦</div>
+            <div class="title">Fake Tweet</div>
+          </div>
+          <div class="box" tabindex="0" data-target="fake-iphone.html">
+            <div class="icon">💬</div>
+            <div class="title">eChat</div>
+            <div class="subtitle">Fake iPhone</div>
+          </div>
+          <div class="box" tabindex="0" data-target="spam-NGL.html">
+            <div class="icon">✉️</div>
+            <div class="title">Spam NGL</div>
+            <div class="subtitle">Anonymous Q&A</div>
+          </div>
+        </div>
+
+        <footer>
+          2025 Pixel Art Project<br>KentangDev.
+        </footer>
+      `;
+
+      document.querySelectorAll('.box').forEach(box => {
+        box.addEventListener('click', () => {
           const t = box.dataset.target;
           if (t) window.location.href = t;
-        }
+        });
+        box.addEventListener('keydown', e => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            const t = box.dataset.target;
+            if (t) window.location.href = t;
+          }
+        });
       });
-    });
-  </script>
-</body>
-</html>
+
+      setupInspectProtection();
+    }
+
+    // === PROTEKSI INSPECT DENGAN FIRESTORE ===
+    async function setupInspectProtection() {
+      const MAX_ATTEMPTS = 3;
+      const BLOCK_DURATION = 120000; // 2 menit
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const uid = user.uid;
+      const attemptsRef = db.collection('users').doc(uid).collection('security').doc('attempts');
+
+      // Cek status blokir saat load
+      const doc = await attemptsRef.get();
+      const now = Date.now();
+
+      if (doc.exists) {
+        const data = doc.data();
+        if (data.blockedUntil && now < data.blockedUntil) {
+          window.location.href = "banned.html";
+          return;
+        }
+        // Reset jika sudah lewat 2 menit
+        if (data.lastAttempt && now - data.lastAttempt > BLOCK_DURATION) {
+          await attemptsRef.update({
+            attempts: 0,
+            lastAttempt: firebase.firestore.FieldValue.delete(),
+            blockedUntil: firebase.firestore.FieldValue.delete()
+          });
+        }
+      }
+
+      // Fungsi tambah percobaan
+      async function addAttempt() {
+        const now = Date.now();
+     

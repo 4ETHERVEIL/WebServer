@@ -49,6 +49,39 @@
       font-size: 10px;
       margin-bottom: 16px;
     }
+    
+    /* === Menu Navigasi Admin === */
+    .admin-menu {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .menu-btn {
+      padding: 8px 12px;
+      background: #0a111e;
+      border: 1px solid var(--accent-2);
+      color: var(--muted);
+      font-family: "Press Start 2P", monospace;
+      font-size: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .menu-btn.active {
+      background: var(--accent-2);
+      color: black;
+    }
+
+    /* === Panel Konten === */
+    .panel {
+      display: none;
+    }
+    .panel.active {
+      display: block;
+    }
+
+    /* === Tabel User === */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -81,8 +114,8 @@
       word-wrap: break-word;
     }
 
-    /* === Popup Ban === */
-    #banPopup {
+    /* === Popup Umum === */
+    .popup-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.85);
@@ -97,22 +130,23 @@
       border-radius: 8px;
       padding: 16px;
       width: 90%;
-      max-width: 320px;
+      max-width: 340px;
       font-size: 10px;
-      text-align: center;
+      text-align: left;
     }
     .popup-content h3 {
       color: gold;
       margin: 0 0 12px;
+      text-align: center;
     }
     .popup-content label {
       display: block;
       margin: 8px 0 4px;
       font-size: 9px;
     }
+    .popup-content input,
     .popup-content select,
-    .popup-content input[type="number"],
-    .popup-content input[type="text"] {
+    .popup-content textarea {
       width: 100%;
       padding: 6px;
       margin: 4px 0;
@@ -121,18 +155,23 @@
       color: white;
       font-family: "Press Start 2P", monospace;
       font-size: 9px;
-      text-align: center;
     }
     .popup-buttons {
       margin-top: 12px;
+      display: flex;
+      gap: 8px;
     }
     .popup-buttons button {
-      width: 48%;
+      flex: 1;
       padding: 5px;
       font-size: 9px;
     }
     .cancel-btn {
       background: #555;
+      color: white;
+    }
+    .confirm-btn {
+      background: var(--accent-2);
       color: white;
     }
   </style>
@@ -142,25 +181,48 @@
     <a href="index.html" class="back-btn">← Kembali ke Menu</a>
     <h2>🔒 ADMIN DASHBOARD</h2>
     
-    <table id="userTable">
-      <thead>
-        <tr>
-          <th>UID 9 Digit</th>
-          <th>Email</th>
-          <th>Role</th>
-          <th>Banned?</th>
-          <th>Catatan</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody id="userList">
-        <tr><td colspan="6">Memuat data...</td></tr>
-      </tbody>
-    </table>
+    <!-- Menu Navigasi -->
+    <div class="admin-menu">
+      <button class="menu-btn active" data-panel="users">Kelola User</button>
+      <button class="menu-btn" data-panel="upload">Upload Box Baru</button>
+    </div>
+
+    <!-- Panel: Kelola User -->
+    <div id="users-panel" class="panel active">
+      <table id="userTable">
+        <thead>
+          <tr>
+            <th>UID 9 Digit</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Banned?</th>
+            <th>Catatan</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="userList">
+          <tr><td colspan="6">Memuat data...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Panel: Upload Box Baru -->
+    <div id="upload-panel" class="panel">
+      <p style="text-align:center; font-size:10px; margin-bottom:16px;">
+        Tambahkan item baru ke menu utama pengguna.
+      </p>
+      <button class="confirm-btn" onclick="openUploadPopup()" style="width:100%; padding:8px; font-size:10px;">
+        + Buat Box Baru
+      </button>
+      <h3 style="margin-top:20px; font-size:12px;">Daftar Box Saat Ini:</h3>
+      <div id="menuList" style="font-size:9px; margin-top:8px;">
+        Memuat...
+      </div>
+    </div>
   </div>
 
-  <!-- Popup Ban -->
-  <div id="banPopup">
+  <!-- Popup: Ban User -->
+  <div id="banPopup" class="popup-overlay">
     <div class="popup-content">
       <h3>⛔ BAN USER</h3>
       <label for="banUnit">Durasi:</label>
@@ -172,12 +234,33 @@
       <input type="number" id="banDuration" min="1" value="10" placeholder="Durasi">
       <label for="banNote">Catatan (opsional):</label>
       <input type="text" id="banNote" placeholder="Alasan banned">
-      
       <input type="hidden" id="banTargetUid">
+      <div class="popup-buttons">
+        <button class="confirm-btn" onclick="confirmBan()">Ban</button>
+        <button class="cancel-btn" onclick="closeBanPopup()">Batal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup: Upload Box Baru -->
+  <div id="uploadPopup" class="popup-overlay">
+    <div class="popup-content">
+      <h3>➕ UPLOAD BOX BARU</h3>
+      <label for="boxTitle">Judul:</label>
+      <input type="text" id="boxTitle" placeholder="Contoh: Game Baru" required>
+      
+      <label for="boxIcon">Ikon (Emoji):</label>
+      <input type="text" id="boxIcon" placeholder="Contoh: 🎮" maxlength="2" required>
+      
+      <label for="boxTarget">File Target:</label>
+      <input type="text" id="boxTarget" placeholder="Contoh: game-baru.html" required>
+      
+      <label for="boxSubtitle">Deskripsi (opsional):</label>
+      <input type="text" id="boxSubtitle" placeholder="Opsional">
       
       <div class="popup-buttons">
-        <button class="ban-confirm-btn" onclick="confirmBan()">Ban</button>
-        <button class="cancel-btn" onclick="closeBanPopup()">Batal</button>
+        <button class="confirm-btn" onclick="submitNewBox()">Simpan</button>
+        <button class="cancel-btn" onclick="closeUploadPopup()">Batal</button>
       </div>
     </div>
   </div>
@@ -203,6 +286,21 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
+    // Navigasi Menu
+    document.querySelectorAll('.menu-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        const panelId = btn.dataset.panel;
+        document.getElementById(panelId + '-panel').classList.add('active');
+        
+        if (panelId === 'upload') {
+          loadMenuItems();
+        }
+      });
+    });
+
     auth.onAuthStateChanged(async (user) => {
       if (!user) {
         alert("Silakan login terlebih dahulu!");
@@ -220,17 +318,16 @@
       loadUsers();
     });
 
+    // === USER MANAGEMENT ===
     async function loadUsers() {
       const list = document.getElementById("userList");
       try {
         const snapshot = await db.collection("users").orderBy("createdAt", "asc").get();
         list.innerHTML = "";
-        
         if (snapshot.empty) {
           list.innerHTML = `<tr><td colspan="6">Belum ada user.</td></tr>`;
           return;
         }
-
         snapshot.forEach(doc => {
           const d = doc.data();
           const isBanned = d.bannedUntil && d.bannedUntil.toDate() > new Date();
@@ -240,7 +337,6 @@
             const timeStr = endTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
             bannedDisplay = `Ya (sampai ${timeStr})`;
           }
-
           const row = document.createElement("tr");
           row.innerHTML = `
             <td>${d.uid9 || '—'}</td>
@@ -280,21 +376,12 @@
       const unit = document.getElementById("banUnit").value;
       const durStr = document.getElementById("banDuration").value;
       const note = (document.getElementById("banNote").value || "Dibanned oleh admin").trim();
-      
       const dur = parseInt(durStr);
       if (isNaN(dur) || dur < 1) {
         alert("Durasi harus minimal 1!");
         return;
       }
-
-      let minutes;
-      if (unit === "hour") {
-        minutes = dur * 60;
-      } else {
-        // "min" dan "custom" sama-sama dalam menit
-        minutes = dur;
-      }
-
+      let minutes = (unit === "hour") ? dur * 60 : dur;
       try {
         const banUntil = new Date();
         banUntil.setMinutes(banUntil.getMinutes() + minutes);
@@ -321,11 +408,78 @@
       }
     }
 
-    // Tutup popup saat klik di luar konten
-    document.getElementById("banPopup").addEventListener("click", (e) => {
-      if (e.target.id === "banPopup") {
-        closeBanPopup();
+    // === MENU ITEM MANAGEMENT ===
+    async function loadMenuItems() {
+      const container = document.getElementById("menuList");
+      try {
+        const snapshot = await db.collection("menuItems").orderBy("createdAt", "desc").get();
+        if (snapshot.empty) {
+          container.innerHTML = "<p>Belum ada box.</p>";
+          return;
+        }
+        let html = "<ul style='padding-left:16px;'>";
+        snapshot.forEach(doc => {
+          const d = doc.data();
+          html += `<li><strong>${d.title}</strong> → ${d.target} ${d.subtitle ? `(${d.subtitle})` : ''}</li>`;
+        });
+        html += "</ul>";
+        container.innerHTML = html;
+      } catch (e) {
+        container.innerHTML = "<p>Gagal memuat daftar box.</p>";
       }
+    }
+
+    function openUploadPopup() {
+      document.getElementById("boxTitle").value = "";
+      document.getElementById("boxIcon").value = "";
+      document.getElementById("boxTarget").value = "";
+      document.getElementById("boxSubtitle").value = "";
+      document.getElementById("uploadPopup").style.display = "flex";
+    }
+
+    function closeUploadPopup() {
+      document.getElementById("uploadPopup").style.display = "none";
+    }
+
+    async function submitNewBox() {
+      const title = document.getElementById("boxTitle").value.trim();
+      const icon = document.getElementById("boxIcon").value.trim();
+      const target = document.getElementById("boxTarget").value.trim();
+      const subtitle = document.getElementById("boxSubtitle").value.trim();
+
+      if (!title || !icon || !target) {
+        alert("Judul, ikon, dan file target wajib diisi!");
+        return;
+      }
+
+      if (!target.endsWith('.html')) {
+        alert("File target harus berakhiran .html!");
+        return;
+      }
+
+      try {
+        await db.collection("menuItems").add({
+          title: title,
+          icon: icon,
+          target: target,
+          subtitle: subtitle || null,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        closeUploadPopup();
+        loadMenuItems();
+        alert("Box baru berhasil ditambahkan!");
+      } catch (e) {
+        alert("Gagal menyimpan box: " + e.message);
+      }
+    }
+
+    // Tutup popup saat klik di luar
+    document.querySelectorAll('.popup-overlay').forEach(el => {
+      el.addEventListener("click", (e) => {
+        if (e.target === el) {
+          el.style.display = "none";
+        }
+      });
     });
   </script>
 </body>

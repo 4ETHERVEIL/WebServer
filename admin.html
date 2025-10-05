@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Dashboard — Pixel Art</title>
+  <link rel="icon" href="foto/foto.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #0f1724;
+      --accent: #3ce0c3;
+      --accent-2: #7c5cff;
+      --muted: #b6c0d6;
+      --box: #121826;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+
+    body {
+      font-family: "Press Start 2P", monospace;
+      background: url('https://i.imgur.com/nvdnNzi.jpeg') center/cover no-repeat fixed;
+      color: var(--muted);
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1100px;
+      background: rgba(11, 18, 32, 0.65);
+      border: 4px solid #071022;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+    }
+
+    header h1 {
+      margin: 0 0 16px;
+      font-size: clamp(14px, 4vw, 18px);
+      color: var(--accent);
+      text-align: center;
+      position: relative;
+    }
+
+    .user-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .user-card {
+      background: #0f1625;
+      border: 2px solid #071022;
+      border-radius: 6px;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .user-info {
+      flex: 1;
+    }
+
+    .user-info div {
+      font-size: 10px;
+      margin: 2px 0;
+    }
+
+    .user-info .uid {
+      font-family: monospace;
+      color: var(--accent);
+      font-size: 9px;
+    }
+
+    .user-info .display-id {
+      font-family: monospace;
+      color: white;
+      font-size: 12px;
+    }
+
+    .status {
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    .status.banned {
+      background: #ff5555;
+      color: white;
+    }
+
+    .status.active {
+      background: #3ce0c3;
+      color: black;
+    }
+
+    .actions button {
+      padding: 4px 8px;
+      font-family: "Press Start 2P", monospace;
+      font-size: 8px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      margin-left: 4px;
+    }
+
+    .ban-btn {
+      background: #ff5555;
+      color: white;
+    }
+
+    .unban-btn {
+      background: #3ce0c3;
+      color: black;
+    }
+
+    .logout-btn {
+      display: block;
+      width: 100%;
+      max-width: 150px;
+      margin: 16px auto;
+      padding: 6px;
+      background: #ff5555;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-family: "Press Start 2P", monospace;
+      font-size: 9px;
+      cursor: pointer;
+    }
+
+    footer {
+      margin-top: 16px;
+      text-align: center;
+      font-size: clamp(7px, 2vw, 8px);
+      color: #8ea0c6;
+    }
+
+    /* Login Form */
+    .login-form {
+      max-width: 320px;
+      margin: 20px auto;
+      padding: 16px;
+    }
+
+    .login-form input {
+      width: 100%;
+      padding: 8px;
+      margin: 6px 0;
+      border-radius: 4px;
+      border: 1px solid var(--accent);
+      background: #0f1625;
+      color: white;
+      font-family: "Press Start 2P", monospace;
+      font-size: 10px;
+    }
+
+    .login-form button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 10px;
+      background: var(--accent-2);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-family: "Press Start 2P", monospace;
+      font-size: 10px;
+      cursor: pointer;
+    }
+
+    .error {
+      color: #ff5555;
+      font-size: 9px;
+      margin-top: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container" id="mainContainer">
+    <!-- Akan diisi dinamis -->
+  </div>
+
+  <script>
+    // === FIREBASE CONFIG === (SAMA DENGAN index.html)
+    const firebaseConfig = {
+      apiKey: "AIzaSyC5HS7vsJVs9dtarPkzhQmiqNaeCKkJw_A",
+      authDomain: "noxius-panel.firebaseapp.com",
+      projectId: "noxius-panel",
+      storageBucket: "noxius-panel.firebasestorage.app",
+      messagingSenderId: "873696240519",
+      appId: "1:873696240519:web:401f9efb0d71b32363a922",
+      measurementId: "G-YNC6NQT179"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    const mainContainer = document.getElementById('mainContainer');
+
+    // === CEK APAKAH ADMIN ===
+    async function isAdmin(uid) {
+      const adminDoc = await db.collection('admins').doc(uid).get();
+      return adminDoc.exists && adminDoc.data().role === "admin";
+    }
+
+    // === RENDER LOGIN ADMIN ===
+    function renderAdminLogin() {
+      mainContainer.innerHTML = `
+        <header>
+          <h1 data-text="ADMIN LOGIN">ADMIN LOGIN</h1>
+        </header>
+        <div class="login-form">
+          <input type="email" id="adminEmail" placeholder="Admin Email" />
+          <input type="password" id="adminPassword" placeholder="Password" />
+          <button id="adminLoginBtn">LOGIN</button>
+          <div class="error" id="adminError"></div>
+        </div>
+        <footer>
+          2025 Pixel Art Project<br>KentangDev.
+        </footer>
+      `;
+
+      document.getElementById('adminLoginBtn').addEventListener('click', async () => {
+        const email = document.getElementById('adminEmail').value.trim();
+        const password = document.getElementById('adminPassword').value;
+        const errorEl = document.getElementById('adminError');
+
+        if (!email || !password) {
+          errorEl.textContent = "Email dan password wajib diisi!";
+          return;
+        }
+
+        try {
+          await auth.signInWithEmailAndPassword(email, password);
+          // Role dicek di onAuthStateChanged
+        } catch (err) {
+          errorEl.textContent = "Login admin gagal: " + (err.message || "Coba lagi.");
+        }
+      });
+    }
+
+    // === RENDER DASHBOARD ADMIN ===
+    async function renderAdminDashboard() {
+      mainContainer.innerHTML = `
+        <header>
+          <h1 data-text="ADMIN DASHBOARD">ADMIN DASHBOARD</h1>
+        </header>
+        <div class="user-list" id="userList">
+          <p style="text-align:center; font-size:10px;">Memuat daftar user...</p>
+        </div>
+        <button class="logout-btn" id="adminLogoutBtn">🚪 LOGOUT</button>
+        <footer>
+          2025 Pixel Art Project<br>KentangDev.
+        </footer>
+      `;
+
+      // Logout
+      document.getElementById('adminLogoutBtn').addEventListener('click', () => {
+        auth.signOut().then(() => {
+          renderAdminLogin();
+        });
+      });
+
+      // Muat daftar user
+      loadUsers();
+    }
+
+    // === MUAT DAFTAR USER ===
+    async function loadUsers() {
+      const userListEl = document.getElementById('userList');
+      try {
+        const usersSnapshot = await db.collection('users').get();
+        if (usersSnapshot.empty) {
+          userListEl.innerHTML = '<p style="text-align:center; font-size:10px;">Belum ada user.</p>';
+          return;
+        }
+
+        let html = '';
+        for (const userDoc of usersSnapshot.docs) {
+          const uid = userDoc.id;
+          const profileRef = db.collection('users').doc(uid).collection('profile').doc('info');
+          const securityRef = db.collection('users').doc(uid).collection('security').doc('attempts');
+
+          const [profileSnap, securitySnap] = await Promise.all([
+            profileRef.get(),
+            securityRef.get()
+          ]);
+
+          const displayUid = profileSnap.exists ? profileSnap.data().displayUid || '—' : '—';
+          const isBanned = securitySnap.exists && securitySnap.data().blockedUntil && Date.now() < securitySnap.data().blockedUntil;
+
+          html += `
+            <div class="user-card">
+              <div class="user-info">
+                <div class="display-id">${displayUid}</div>
+                <div class="uid">UID: ${uid.substring(0, 8)}...</div>
+              </div>
+              <div>
+                <div class="status ${isBanned ? 'banned' : 'active'}">
+                  ${isBanned ? 'BANNED' : 'ACTIVE'}
+                </div>
+                <div class="actions">
+                  ${isBanned ? 
+                    `<button class="unban-btn" onclick="unbanUser('${uid}')">UNBAN</button>` :
+                    `<button class="ban-btn" onclick="banUser('${uid}')">BAN</button>`
+                  }
+                </div>
+              </div>
+            </div>
+          `;
+        }
+        userListEl.innerHTML = html;
+      } catch (err) {
+        console.error("Gagal memuat user:", err);
+        userListEl.innerHTML = '<p style="text-align:center; color:#ff5555; font-size:10px;">Gagal memuat data.</p>';
+      }
+    }
+
+    // === FUNGSI BAN USER ===
+    async function banUser(uid) {
+      if (!confirm(`Yakin ingin ban user ${uid}?`)) return;
+      try {
+        const now = Date.now();
+        await db.collection('users').doc(uid).collection('security').doc('attempts').set({
+          attempts: 99,
+          blockedUntil: now + 120000, // 2 menit
+          lastAttempt: now
+        }, { merge: true });
+        alert("✅ User berhasil di-ban!");
+        loadUsers(); // refresh
+      } catch (err) {
+        alert("❌ Gagal ban user: " + err.message);
+      }
+    }
+
+    // === FUNGSI UNBAN USER ===
+    async function unbanUser(uid) {
+      if (!confirm(`Yakin ingin unban user ${uid}?`)) return;
+      try {
+        await db.collection('users').doc(uid).collection('security').doc('attempts').update({
+          blockedUntil: firebase.firestore.FieldValue.delete(),
+          attempts: 0
+        });
+        alert("✅ User berhasil di-unban!");
+        loadUsers(); // refresh
+      } catch (err) {
+        alert("❌ Gagal unban user: " + err.message);
+      }
+    }
+
+    // === EKSPOR FUNGSI KE GLOBAL ===
+    window.banUser = banUser;
+    window.unbanUser = unbanUser;
+
+    // === CEK STATUS LOGIN ===
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        const admin = await isAdmin(user.uid);
+        if (admin) {
+          renderAdminDashboard();
+        } else {
+          // Bukan admin → logout
+          alert("❌ Anda bukan admin!");
+          auth.signOut();
+        }
+      } else {
+        renderAdminLogin();
+      }
+    });
+  </script>
+</body>
+</html>

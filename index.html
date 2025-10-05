@@ -3,15 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login — Pixel Art</title>
+  <title>Menu Pilihan — Pixel Art</title>
   <link rel="icon" href="foto/foto.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
   <style>
     :root {
       --bg: #0b1220;
@@ -165,489 +159,200 @@
       .box { height: 120px; padding: 10px; }
       .icon { font-size: 24px; }
     }
-
-    /* Popup Umum */
-    .popup-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.7);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-    }
-
-    .popup-box {
-      background: #0f1625;
-      color: white;
-      padding: 18px;
-      border: 2px solid var(--accent-2);
-      border-radius: 8px;
-      max-width: 280px;
-      width: 90%;
-      text-align: center;
-      font-family: "Press Start 2P", monospace;
-      font-size: 10px;
-    }
-
-    .popup-box h3 {
-      margin: 0 0 8px;
-      color: var(--accent);
-      font-size: 12px;
-    }
-
-    .popup-box p {
-      font-size: 8px;
-      color: #9fb1d6;
-      margin-bottom: 10px;
-    }
-
-    .popup-box button {
-      background: var(--accent-2);
-      border: none;
-      padding: 5px 10px;
-      color: white;
-      border-radius: 4px;
-      font-family: "Press Start 2P", monospace;
-      font-size: 9px;
-      margin-top: 10px;
-      cursor: pointer;
-    }
-
-    /* Popup Account Khusus */
-    #accountPopup .popup-box {
-      border-color: var(--accent);
-    }
-
-    #accountPopup .popup-box h3 {
-      color: var(--accent);
-    }
-
-    #popupUserUid {
-      font-family: monospace;
-      color: white;
-      font-size: 12px;
-      letter-spacing: 1px;
-      margin: 6px 0;
-      cursor: pointer;
-      padding: 4px;
-      border-radius: 3px;
-      transition: background 0.2s;
-    }
-
-    #popupUserUid:hover {
-      background: rgba(60, 224, 195, 0.2);
-    }
-
-    #popupLogoutBtn {
-      background: #ff5555 !important;
-      width: 100%;
-      padding: 4px;
-      font-size: 8px;
-      margin-top: 10px;
-    }
   </style>
 </head>
 <body>
 
-  <div class="container" id="mainContainer" role="main">
-    <!-- Akan diisi dinamis -->
+  <div class="container" role="main">
+    <header>
+      <h1 data-text="PILIHAN — PIXEL PANEL">PILIHAN — PIXEL PANEL</h1>
+      <p>Pilih box untuk membuka file terkait. (Klik / tekan Enter pada kotak fokus)</p>
+    </header>
+
+    <div class="grid" id="menuGrid" style="display:none;">
+      <div class="box" tabindex="0" data-target="QR.html">
+        <div class="icon">🗺️</div>
+        <div class="title">QR Generator</div>
+      </div>
+
+      <div class="box" tabindex="0" data-target="fake-tweet.html">
+        <div class="icon">🐦</div>
+        <div class="title">Fake Tweet</div>
+      </div>
+
+      <div class="box" tabindex="0" data-target="fake-iphone.html">
+        <div class="icon">💬</div>
+        <div class="title">eChat</div>
+        <div class="subtitle">Fake iPhone</div>
+      </div>
+
+      <div class="box" tabindex="0" data-target="spam-NGL.html">
+        <div class="icon">✉️</div>
+        <div class="title">Spam NGL</div>
+        <div class="subtitle">Anonymous Q&A</div>
+      </div>
+    </div>
+
+    <footer id="mainFooter">
+      <!-- Diisi oleh JS -->
+    </footer>
   </div>
 
-  <!-- Popup Peringatan -->
-  <div id="warningPopup1" class="popup-overlay">
-    <div class="popup-box">
-      <h2>⚠️ Peringatan!</h2>
-      <p id="warningMessage1"></p>
-      <button onclick="closeWarning1()">OK</button>
-    </div>
-  </div>
-
-  <!-- Popup Account -->
-  <div id="accountPopup" class="popup-overlay">
-    <div class="popup-box">
-      <h3>👤 Akun Anda</h3>
-      <p>Untuk menyalin ID, tinggal klik!</p>
-      <div style="font-size:8px; color:#b6c0d6; margin-bottom:4px;">ID:</div>
-      <div id="popupUserUid">LOADING...</div>
-      <button id="popupLogoutBtn">🚪 LOGOUT</button>
-    </div>
-  </div>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
   <script>
-    // === FIREBASE CONFIG ===
-    const firebaseConfig = {
-      apiKey: "AIzaSyC5HS7vsJVs9dtarPkzhQmiqNaeCKkJw_A",
-      authDomain: "noxius-panel.firebaseapp.com",
-      projectId: "noxius-panel",
-      storageBucket: "noxius-panel.firebasestorage.app",
-      messagingSenderId: "873696240519",
-      appId: "1:873696240519:web:401f9efb0d71b32363a922",
-      measurementId: "G-YNC6NQT179"
-    };
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyC5HS7vsJVs9dtarPkzhQmiqNaeCKkJw_A",
+  authDomain: "noxius-panel.firebaseapp.com",
+  projectId: "noxius-panel",
+  storageBucket: "noxius-panel.firebasestorage.app",
+  messagingSenderId: "873696240519",
+  appId: "1:873696240519:web:401f9efb0d71b32363a922",
+  measurementId: "G-YNC6NQT179"
+};
 
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    const mainContainer = document.getElementById('mainContainer');
-
-    window.closeWarning1 = () => {
-      document.getElementById("warningPopup1").style.display = "none";
-    };
-
-    // === GENERATE 8-DIGIT UID ===
-    function generate8DigitUid() {
-      return Math.floor(10000000 + Math.random() * 90000000).toString();
+    function generate9DigitUID() {
+      return Math.floor(100000000 + Math.random() * 900000000).toString();
     }
 
-    // === RENDER LOGIN ===
-    function renderLogin() {
-      mainContainer.innerHTML = `
-        <header>
-          <h1 data-text="LOGIN — PIXEL PANEL">LOGIN — PIXEL PANEL</h1>
-          <p>Masukkan email dan password untuk melanjutkan.</p>
-        </header>
-        <div style="max-width: 320px; margin: 20px auto; padding: 16px;">
-          <input type="email" id="email" placeholder="Email" style="width:100%; padding:8px; margin:6px 0; border-radius:4px; border:1px solid #3ce0c3; background:#0f1625; color:white; font-family:'Press Start 2P', monospace; font-size:10px;">
-          <input type="password" id="password" placeholder="Password" style="width:100%; padding:8px; margin:6px 0; border-radius:4px; border:1px solid #3ce0c3; background:#0f1625; color:white; font-family:'Press Start 2P', monospace; font-size:10px;">
-          <button id="loginBtn" style="width:100%; padding:8px; margin-top:10px; background:#7c5cff; color:white; border:none; border-radius:4px; font-family:'Press Start 2P', monospace; font-size:10px; cursor:pointer;">
-            LOGIN
-          </button>
-          <button id="signupBtn" style="width:100%; padding:6px; margin-top:6px; background:transparent; color:#7c5cff; border:1px solid #7c5cff; border-radius:4px; font-family:'Press Start 2P', monospace; font-size:9px; cursor:pointer;">
-            ➕ Buat Akun Baru
-          </button>
-          <button id="resetBtn" style="width:100%; padding:6px; margin-top:6px; background:transparent; color:#3ce0c3; border:1px solid #3ce0c3; border-radius:4px; font-family:'Press Start 2P', monospace; font-size:9px; cursor:pointer;">
-            🔑 Lupa Password?
-          </button>
-          <p id="loginError" style="color:#ff5555; margin-top:10px; font-size:9px; text-align:center;"></p>
+    async function ensureUserUID(user) {
+      const userRef = db.collection("users").doc(user.uid);
+      const doc = await userRef.get();
+      if (!doc.exists) {
+        const customUID = generate9DigitUID();
+        await userRef.set({
+          email: user.email,
+          uid9: customUID,
+          role: "user",
+          bannedUntil: null,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        return customUID;
+      } else {
+        return doc.data().uid9;
+      }
+    }
+
+    function showAccountPopup(uid9) {
+      const popup = document.createElement("div");
+      popup.id = "accountPopup";
+      popup.innerHTML = `
+        <div style="position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+          <div style="background: #0f1625; color: white; padding: 16px; border: 2px solid var(--accent-2); border-radius: 8px; max-width: 280px; width: 90%; text-align: center; font-family: 'Press Start 2P', monospace; font-size: 10px;">
+            <h3>AKUN</h3>
+            <p>ID: <strong>${uid9}</strong></p>
+            <button id="copyBtn" style="background: var(--accent); border: none; padding: 4px 8px; color: black; border-radius: 4px; font-size: 9px; margin: 6px 0;">Salin UID</button><br>
+            <button onclick="auth.signOut().then(() => location.reload()); document.getElementById('accountPopup').remove();" 
+                    style="background: #ff4d4d; border: none; padding: 4px 8px; color: white; border-radius: 4px; font-size: 9px;">Logout</button>
+          </div>
         </div>
-        <footer>
-          2025 Pixel Art Project<br>KentangDev.
-        </footer>
       `;
+      document.body.appendChild(popup);
 
-      document.getElementById('loginBtn').addEventListener('click', handleLogin);
-      document.getElementById('signupBtn').addEventListener('click', renderSignup);
-      document.getElementById('resetBtn').addEventListener('click', handleResetPassword);
+      document.getElementById("copyBtn").addEventListener("click", () => {
+        navigator.clipboard.writeText(uid9).then(() => {
+          alert("UID disalin!");
+        });
+      });
     }
 
-    // === RENDER SIGN UP ===
-    function renderSignup() {
-      mainContainer.innerHTML = `
-        <header>
-          <h1 data-text="DAFTAR — PIXEL PANEL">DAFTAR — PIXEL PANEL</h1>
-          <p>Buat akun baru untuk mengakses panel.</p>
-        </header>
-        <div style="max-width: 320px; margin: 20px auto; padding: 16px;">
-          <input type="email" id="signupEmail" placeholder="Email" style="width:100%; padding:8px; margin:6px 0; border-radius:4px; border:1px solid #3ce0c3; background:#0f1625; color:white; font-family:'Press Start 2P', monospace; font-size:10px;">
-          <input type="password" id="signupPassword" placeholder="Password (min. 6 karakter)" style="width:100%; padding:8px; margin:6px 0; border-radius:4px; border:1px solid #3ce0c3; background:#0f1625; color:white; font-family:'Press Start 2P', monospace; font-size:10px;">
-          <button id="createAccountBtn" style="width:100%; padding:8px; margin-top:10px; background:#3ce0c3; color:black; border:none; border-radius:4px; font-family:'Press Start 2P', monospace; font-size:10px; cursor:pointer;">
-            BUAT AKUN
-          </button>
-          <button id="backToLoginBtn" style="width:100%; padding:6px; margin-top:6px; background:transparent; color:#7c5cff; border:1px solid #7c5cff; border-radius:4px; font-family:'Press Start 2P', monospace; font-size:9px; cursor:pointer;">
-            ← Kembali ke Login
-          </button>
-          <p id="signupError" style="color:#ff5555; margin-top:10px; font-size:9px; text-align:center;"></p>
+    function showBannedPopup(unbanTime) {
+      const now = new Date();
+      let timeLeft = Math.ceil((unbanTime - now) / 1000);
+      
+      const popup = document.createElement("div");
+      popup.id = "bannedPopup";
+      popup.innerHTML = `
+        <div style="position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+          <div style="background: #220000; color: #ff6666; padding: 20px; border: 2px solid #ff0000; border-radius: 8px; max-width: 300px; width: 90%; text-align: center; font-family: 'Press Start 2P', monospace; font-size: 10px;">
+            <h2>⛔ DIBANNED!</h2>
+            <p>Akun Anda dibanned sementara.</p>
+            <p>Waktu tersisa: <span id="countdown">${timeLeft}s</span></p>
+            <button onclick="location.reload()" style="background: #555; color: white; border: none; padding: 5px 10px; border-radius: 4px; margin-top: 10px;">Refresh</button>
+          </div>
         </div>
-        <footer>
-          2025 Pixel Art Project<br>KentangDev.
-        </footer>
       `;
+      document.body.appendChild(popup);
 
-      document.getElementById('createAccountBtn').addEventListener('click', handleSignup);
-      document.getElementById('backToLoginBtn').addEventListener('click', renderLogin);
-    }
-
-    function handleLogin() {
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      const errorEl = document.getElementById('loginError');
-
-      if (!email || !password) {
-        errorEl.textContent = "Email dan password wajib diisi!";
-        return;
-      }
-
-      auth.signInWithEmailAndPassword(email, password)
-        .then(() => {
-          renderMenu();
-        })
-        .catch(err => {
-          let msg = "Email atau password salah.";
-          if (err.code === "auth/too-many-requests") msg = "Terlalu banyak percobaan. Coba lagi nanti.";
-          errorEl.textContent = "❌ " + msg;
-        });
-    }
-
-    function handleSignup() {
-      const email = document.getElementById('signupEmail').value.trim();
-      const password = document.getElementById('signupPassword').value;
-      const errorEl = document.getElementById('signupError');
-
-      if (!email || !password) {
-        errorEl.textContent = "Email dan password wajib diisi!";
-        return;
-      }
-
-      if (password.length < 6) {
-        errorEl.textContent = "Password minimal 6 karakter!";
-        return;
-      }
-
-      auth.createUserWithEmailAndPassword(email, password)
-        .then(() => {
-          renderMenu();
-        })
-        .catch(err => {
-          let msg = "Gagal membuat akun.";
-          if (err.code === "auth/email-already-in-use") {
-            msg = "Email sudah terdaftar.";
-          } else if (err.code === "auth/invalid-email") {
-            msg = "Format email tidak valid.";
-          } else if (err.code === "auth/weak-password") {
-            msg = "Password terlalu lemah (min. 6 karakter).";
-          }
-          errorEl.textContent = "❌ " + msg;
-        });
-    }
-
-    function handleResetPassword() {
-      const email = document.getElementById('email').value.trim();
-      const errorEl = document.getElementById('loginError');
-
-      if (!email) {
-        errorEl.textContent = "Masukkan email terlebih dahulu!";
-        return;
-      }
-
-      auth.sendPasswordResetEmail(email)
-        .then(() => {
-          errorEl.style.color = "#3ce0c3";
-          errorEl.innerHTML = "✅ Link reset password telah dikirim!";
-        })
-        .catch(err => {
-          let msg = "Gagal mengirim email reset.";
-          if (err.code === "auth/user-not-found") msg = "Email tidak terdaftar.";
-          errorEl.textContent = "❌ " + msg;
-        });
-    }
-
-    // === RENDER MENU DENGAN DETEKSI ADMIN ===
-    async function renderMenu() {
-      const user = auth.currentUser;
-      if (!user) {
-        renderLogin();
-        return;
-      }
-
-      const uid = user.uid;
-      const profileRef = db.collection('users').doc(uid).collection('profile').doc('info');
-      let displayUid = "LOADING...";
-
-      try {
-        const doc = await profileRef.get();
-        if (doc.exists && doc.data().displayUid) {
-          displayUid = doc.data().displayUid;
+      const countdownEl = document.getElementById("countdown");
+      const timer = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          document.getElementById("bannedPopup").remove();
+          location.reload();
         } else {
-          displayUid = generate8DigitUid();
-          await profileRef.set({ displayUid }, { merge: true });
+          countdownEl.textContent = `${timeLeft}s`;
         }
-      } catch (err) {
-        console.error("Gagal muat UID:", err);
-        displayUid = "ERROR";
-      }
+      }, 1000);
+    }
 
-      // Cek apakah admin
-      let isAdmin = false;
-      try {
-        const adminDoc = await db.collection('admins').doc(uid).get();
-        isAdmin = adminDoc.exists && adminDoc.data().role === "admin";
-      } catch (err) {
-        console.error("Gagal cek role admin:", err);
-      }
-
-      mainContainer.innerHTML = `
-        <header>
-          <h1 data-text="PILIHAN — PIXEL PANEL">PILIHAN — PIXEL PANEL</h1>
-          <p>Pilih box untuk membuka file terkait.</p>
-        </header>
-
-        <div class="grid" id="menuGrid">
-          <div class="box" tabindex="0" data-target="QR.html">
-            <div class="icon">🗺️</div>
-            <div class="title">QR Generator</div>
-          </div>
-          <div class="box" tabindex="0" data-target="fake-tweet.html">
-            <div class="icon">🐦</div>
-            <div class="title">Fake Tweet</div>
-          </div>
-          <div class="box" tabindex="0" data-target="fake-iphone.html">
-            <div class="icon">💬</div>
-            <div class="title">eChat</div>
-            <div class="subtitle">Fake iPhone</div>
-          </div>
-          <div class="box" tabindex="0" data-target="spam-NGL.html">
-            <div class="icon">✉️</div>
-            <div class="title">Spam NGL</div>
-            <div class="subtitle">Anonymous Q&A</div>
-          </div>
-        </div>
-
-        ${isAdmin ? `
-        <button id="adminBtn" style="background:#ffaa00; color:black; border:none; padding:6px 12px; border-radius:4px; font-family:'Press Start 2P', monospace; font-size:9px; cursor:pointer; margin:16px auto 0; display:block; width:140px; text-align:center;">
-          🛡️ Admin Panel
-        </button>
-        ` : ''}
-
-        <button id="accountBtn" style="background:#7c5cff; color:white; border:none; padding:6px 12px; border-radius:4px; font-family:'Press Start 2P', monospace; font-size:9px; cursor:pointer; margin:16px auto 0; display:block; width:140px; text-align:center;">
-          👤 Account
-        </button>
-
-        <footer>
-          2025 Pixel Art Project<br>KentangDev.
-        </footer>
-      `;
-
-      // Admin button
-      if (isAdmin) {
-        document.getElementById('adminBtn').addEventListener('click', () => {
-          window.location.href = "admin.html";
-        });
-      }
-
-      // Account button
-      document.getElementById('accountBtn').addEventListener('click', () => {
-        document.getElementById('popupUserUid').textContent = displayUid;
-        document.getElementById('accountPopup').style.display = 'flex';
+    // Event listener untuk box
+    document.querySelectorAll('.box').forEach(box => {
+      box.addEventListener('click', () => {
+        const t = box.dataset.target;
+        if (t) window.location.href = t;
       });
-
-      // Salin UID → alert
-      document.getElementById('popupUserUid').addEventListener('click', async () => {
-        try {
-          await navigator.clipboard.writeText(displayUid);
-          alert("✅ ID berhasil disalin!");
-        } catch (err) {
-          alert("❌ Gagal menyalin ID");
-        }
-      });
-
-      // Logout
-      document.getElementById('popupLogoutBtn').addEventListener('click', () => {
-        auth.signOut().then(() => {
-          document.getElementById('accountPopup').style.display = 'none';
-          renderLogin();
-        }).catch(err => {
-          console.error("Logout gagal:", err);
-        });
-      });
-
-      // Tutup popup saat klik di luar
-      document.getElementById('accountPopup').addEventListener('click', (e) => {
-        if (e.target.id === 'accountPopup') {
-          document.getElementById('accountPopup').style.display = 'none';
-        }
-      });
-
-      // Navigasi
-      document.querySelectorAll('.box').forEach(box => {
-        box.addEventListener('click', () => {
+      box.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
           const t = box.dataset.target;
           if (t) window.location.href = t;
-        });
-        box.addEventListener('keydown', e => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            const t = box.dataset.target;
-            if (t) window.location.href = t;
-          }
-        });
+        }
       });
+    });
 
-      setupInspectProtection();
-    }
+    // Observasi status auth
+    auth.onAuthStateChanged(async (user) => {
+      const menuGrid = document.getElementById("menuGrid");
+      const footer = document.getElementById("mainFooter");
 
-    // === PROTEKSI INSPECT DENGAN FIRESTORE ===
-    async function setupInspectProtection() {
-      const MAX_ATTEMPTS = 3;
-      const BLOCK_DURATION = 120000;
-      const user = auth.currentUser;
-      if (!user) return;
-
-      const uid = user.uid;
-      const attemptsRef = db.collection('users').doc(uid).collection('security').doc('attempts');
-
-      const doc = await attemptsRef.get();
-      const now = Date.now();
-
-      if (doc.exists) {
-        const data = doc.data();
-        if (data.blockedUntil && now < data.blockedUntil) {
-          window.location.href = "banned.html";
-          return;
-        }
-        if (data.lastAttempt && now - data.lastAttempt > BLOCK_DURATION) {
-          await attemptsRef.update({
-            attempts: 0,
-            lastAttempt: firebase.firestore.FieldValue.delete(),
-            blockedUntil: firebase.firestore.FieldValue.delete()
-          });
-        }
-      }
-
-      async function addAttempt() {
-        const now = Date.now();
-        const doc = await attemptsRef.get();
-        let attempts = 0;
-
-        if (doc.exists) {
-          const d = doc.data();
-          if (d.blockedUntil && now < d.blockedUntil) {
-            window.location.href = "banned.html";
+      if (user) {
+        // Cek banned
+        const userDoc = await db.collection("users").doc(user.uid).get();
+        if (userDoc.exists) {
+          const data = userDoc.data();
+          const bannedUntil = data.bannedUntil;
+          if (bannedUntil && bannedUntil.toDate() > new Date()) {
+            showBannedPopup(bannedUntil.toDate());
+            menuGrid.style.display = "none";
             return;
           }
-          attempts = d.attempts || 0;
         }
 
-        const newAttempts = attempts + 1;
-        if (newAttempts >= MAX_ATTEMPTS) {
-          await attemptsRef.set({
-            attempts: newAttempts,
-            blockedUntil: now + BLOCK_DURATION,
-            lastAttempt: now
-          }, { merge: true });
-          window.location.href = "banned.html";
-        } else {
-          await attemptsRef.set({
-            attempts: newAttempts,
-            lastAttempt: now
-          }, { merge: true });
-          document.getElementById("warningMessage1").innerText = `Peringatan (${newAttempts}/${MAX_ATTEMPTS})`;
-          document.getElementById("warningPopup1").style.display = "flex";
-        }
-      }
+        // Pastikan UID 9 digit ada
+        const uid9 = await ensureUserUID(user);
 
-      document.addEventListener('contextmenu', async (e) => {
-        e.preventDefault();
-        await addAttempt();
-      });
-
-      document.addEventListener('keydown', async (e) => {
-        if (e.key === 'F12' || 
-            (e.ctrlKey && e.shiftKey && ['I','J'].includes(e.key.toUpperCase())) || 
-            (e.ctrlKey && e.key.toUpperCase() === 'U')) {
-          e.preventDefault();
-          await addAttempt();
-        }
-      });
-    }
-
-    // === CEK LOGIN SAAT DIMUAT ===
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        renderMenu();
+        // Tampilkan menu
+        menuGrid.style.display = "grid";
+        footer.innerHTML = `
+          <button id="accountBtn" style="
+            background: var(--accent-2); border: none; padding: 4px 8px; color: white;
+            border-radius: 4px; font-family: 'Press Start 2P', monospace; font-size: 8px;
+            cursor: pointer;
+          ">Account</button>
+          <br>2025 Pixel Art Project<br>KentangDev.
+        `;
+        document.getElementById("accountBtn").addEventListener("click", () => showAccountPopup(uid9));
       } else {
-        renderLogin();
+        menuGrid.style.display = "none";
+        footer.innerHTML = `
+          <p style="font-size: 8px;">Silakan login untuk mengakses menu.</p>
+          <button onclick="window.location.href='login.html'" style="
+            background: var(--accent); border: none; padding: 4px 8px; color: black;
+            border-radius: 4px; font-family: 'Press Start 2P', monospace; font-size: 8px;
+            margin-top: 8px;
+          ">Login / Register</button>
+          <br>2025 Pixel Art Project<br>KentangDev.
+        `;
       }
     });
   </script>

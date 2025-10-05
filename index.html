@@ -98,6 +98,49 @@
       margin-bottom: 16px;
     }
 
+    .uid-box {
+      background: #0f1625;
+      border: 2px solid var(--accent);
+      border-radius: 6px;
+      padding: 12px;
+      margin: 16px 0;
+      text-align: center;
+      font-size: 10px;
+    }
+
+    .uid-box .label {
+      color: var(--accent);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .uid-box #userUid {
+      font-family: monospace;
+      color: white;
+      word-break: break-all;
+      margin: 4px 0;
+      font-size: 9px;
+    }
+
+    .uid-box button {
+      background: var(--accent);
+      color: black;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-family: "Press Start 2P", monospace;
+      font-size: 8px;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+
+    .uid-box #copyStatus {
+      color: var(--accent);
+      font-size: 8px;
+      margin-top: 4px;
+      height: 12px;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -164,6 +207,7 @@
     @media (max-width: 360px) {
       .box { height: 120px; padding: 10px; }
       .icon { font-size: 24px; }
+      .uid-box #userUid { font-size: 8px; }
     }
 
     /* Popup */
@@ -260,7 +304,7 @@
           <p id="loginError" style="color:#ff5555; margin-top:10px; font-size:9px; text-align:center;"></p>
         </div>
         <footer>
-          2025 Pixel Art Project<br>NoxiusDev.
+          2025 Pixel Art Project<br>KentangDev.
         </footer>
       `;
 
@@ -288,7 +332,7 @@
           <p id="signupError" style="color:#ff5555; margin-top:10px; font-size:9px; text-align:center;"></p>
         </div>
         <footer>
-          2025 Pixel Art Project<br>NoxiusDev.
+          2025 Pixel Art Project<br>KentangDev.
         </footer>
       `;
 
@@ -296,7 +340,6 @@
       document.getElementById('backToLoginBtn').addEventListener('click', renderLogin);
     }
 
-    // === HANDLE LOGIN ===
     function handleLogin() {
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
@@ -318,7 +361,6 @@
         });
     }
 
-    // === HANDLE SIGN UP ===
     function handleSignup() {
       const email = document.getElementById('signupEmail').value.trim();
       const password = document.getElementById('signupPassword').value;
@@ -335,9 +377,7 @@
       }
 
       auth.createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          // Opsional: kirim verifikasi email
-          // userCredential.user.sendEmailVerification();
+        .then(() => {
           renderMenu();
         })
         .catch(err => {
@@ -353,7 +393,6 @@
         });
     }
 
-    // === HANDLE RESET PASSWORD ===
     function handleResetPassword() {
       const email = document.getElementById('email').value.trim();
       const errorEl = document.getElementById('loginError');
@@ -375,13 +414,27 @@
         });
     }
 
-    // === RENDER MENU UTAMA ===
+    // === RENDER MENU DENGAN UID ===
     function renderMenu() {
+      const user = auth.currentUser;
+      if (!user) {
+        renderLogin();
+        return;
+      }
+      const uid = user.uid;
+
       mainContainer.innerHTML = `
         <header>
           <h1 data-text="PILIHAN — PIXEL PANEL">PILIHAN — PIXEL PANEL</h1>
           <p>Pilih box untuk membuka file terkait.</p>
         </header>
+
+        <div class="uid-box">
+          <span class="label">🆔 UID Akun Anda:</span>
+          <div id="userUid">${uid}</div>
+          <button id="copyUidBtn">Salin UID</button>
+          <div id="copyStatus"></div>
+        </div>
 
         <div class="grid" id="menuGrid">
           <div class="box" tabindex="0" data-target="QR.html">
@@ -405,10 +458,24 @@
         </div>
 
         <footer>
-          2025 Pixel Art Project<br>NoxiusDev.
+          2025 Pixel Art Project<br>KentangDev.
         </footer>
       `;
 
+      // Salin UID
+      document.getElementById('copyUidBtn').addEventListener('click', async () => {
+        const statusEl = document.getElementById('copyStatus');
+        try {
+          await navigator.clipboard.writeText(uid);
+          statusEl.textContent = "✅ Disalin!";
+          setTimeout(() => statusEl.textContent = "", 2000);
+        } catch (err) {
+          statusEl.textContent = "❌ Gagal";
+          setTimeout(() => statusEl.textContent = "", 2000);
+        }
+      });
+
+      // Navigasi
       document.querySelectorAll('.box').forEach(box => {
         box.addEventListener('click', () => {
           const t = box.dataset.target;
@@ -501,7 +568,7 @@
       });
     }
 
-    // === CEK STATUS LOGIN ===
+    // === CEK LOGIN SAAT DIMUAT ===
     auth.onAuthStateChanged(user => {
       if (user) {
         renderMenu();

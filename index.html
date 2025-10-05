@@ -98,43 +98,38 @@
       margin-bottom: 16px;
     }
 
-    .uid-box {
+    /* ACCOUNT BOX */
+    .account-box {
       background: #0f1625;
       border: 2px solid var(--accent);
       border-radius: 6px;
-      padding: 12px;
+      padding: 16px;
       margin: 16px 0;
       text-align: center;
       font-size: 10px;
     }
 
-    .uid-box .label {
-      color: var(--accent);
-      margin-bottom: 6px;
-      display: block;
-    }
-
-    .uid-box #userUid {
+    .account-box #userUid {
       font-family: monospace;
       color: white;
-      font-size: 14px;
+      font-size: 16px;
       letter-spacing: 2px;
-      margin: 4px 0;
+      margin: 8px 0;
     }
 
-    .uid-box button {
+    .account-box button {
       background: var(--accent);
       color: black;
       border: none;
-      padding: 4px 8px;
+      padding: 4px 10px;
       border-radius: 4px;
       font-family: "Press Start 2P", monospace;
-      font-size: 8px;
+      font-size: 9px;
       cursor: pointer;
-      margin-top: 6px;
+      margin: 6px 0;
     }
 
-    .uid-box #copyStatus {
+    .account-box #copyStatus {
       color: var(--accent);
       font-size: 8px;
       margin-top: 4px;
@@ -142,16 +137,15 @@
     }
 
     .logout-btn {
-      display: block;
       width: 100%;
-      padding: 6px;
       margin-top: 12px;
-      background: #ff5555;
-      color: white;
+      background: #ff5555 !important;
+      color: white !important;
       border: none;
+      padding: 6px;
       border-radius: 4px;
       font-family: "Press Start 2P", monospace;
-      font-size: 9px;
+      font-size: 10px;
       cursor: pointer;
     }
 
@@ -221,6 +215,7 @@
     @media (max-width: 360px) {
       .box { height: 120px; padding: 10px; }
       .icon { font-size: 24px; }
+      .account-box #userUid { font-size: 14px; }
     }
 
     /* Popup */
@@ -297,7 +292,7 @@
 
     // === GENERATE 8-DIGIT UID ===
     function generate8DigitUid() {
-      return Math.floor(10000000 + Math.random() * 90000000).toString(); // 10000000 to 99999999
+      return Math.floor(10000000 + Math.random() * 90000000).toString();
     }
 
     // === RENDER LOGIN ===
@@ -432,7 +427,7 @@
         });
     }
 
-    // === RENDER MENU DENGAN 8-DIGIT UID & LOGOUT ===
+    // === RENDER MENU DENGAN ACCOUNT BOX ===
     async function renderMenu() {
       const user = auth.currentUser;
       if (!user) {
@@ -442,19 +437,18 @@
 
       const uid = user.uid;
       const profileRef = db.collection('users').doc(uid).collection('profile').doc('info');
-      let displayUid = "";
+      let displayUid = "LOADING...";
 
       try {
         const doc = await profileRef.get();
         if (doc.exists && doc.data().displayUid) {
           displayUid = doc.data().displayUid;
         } else {
-          // Buat UID 8-digit baru
           displayUid = generate8DigitUid();
           await profileRef.set({ displayUid }, { merge: true });
         }
       } catch (err) {
-        console.error("Gagal memuat UID:", err);
+        console.error("Gagal muat UID:", err);
         displayUid = "ERROR";
       }
 
@@ -464,11 +458,15 @@
           <p>Pilih box untuk membuka file terkait.</p>
         </header>
 
-        <div class="uid-box">
-          <span class="label">🆔 ID Akun Anda:</span>
+        <div class="account-box">
+          <div style="display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:8px;">
+            <span>🆔</span>
+            <span>ID Akun Anda:</span>
+          </div>
           <div id="userUid">${displayUid}</div>
           <button id="copyUidBtn">Salin ID</button>
           <div id="copyStatus"></div>
+          <button class="logout-btn" id="logoutBtn">🚪 LOGOUT</button>
         </div>
 
         <div class="grid" id="menuGrid">
@@ -491,8 +489,6 @@
             <div class="subtitle">Anonymous Q&A</div>
           </div>
         </div>
-
-        <button class="logout-btn" id="logoutBtn">🚪 LOGOUT</button>
 
         <footer>
           2025 Pixel Art Project<br>KentangDev.

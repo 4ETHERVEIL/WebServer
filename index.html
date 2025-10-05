@@ -3,27 +3,55 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Menu Pilihan — Pixel Art</title>
+  <title>Menu Pilihan — Matrix Arcade</title>
   <link rel="icon" href="foto/foto.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b1220;
-      --panel: #0f1724;
-      --accent: #3ce0c3;
-      --accent-2: #7c5cff;
-      --muted: #b6c0d6;
-      --box: #121826;
+      --matrix-green: #00ff41;
+      --matrix-dark: #000000;
+      --matrix-darker: #000a00;
+      --text-muted: #00551a;
+      --border: #003311;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; }
+    html, body { 
+      height: 100%; 
+      background-color: var(--matrix-dark);
+      overflow: hidden;
+    }
 
-    /* Background gambar */
+    /* Efek falling code (opsional, bisa dihapus) */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        repeating-linear-gradient(
+          to bottom,
+          transparent 0%,
+          transparent 1.5%,
+          rgba(0, 255, 65, 0.02) 2%,
+          rgba(0, 255, 65, 0.02) 2.5%
+        ),
+        var(--matrix-dark);
+      pointer-events: none;
+      z-index: -2;
+      animation: matrix-fall 20s linear infinite;
+    }
+
+    @keyframes matrix-fall {
+      0% { background-position: 0 0; }
+      100% { background-position: 100px 100vh; }
+    }
+
     body {
       font-family: "Press Start 2P", monospace;
-      background: url('https://i.imgur.com/nvdnNzi.jpeg') center/cover no-repeat fixed;
-      color: var(--muted);
+      color: var(--matrix-green);
       padding: 16px;
       display: flex;
       align-items: center;
@@ -33,24 +61,29 @@
     .container {
       width: 100%;
       max-width: 1100px;
-      background: rgba(11, 18, 32, 0.65);
-      border: 4px solid #071022;
+      background: rgba(0, 10, 0, 0.7);
+      border: 2px solid var(--matrix-green);
       padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(5px);
-      -webkit-backdrop-filter: blur(5px);
-    }
-
-    /* Glitch pada judul */
-    header h1 {
-      margin: 0 0 8px;
-      font-size: clamp(14px, 4vw, 18px);
-      color: var(--accent);
-      text-align: center;
+      border-radius: 4px;
+      box-shadow: 
+        0 0 10px rgba(0, 255, 65, 0.2),
+        inset 0 0 8px rgba(0, 255, 65, 0.1);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
       position: relative;
     }
 
+    /* Judul Matrix */
+    header h1 {
+      margin: 0 0 8px;
+      font-size: clamp(12px, 3.8vw, 16px);
+      color: var(--matrix-green);
+      text-align: center;
+      text-shadow: 0 0 5px rgba(0, 255, 65, 0.7);
+      letter-spacing: 1px;
+    }
+
+    /* Glitch Matrix */
     header h1::before,
     header h1::after {
       content: attr(data-text);
@@ -59,251 +92,147 @@
       left: 0;
       width: 100%;
       height: 100%;
+      opacity: 0.3;
     }
 
     header h1::before {
-      color: #ff00c8;
-      clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
-      animation: glitch-1 3s infinite;
-      opacity: 0.6;
+      color: #008822;
+      clip-path: polygon(0 0, 100% 0, 100% 48%, 0 48%);
+      animation: glitch-matrix-1 5s infinite;
     }
 
     header h1::after {
-      color: #00ffe5;
-      clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
-      animation: glitch-2 3.2s infinite;
-      opacity: 0.6;
+      color: #00cc33;
+      clip-path: polygon(0 52%, 100% 52%, 100% 100%, 0 100%);
+      animation: glitch-matrix-2 5.3s infinite;
     }
 
-    @keyframes glitch-1 {
-      0%, 95%, 100% { transform: translateX(0); }
-      96% { transform: translateX(-2px); }
-      98% { transform: translateX(2px); }
+    @keyframes glitch-matrix-1 {
+      0%, 96%, 100% { transform: translateX(0); }
+      97% { transform: translateX(-1px); }
+      99% { transform: translateX(1px); }
     }
 
-    @keyframes glitch-2 {
-      0%, 95%, 100% { transform: translateX(0); }
-      96% { transform: translateX(2px); }
-      98% { transform: translateX(-2px); }
+    @keyframes glitch-matrix-2 {
+      0%, 96%, 100% { transform: translateX(0); }
+      97% { transform: translateX(1px); }
+      99% { transform: translateX(-1px); }
     }
 
     header p {
       text-align: center;
-      font-size: clamp(7px, 2.4vw, 9px);
-      color: #93a0c0;
+      font-size: clamp(6px, 2.2vw, 8px);
+      color: #00aa33;
       margin-bottom: 16px;
+      letter-spacing: 0.5px;
     }
 
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-      gap: 14px;
+      gap: 12px;
     }
 
     .box {
-      background: #0f1625;
-      border: 3px solid #071022;
-      border-radius: 6px;
-      padding: 14px;
-      height: 140px;
+      background: rgba(0, 15, 0, 0.6);
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      padding: 12px;
+      height: 130px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     }
 
     .box:hover {
-      transform: translateY(-4px);
-      border-color: var(--accent-2);
-      box-shadow: 0 6px 12px rgba(124, 92, 255, 0.3);
+      transform: translateY(-3px);
+      border-color: var(--matrix-green);
+      background: rgba(0, 25, 0, 0.7);
+      box-shadow: 0 0 8px rgba(0, 255, 65, 0.2);
     }
 
     .box:hover .icon {
-      animation: glitch-icon 0.6s;
+      animation: flicker 0.5s infinite alternate;
     }
 
-    @keyframes glitch-icon {
-      0%, 100% { filter: hue-rotate(0deg); }
-      20% { filter: hue-rotate(10deg); }
-      40% { filter: hue-rotate(-10deg); }
-      60% { filter: hue-rotate(5deg); }
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
     }
 
     .icon {
-      font-size: 28px;
-      margin-bottom: 8px;
-      color: var(--accent-2);
+      font-size: 26px;
+      margin-bottom: 6px;
+      color: var(--matrix-green);
     }
 
     .title {
-      font-size: clamp(8px, 2.6vw, 10px);
+      font-size: clamp(7px, 2.4vw, 9px);
       text-align: center;
-      color: var(--muted);
+      color: var(--matrix-green);
+      text-shadow: 0 0 3px rgba(0, 255, 65, 0.4);
     }
 
     .subtitle {
-      font-size: clamp(7px, 2.2vw, 8px);
-      color: #9fb1d6;
-      margin-top: 4px;
+      font-size: clamp(6px, 2.0vw, 7px);
+      color: #00aa33;
+      margin-top: 3px;
     }
 
     footer {
       margin-top: 16px;
       text-align: center;
-      font-size: clamp(7px, 2vw, 8px);
-      color: #8ea0c6;
+      font-size: clamp(6px, 1.8vw, 7px);
+      color: #007722;
+      letter-spacing: 1px;
     }
 
     @media (max-width: 360px) {
-      .box { height: 120px; padding: 10px; }
-      .icon { font-size: 24px; }
+      .box { height: 110px; padding: 8px; }
+      .icon { font-size: 22px; }
     }
 
-    /* Popup */
+    /* Popup Matrix */
     #warningPopup1 {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.7);
+      background: rgba(0, 0, 0, 0.9);
       display: none;
       align-items: center;
       justify-content: center;
       z-index: 9999;
     }
     #warningPopup1 .popup-box1 {
-      background: #0f1625;
-      color: white;
-      padding: 18px;
-      border: 2px solid var(--accent-2);
-      border-radius: 8px;
+      background: rgba(0, 10, 0, 0.9);
+      color: var(--matrix-green);
+      padding: 16px;
+      border: 2px solid var(--matrix-green);
+      border-radius: 4px;
       max-width: 280px;
       width: 90%;
       text-align: center;
       font-family: "Press Start 2P", monospace;
-      font-size: 10px;
+      font-size: 9px;
+      box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
     }
     #warningPopup1 button1 {
-      background: var(--accent-2);
-      border: none;
-      padding: 5px 10px;
-      color: white;
-      border-radius: 4px;
+      background: rgba(0, 255, 65, 0.2);
+      border: 1px solid var(--matrix-green);
+      padding: 4px 8px;
+      color: var(--matrix-green);
+      border-radius: 3px;
       font-family: "Press Start 2P", monospace;
-      font-size: 9px;
-      margin-top: 10px;
+      font-size: 8px;
+      margin-top: 8px;
       cursor: pointer;
+      transition: background 0.2s;
     }
-
-    /* === CYBERPUNK PIXEL ENHANCEMENTS === */
-
-    /* Efek scanline CRT */
-    body::after {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: repeating-linear-gradient(
-        to bottom,
-        transparent,
-        transparent 1px,
-        rgba(0, 255, 255, 0.03) 1px,
-        rgba(0, 255, 255, 0.03) 2px
-      );
-      pointer-events: none;
-      z-index: 9998;
-      animation: scanline 8s linear infinite;
-    }
-
-    @keyframes scanline {
-      0% { background-position: 0 0; }
-      100% { background-position: 0 100vh; }
-    }
-
-    /* Border neon pada container */
-    .container {
-      position: relative;
-      overflow: hidden;
-    }
-
-    .container::before {
-      content: "";
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      background: linear-gradient(45deg, 
-        var(--accent), 
-        var(--accent-2), 
-        #ff00c8, 
-        var(--accent)
-      );
-      z-index: -1;
-      border-radius: 10px;
-      animation: border-glow 3s infinite alternate;
-      filter: blur(8px);
-      opacity: 0.7;
-    }
-
-    @keyframes border-glow {
-      0% { opacity: 0.5; }
-      100% { opacity: 0.9; }
-    }
-
-    /* Efek neon pada box saat hover */
-    .box:hover {
-      box-shadow: 
-        0 0 8px var(--accent-2),
-        0 0 16px rgba(124, 92, 255, 0.6),
-        0 4px 12px rgba(0, 0, 0, 0.5);
-    }
-
-    /* Teks judul: tambah glow */
-    header h1 {
-      text-shadow: 
-        0 0 5px var(--accent),
-        0 0 10px var(--accent),
-        0 0 15px rgba(60, 224, 195, 0.5);
-    }
-
-    /* Efek flicker pada ikon */
-    .icon {
-      transition: filter 0.3s ease;
-    }
-
-    .box:hover .icon {
-      filter: brightness(1.4) saturate(1.8);
-      text-shadow: 
-        0 0 6px var(--accent-2),
-        0 0 12px rgba(124, 92, 255, 0.7);
-    }
-
-    /* Footer: tambah sedikit glow */
-    footer {
-      text-shadow: 0 0 4px rgba(142, 160, 198, 0.4);
-    }
-
-    /* Perbaiki animasi glitch ikon agar lebih cyberpunk */
-    @keyframes glitch-icon {
-      0%, 100% { filter: hue-rotate(0deg) brightness(1); }
-      20% { filter: hue-rotate(20deg) brightness(1.2); }
-      40% { filter: hue-rotate(-20deg) brightness(0.9); }
-      60% { filter: hue-rotate(10deg) brightness(1.1); }
-      80% { filter: hue-rotate(-10deg) brightness(0.95); }
-    }
-
-    /* Efek kedip pada popup */
-    #warningPopup1 .popup-box1 {
-      animation: pulse-border 2s infinite;
-    }
-
-    @keyframes pulse-border {
-      0%, 100% { box-shadow: 0 0 8px var(--accent-2); }
-      50% { box-shadow: 0 0 16px var(--accent-2), 0 0 24px rgba(124, 92, 255, 0.6); }
+    #warningPopup1 button1:hover {
+      background: rgba(0, 255, 65, 0.3);
     }
   </style>
 </head>
@@ -311,45 +240,45 @@
 
   <div class="container" role="main">
     <header>
-      <h1 data-text="PILIHAN — PIXEL PANEL">PILIHAN — PIXEL PANEL</h1>
-      <p>Pilih box untuk membuka file terkait. (Klik / tekan Enter pada kotak fokus)</p>
+      <h1 data-text="MATRIX ARCADE">MATRIX ARCADE</h1>
+      <p>SELECT OPTION TO PROCEED. (CLICK OR PRESS ENTER)</p>
     </header>
 
     <div class="grid" id="menuGrid">
       <div class="box" tabindex="0" data-target="QR.html">
         <div class="icon">🗺️</div>
-        <div class="title">QR Generator</div>
+        <div class="title">QR GEN</div>
       </div>
 
       <div class="box" tabindex="0" data-target="fake-tweet.html">
         <div class="icon">🐦</div>
-        <div class="title">Fake Tweet</div>
+        <div class="title">FAKE TWEET</div>
       </div>
 
       <div class="box" tabindex="0" data-target="fake-iphone.html">
         <div class="icon">💬</div>
-        <div class="title">eChat</div>
-        <div class="subtitle">Fake iPhone</div>
+        <div class="title">ECHAT</div>
+        <div class="subtitle">IPHONE SIM</div>
       </div>
 
       <div class="box" tabindex="0" data-target="spam-NGL.html">
         <div class="icon">✉️</div>
-        <div class="title">Spam NGL</div>
-        <div class="subtitle">Anonymous Q&A</div>
+        <div class="title">SPAM NGL</div>
+        <div class="subtitle">ANON Q&A</div>
       </div>
     </div>
 
     <footer>
-      2025 Pixel Art Project<br>KentangDev.
+      SYSTEM v2.05<br>KENTANGDEV // 2025
     </footer>
   </div>
 
   <!-- Popup Peringatan -->
   <div id="warningPopup1">
     <div class="popup-box1">
-      <h21>⚠️ Peringatan!</h21>
+      <h21>⚠ SYSTEM ALERT</h21>
       <p1 id="warningMessage1"></p1>
-      <button1 onclick="closeWarning1()">OK</button1>
+      <button1 onclick="closeWarning1()">ACKNOWLEDGE</button1>
     </div>
   </div>
 
@@ -368,7 +297,7 @@
         localStorage.setItem("blockedUntil", Date.now() + 120000);
         window.location.href = "banned.html";
       } else {
-        document.getElementById("warningMessage1").innerText = `Peringatan (${a}/${MAX_ATTEMPTS})`;
+        document.getElementById("warningMessage1").innerText = `WARNING (${a}/${MAX_ATTEMPTS})`;
         document.getElementById("warningPopup1").style.display = "flex";
       }
     }

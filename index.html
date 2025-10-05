@@ -1,9 +1,10 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin Panel — Pixel Art</title>
+  <title>Pixel Art — Login & Menu</title>
+  <link rel="icon" href="foto/foto.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -12,304 +13,191 @@
       --accent: #3ce0c3;
       --accent-2: #7c5cff;
       --muted: #b6c0d6;
+      --box: #121826;
     }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+
     body {
-      background: var(--bg);
-      color: var(--muted);
       font-family: "Press Start 2P", monospace;
+      background: url('https://i.imgur.com/nvdnNzi.jpeg') center/cover no-repeat fixed;
+      color: var(--muted);
       padding: 16px;
-      margin: 0;
-      min-height: 100vh;
       display: flex;
+      align-items: center;
       justify-content: center;
     }
+
     .container {
       width: 100%;
-      max-width: 850px;
+      max-width: 1100px;
       background: rgba(11, 18, 32, 0.65);
       border: 4px solid #071022;
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
     }
-    h2 {
+
+    /* === Login Form === */
+    .auth-form {
+      max-width: 360px;
+      margin: 0 auto;
       text-align: center;
-      color: gold;
-      margin: 0 0 20px;
-      font-size: 18px;
     }
-    .back-btn {
-      display: inline-block;
-      background: var(--accent-2);
+    .auth-form h2 {
+      color: var(--accent);
+      margin-bottom: 16px;
+      font-size: 16px;
+    }
+    .auth-form input {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0;
+      background: #0a111e;
+      border: 1px solid #333;
       color: white;
-      text-decoration: none;
-      padding: 6px 12px;
+      font-family: inherit;
+      font-size: 12px;
+    }
+    .auth-form button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: none;
       border-radius: 4px;
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .login-btn { background: var(--accent-2); color: white; }
+    .register-btn { background: var(--accent); color: black; }
+    .reset-btn { background: #555; color: white; font-size: 10px; padding: 6px; }
+    .switch-mode {
+      color: var(--accent);
+      text-decoration: underline;
+      cursor: pointer;
       font-size: 10px;
+      display: block;
+      margin-top: 8px;
+    }
+
+    /* === Menu Utama === */
+    header h1 {
+      margin: 0 0 8px;
+      font-size: clamp(14px, 4vw, 18px);
+      color: var(--accent);
+      text-align: center;
+      position: relative;
+    }
+
+    header h1::before,
+    header h1::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    header h1::before {
+      color: #ff00c8;
+      clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+      animation: glitch-1 3s infinite;
+      opacity: 0.6;
+    }
+
+    header h1::after {
+      color: #00ffe5;
+      clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+      animation: glitch-2 3.2s infinite;
+      opacity: 0.6;
+    }
+
+    @keyframes glitch-1 {
+      0%, 95%, 100% { transform: translateX(0); }
+      96% { transform: translateX(-2px); }
+      98% { transform: translateX(2px); }
+    }
+
+    @keyframes glitch-2 {
+      0%, 95%, 100% { transform: translateX(0); }
+      96% { transform: translateX(2px); }
+      98% { transform: translateX(-2px); }
+    }
+
+    header p {
+      text-align: center;
+      font-size: clamp(7px, 2.4vw, 9px);
+      color: #93a0c0;
       margin-bottom: 16px;
     }
-    
-    /* Menu Navigasi */
-    .admin-menu {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .menu-btn {
-      padding: 8px 12px;
-      background: #0a111e;
-      border: 1px solid var(--accent-2);
-      color: var(--muted);
-      font-family: "Press Start 2P", monospace;
-      font-size: 10px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .menu-btn.active {
-      background: var(--accent-2);
-      color: black;
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 14px;
     }
 
-    /* Panel Konten */
-    .panel {
-      display: none;
-    }
-    .panel.active {
-      display: block;
-    }
-
-    /* Tabel User */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 9px;
-    }
-    th, td {
-      border: 1px solid #333;
-      padding: 8px;
-      text-align: center;
-    }
-    th {
-      background: #0a111e;
-    }
-    button {
-      padding: 4px 6px;
-      border: none;
-      border-radius: 3px;
-      font-family: "Press Start 2P", monospace;
-      font-size: 8px;
-      cursor: pointer;
-    }
-    .ban-btn { background: #ff4d4d; color: white; }
-    .unban-btn { background: #3ce0c3; color: black; }
-    .admin-tag { color: gold; font-weight: bold; }
-    .banned-yes { color: #ff6666; font-weight: bold; }
-    .note-cell {
-      font-size: 7px;
-      color: #aaa;
-      max-width: 120px;
-      word-wrap: break-word;
-    }
-
-    /* Daftar Menu Items */
-    #menuList {
-      margin-top: 16px;
-    }
-    .menu-item {
+    .box {
       background: #0f1625;
-      border: 1px solid #333;
-      padding: 10px;
+      border: 3px solid #071022;
+      border-radius: 6px;
+      padding: 14px;
+      height: 140px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+    }
+
+    .box:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent-2);
+      box-shadow: 0 6px 12px rgba(124, 92, 255, 0.3);
+    }
+
+    .icon {
+      font-size: 28px;
       margin-bottom: 8px;
-      border-radius: 4px;
-      font-size: 10px;
+      color: var(--accent-2);
     }
-    .menu-item-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-    }
-    .menu-item-title {
-      font-weight: bold;
-      color: var(--accent);
-    }
-    .menu-item-actions button {
-      margin-left: 4px;
-      padding: 3px 6px;
-      font-size: 8px;
-    }
-    .edit-btn { background: var(--accent); color: black; }
-    .delete-btn { background: #ff4d4d; color: white; }
 
-    /* Popup Umum */
-    .popup-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.85);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-    }
-    .popup-content {
-      background: #0f1625;
-      border: 2px solid var(--accent-2);
-      border-radius: 8px;
-      padding: 16px;
-      width: 90%;
-      max-width: 340px;
-      font-size: 10px;
-      text-align: left;
-    }
-    .popup-content h3 {
-      color: gold;
-      margin: 0 0 12px;
+    .title {
+      font-size: clamp(8px, 2.6vw, 10px);
       text-align: center;
+      color: var(--muted);
     }
-    .popup-content label {
-      display: block;
-      margin: 8px 0 4px;
-      font-size: 9px;
+
+    .subtitle {
+      font-size: clamp(7px, 2.2vw, 8px);
+      color: #9fb1d6;
+      margin-top: 4px;
     }
-    .popup-content input,
-    .popup-content select,
-    .popup-content textarea {
-      width: 100%;
-      padding: 6px;
-      margin: 4px 0;
-      background: #0a111e;
-      border: 1px solid #333;
-      color: white;
-      font-family: "Press Start 2P", monospace;
-      font-size: 9px;
+
+    footer {
+      margin-top: 16px;
+      text-align: center;
+      font-size: clamp(7px, 2vw, 8px);
+      color: #8ea0c6;
     }
-    .popup-buttons {
-      margin-top: 12px;
-      display: flex;
-      gap: 8px;
-    }
-    .popup-buttons button {
-      flex: 1;
-      padding: 5px;
-      font-size: 9px;
-    }
-    .cancel-btn {
-      background: #555;
-      color: white;
-    }
-    .confirm-btn {
-      background: var(--accent-2);
-      color: white;
-    }
-    .delete-confirm-btn {
-      background: #ff4d4d;
-      color: white;
+
+    @media (max-width: 360px) {
+      .box { height: 120px; padding: 10px; }
+      .icon { font-size: 24px; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <a href="index.html" class="back-btn">← Kembali ke Menu</a>
-    <h2>🔒 ADMIN DASHBOARD</h2>
-    
-    <!-- Menu Navigasi -->
-    <div class="admin-menu">
-      <button class="menu-btn active" data-panel="users">Kelola User</button>
-      <button class="menu-btn" data-panel="menu">Kelola Menu</button>
-    </div>
 
-    <!-- Panel: Kelola User -->
-    <div id="users-panel" class="panel active">
-      <table id="userTable">
-        <thead>
-          <tr>
-            <th>UID 9 Digit</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Banned?</th>
-            <th>Catatan</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody id="userList">
-          <tr><td colspan="6">Memuat data...</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Panel: Kelola Menu -->
-    <div id="menu-panel" class="panel">
-      <button class="confirm-btn" onclick="openUploadMenuPopup()" style="width:100%; padding:8px; font-size:10px; margin-bottom:16px;">
-        + Tambah Box Baru
-      </button>
-      <h3 style="margin-bottom:12px; font-size:12px;">Daftar Box:</h3>
-      <div id="menuList">
-        Memuat...
-      </div>
-    </div>
-  </div>
-
-  <!-- Popup: Ban User -->
-  <div id="banPopup" class="popup-overlay">
-    <div class="popup-content">
-      <h3>⛔ BAN USER</h3>
-      <label for="banUnit">Durasi:</label>
-      <select id="banUnit">
-        <option value="min">Menit</option>
-        <option value="hour">Jam</option>
-        <option value="custom">Custom (Menit)</option>
-      </select>
-      <input type="number" id="banDuration" min="1" value="10" placeholder="Durasi">
-      <label for="banNote">Catatan (opsional):</label>
-      <input type="text" id="banNote" placeholder="Alasan banned">
-      <input type="hidden" id="banTargetUid">
-      <div class="popup-buttons">
-        <button class="confirm-btn" onclick="confirmBan()">Ban</button>
-        <button class="cancel-btn" onclick="closeBanPopup()">Batal</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Popup: Tambah/Edit Menu -->
-  <div id="menuPopup" class="popup-overlay">
-    <div class="popup-content">
-      <h3 id="menuPopupTitle">➕ TAMBAH BOX BARU</h3>
-      <label for="boxTitle">Judul:</label>
-      <input type="text" id="boxTitle" placeholder="Contoh: Game Baru" required>
-      
-      <label for="boxIcon">Ikon (Emoji):</label>
-      <input type="text" id="boxIcon" placeholder="Contoh: 🎮" maxlength="2" required>
-      
-      <label for="boxTarget">File Target:</label>
-      <input type="text" id="boxTarget" placeholder="Contoh: game-baru.html" required>
-      
-      <label for="boxSubtitle">Deskripsi (opsional):</label>
-      <input type="text" id="boxSubtitle" placeholder="Opsional">
-      
-      <input type="hidden" id="editMenuId">
-      
-      <div class="popup-buttons">
-        <button class="confirm-btn" onclick="submitMenu()">Simpan</button>
-        <button class="cancel-btn" onclick="closeMenuPopup()">Batal</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Popup: Konfirmasi Hapus -->
-  <div id="deletePopup" class="popup-overlay">
-    <div class="popup-content">
-      <h3>🗑️ HAPUS ITEM</h3>
-      <p id="deleteMessage">Yakin ingin menghapus item ini?</p>
-      <input type="hidden" id="deleteType">
-      <input type="hidden" id="deleteId">
-      <div class="popup-buttons">
-        <button class="delete-confirm-btn" onclick="confirmDelete()">Hapus</button>
-        <button class="cancel-btn" onclick="closeDeletePopup()">Batal</button>
-      </div>
-    </div>
+  <div class="container" id="mainContainer">
+    <!-- Akan diisi oleh JS -->
   </div>
 
   <!-- Firebase SDK -->
@@ -333,276 +221,254 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Navigasi Menu
-    document.querySelectorAll('.menu-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-        btn.classList.add('active');
-        const panelId = btn.dataset.panel;
-        document.getElementById(panelId + '-panel').classList.add('active');
-        
-        if (panelId === 'menu') {
-          loadMenuItems();
-        }
-      });
-    });
-
-    auth.onAuthStateChanged(async (user) => {
-      if (!user) {
-        alert("Silakan login terlebih dahulu!");
-        window.location.href = "index.html";
-        return;
-      }
-
-      const userDoc = await db.collection("users").doc(user.uid).get();
-      if (!userDoc.exists || userDoc.data().role !== "admin") {
-        alert("Akses ditolak! Hanya admin yang boleh membuka halaman ini.");
-        window.location.href = "index.html";
-        return;
-      }
-
-      loadUsers();
-    });
-
-    // === USER MANAGEMENT ===
-    async function loadUsers() {
-      const list = document.getElementById("userList");
-      try {
-        const snapshot = await db.collection("users").orderBy("createdAt", "asc").get();
-        list.innerHTML = "";
-        if (snapshot.empty) {
-          list.innerHTML = `<tr><td colspan="6">Belum ada user.</td></tr>`;
-          return;
-        }
-        snapshot.forEach(doc => {
-          const d = doc.data();
-          const isBanned = d.bannedUntil && d.bannedUntil.toDate() > new Date();
-          let bannedDisplay = "Tidak";
-          if (isBanned) {
-            const endTime = d.bannedUntil.toDate();
-            const timeStr = endTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-            bannedDisplay = `Ya (sampai ${timeStr})`;
-          }
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${d.uid9 || '—'}</td>
-            <td>${d.email || '—'}</td>
-            <td>${d.role === "admin" ? '<span class="admin-tag">ADMIN</span>' : 'user'}</td>
-            <td class="${isBanned ? 'banned-yes' : ''}">${bannedDisplay}</td>
-            <td class="note-cell">${d.banNote || '—'}</td>
-            <td>
-              ${isBanned ? 
-                `<button class="unban-btn" onclick="unban('${doc.id}')">Unban</button>` :
-                `<button class="ban-btn" onclick="openBanPopup('${doc.id}')">Ban</button>`
-              }
-            </td>
-          `;
-          list.appendChild(row);
-        });
-      } catch (e) {
-        console.error("Error:", e);
-        list.innerHTML = `<tr><td colspan="6">Gagal memuat data.</td></tr>`;
-      }
+    function generate9DigitUID() {
+      return Math.floor(100000000 + Math.random() * 900000000).toString();
     }
 
-    function openBanPopup(uid) {
-      document.getElementById("banTargetUid").value = uid;
-      document.getElementById("banDuration").value = "10";
-      document.getElementById("banNote").value = "";
-      document.getElementById("banUnit").value = "min";
-      document.getElementById("banPopup").style.display = "flex";
-    }
-
-    function closeBanPopup() {
-      document.getElementById("banPopup").style.display = "none";
-    }
-
-    async function confirmBan() {
-      const uid = document.getElementById("banTargetUid").value;
-      const unit = document.getElementById("banUnit").value;
-      const durStr = document.getElementById("banDuration").value;
-      const note = (document.getElementById("banNote").value || "Dibanned oleh admin").trim();
-      const dur = parseInt(durStr);
-      if (isNaN(dur) || dur < 1) {
-        alert("Durasi harus minimal 1!");
-        return;
-      }
-      let minutes = (unit === "hour") ? dur * 60 : dur;
-      try {
-        const banUntil = new Date();
-        banUntil.setMinutes(banUntil.getMinutes() + minutes);
-        await db.collection("users").doc(uid).update({
-          bannedUntil: firebase.firestore.Timestamp.fromDate(banUntil),
-          banNote: note
-        });
-        closeBanPopup();
-        loadUsers();
-      } catch (e) {
-        alert("Gagal banned user: " + e.message);
-      }
-    }
-
-    async function unban(uid) {
-      try {
-        await db.collection("users").doc(uid).update({
+    async function ensureUserUID(user) {
+      const userRef = db.collection("users").doc(user.uid);
+      const doc = await userRef.get();
+      if (!doc.exists) {
+        const customUID = generate9DigitUID();
+        await userRef.set({
+          email: user.email,
+          uid9: customUID,
+          role: "user",
           bannedUntil: null,
-          banNote: null
+          banNote: null,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        loadUsers();
-      } catch (e) {
-        alert("Gagal unban user: " + e.message);
+        return customUID;
+      } else {
+        return doc.data().uid9;
       }
     }
 
-    // === MENU ITEM MANAGEMENT ===
-    async function loadMenuItems() {
-      const container = document.getElementById("menuList");
+    function showBannedPopup(unbanTime, banNote) {
+      const now = new Date();
+      let timeLeft = Math.ceil((unbanTime - now) / 1000);
+      
+      const popup = document.createElement("div");
+      popup.id = "bannedPopup";
+      popup.innerHTML = `
+        <div style="position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+          <div style="background: #220000; color: #ff6666; padding: 20px; border: 2px solid #ff0000; border-radius: 8px; max-width: 300px; width: 90%; text-align: center; font-family: 'Press Start 2P', monospace; font-size: 10px;">
+            <h2>⛔ DIBANNED!</h2>
+            <p>${banNote || "Akun Anda dibanned sementara."}</p>
+            <p>Waktu tersisa: <span id="countdown">${timeLeft}s</span></p>
+            <button onclick="location.reload()" style="background: #555; color: white; border: none; padding: 5px 10px; border-radius: 4px; margin-top: 10px;">Refresh</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(popup);
+
+      const countdownEl = document.getElementById("countdown");
+      const timer = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          document.getElementById("bannedPopup").remove();
+          location.reload();
+        } else {
+          countdownEl.textContent = `${timeLeft}s`;
+        }
+      }, 1000);
+    }
+
+    function showAccountPopup(uid9, isAdmin) {
+      const adminButton = isAdmin ? `
+        <br><button onclick="window.location.href='admin.html'" style="background: gold; border: none; padding: 4px 8px; color: black; border-radius: 4px; font-size: 9px; margin-top: 6px;">Admin Panel</button>
+      ` : '';
+
+      const popup = document.createElement("div");
+      popup.id = "accountPopup";
+      popup.innerHTML = `
+        <div style="position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+          <div style="background: #0f1625; color: white; padding: 16px; border: 2px solid var(--accent-2); border-radius: 8px; max-width: 280px; width: 90%; text-align: center; font-family: 'Press Start 2P', monospace; font-size: 10px; position: relative;">
+            <button onclick="document.getElementById('accountPopup').remove()" 
+                    style="position: absolute; top: 8px; right: 8px; background: #333; color: white; border: none; width: 20px; height: 20px; border-radius: 50%; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+              ✕
+            </button>
+            
+            <h3>AKUN</h3>
+            <p>ID: <strong>${uid9}</strong></p>
+            <button id="copyBtn" style="background: var(--accent); border: none; padding: 4px 8px; color: black; border-radius: 4px; font-size: 9px; margin: 6px 0;">Salin UID</button><br>
+            ${adminButton}
+            <button onclick="auth.signOut().then(() => location.reload()); document.getElementById('accountPopup').remove();" 
+                    style="background: #ff4d4d; border: none; padding: 4px 8px; color: white; border-radius: 4px; font-size: 9px; margin-top: 8px;">Logout</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(popup);
+
+      document.getElementById("copyBtn").addEventListener("click", () => {
+        navigator.clipboard.writeText(uid9).then(() => {
+          alert("UID disalin!");
+        });
+      });
+    }
+
+    function renderLogin() {
+      document.getElementById("mainContainer").innerHTML = `
+        <div class="auth-form">
+          <h2>LOGIN</h2>
+          <input type="email" id="email" placeholder="Email" autocomplete="email">
+          <input type="password" id="password" placeholder="Password" autocomplete="current-password">
+          <button class="login-btn" onclick="handleLogin()">Login</button>
+          <button class="register-btn" onclick="renderRegister()">Register</button>
+          <div class="switch-mode" onclick="handleResetPassword()">Lupa Password?</div>
+        </div>
+        <footer>2025 Pixel Art Project<br>KentangDev.</footer>
+      `;
+    }
+
+    function renderRegister() {
+      document.getElementById("mainContainer").innerHTML = `
+        <div class="auth-form">
+          <h2>REGISTER</h2>
+          <input type="email" id="email" placeholder="Email" autocomplete="email">
+          <input type="password" id="password" placeholder="Password (min 6 char)" autocomplete="new-password">
+          <button class="register-btn" onclick="handleRegister()">Register</button>
+          <button class="login-btn" onclick="renderLogin()">Sudah Punya Akun?</button>
+        </div>
+        <footer>2025 Pixel Art Project<br>KentangDev.</footer>
+      `;
+    }
+
+    // ✅ RENDER MENU DINAMIS DARI FIRESTORE
+    async function renderMenu(uid9, role) {
+      const isAdmin = (role === "admin");
+      
+      // Muat item menu dari Firestore
+      let menuItems = [];
       try {
         const snapshot = await db.collection("menuItems").orderBy("createdAt", "asc").get();
-        if (snapshot.empty) {
-          container.innerHTML = "<p>Belum ada box.</p>";
-          return;
-        }
-        let html = "";
         snapshot.forEach(doc => {
-          const d = doc.data();
-          // Encode data sebagai base64 untuk keamanan
-          const safeData = btoa(unescape(encodeURIComponent(JSON.stringify(d))));
-          html += `
-            <div class="menu-item">
-              <div class="menu-item-header">
-                <span class="menu-item-title">${d.title || '—'}</span>
-                <span>${d.icon || '❓'}</span>
-              </div>
-              <div>File: ${d.target || '—'}</div>
-              ${d.subtitle ? `<div>Deskripsi: ${d.subtitle}</div>` : ''}
-              <div class="menu-item-actions">
-                <button class="edit-btn" onclick="openEditMenuPopup('${doc.id}', '${safeData}')">Edit</button>
-                <button class="delete-btn" onclick="openDeletePopup('menu', '${doc.id}')">Hapus</button>
-              </div>
-            </div>
-          `;
+          menuItems.push(doc.data());
         });
-        container.innerHTML = html;
       } catch (e) {
-        console.error("Error loading menu:", e);
-        container.innerHTML = "<p>Gagal memuat daftar box.</p>";
-      }
-    }
-
-    function openUploadMenuPopup() {
-      document.getElementById("menuPopupTitle").textContent = "➕ TAMBAH BOX BARU";
-      document.getElementById("boxTitle").value = "";
-      document.getElementById("boxIcon").value = "";
-      document.getElementById("boxTarget").value = "";
-      document.getElementById("boxSubtitle").value = "";
-      document.getElementById("editMenuId").value = "";
-      document.getElementById("menuPopup").style.display = "flex";
-    }
-
-    function openEditMenuPopup(id, encodedData) {
-      try {
-        const data = JSON.parse(decodeURIComponent(escape(atob(encodedData))));
-        document.getElementById("menuPopupTitle").textContent = "✏️ EDIT BOX";
-        document.getElementById("boxTitle").value = data.title || "";
-        document.getElementById("boxIcon").value = data.icon || "";
-        document.getElementById("boxTarget").value = data.target || "";
-        document.getElementById("boxSubtitle").value = data.subtitle || "";
-        document.getElementById("editMenuId").value = id;
-        document.getElementById("menuPopup").style.display = "flex";
-      } catch (e) {
-        alert("Gagal memuat data edit: " + e.message);
-        console.error(e);
-      }
-    }
-
-    function closeMenuPopup() {
-      document.getElementById("menuPopup").style.display = "none";
-    }
-
-    async function submitMenu() {
-      const title = document.getElementById("boxTitle").value.trim();
-      const icon = document.getElementById("boxIcon").value.trim();
-      const target = document.getElementById("boxTarget").value.trim();
-      const subtitle = document.getElementById("boxSubtitle").value.trim();
-      const editId = document.getElementById("editMenuId").value;
-
-      if (!title || !icon || !target) {
-        alert("Judul, ikon, dan file target wajib diisi!");
-        return;
+        console.error("Gagal muat menu:", e);
+        // Fallback ke menu default jika error
+        menuItems = [
+          { title: "QR Generator", icon: "🗺️", target: "QR.html", subtitle: null },
+          { title: "Fake Tweet", icon: "🐦", target: "fake-tweet.html", subtitle: null },
+          { title: "eChat", icon: "💬", target: "fake-iphone.html", subtitle: "Fake iPhone" },
+          { title: "Spam NGL", icon: "✉️", target: "spam-NGL.html", subtitle: "Anonymous Q&A" }
+        ];
       }
 
-      if (!target.endsWith('.html')) {
-        alert("File target harus berakhiran .html!");
-        return;
-      }
-
-      try {
-        if (editId) {
-          await db.collection("menuItems").doc(editId).update({
-            title: title,
-            icon: icon,
-            target: target,
-            subtitle: subtitle || null
-          });
-        } else {
-          await db.collection("menuItems").add({
-            title: title,
-            icon: icon,
-            target: target,
-            subtitle: subtitle || null,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
-        }
-        closeMenuPopup();
-        loadMenuItems();
-        alert(editId ? "Box berhasil diperbarui!" : "Box baru berhasil ditambahkan!");
-      } catch (e) {
-        alert("Gagal menyimpan box: " + e.message);
-      }
-    }
-
-    // === HAPUS UMUM ===
-    function openDeletePopup(type, id) {
-      document.getElementById("deleteType").value = type;
-      document.getElementById("deleteId").value = id;
-      const message = type === 'menu' 
-        ? "Yakin ingin menghapus item menu ini?" 
-        : "Yakin ingin menghapus item ini?";
-      document.getElementById("deleteMessage").textContent = message;
-      document.getElementById("deletePopup").style.display = "flex";
-    }
-
-    function closeDeletePopup() {
-      document.getElementById("deletePopup").style.display = "none";
-    }
-
-    async function confirmDelete() {
-      const type = document.getElementById("deleteType").value;
-      const id = document.getElementById("deleteId").value;
-      try {
-        if (type === 'menu') {
-          await db.collection("menuItems").doc(id).delete();
-        }
-        closeDeletePopup();
-        if (type === 'menu') {
-          loadMenuItems();
-        }
-        alert("Item berhasil dihapus!");
-      } catch (e) {
-        alert("Gagal menghapus item: " + e.message);
-      }
-    }
-
-    // Tutup popup saat klik di luar
-    document.querySelectorAll('.popup-overlay').forEach(el => {
-      el.addEventListener("click", (e) => {
-        if (e.target === el) {
-          el.style.display = "none";
-        }
+      // Bangun grid menu
+      let gridHTML = '';
+      menuItems.forEach(item => {
+        gridHTML += `
+          <div class="box" tabindex="0" data-target="${item.target}">
+            <div class="icon">${item.icon}</div>
+            <div class="title">${item.title}</div>
+            ${item.subtitle ? `<div class="subtitle">${item.subtitle}</div>` : ''}
+          </div>
+        `;
       });
+
+      document.getElementById("mainContainer").innerHTML = `
+        <div role="main">
+          <header>
+            <h1 data-text="PILIHAN — PIXEL PANEL">PILIHAN — PIXEL PANEL</h1>
+            <p>Pilih box untuk membuka file terkait. (Klik / tekan Enter pada kotak fokus)</p>
+          </header>
+
+          <div class="grid" id="menuGrid">
+            ${gridHTML}
+          </div>
+
+          <footer>
+            <button id="accountBtn" style="
+              background: var(--accent-2); border: none; padding: 4px 8px; color: white;
+              border-radius: 4px; font-family: 'Press Start 2P', monospace; font-size: 8px;
+              cursor: pointer;
+            ">Account</button>
+            <br>2025 Pixel Art Project<br>KentangDev.
+          </footer>
+        </div>
+      `;
+
+      // Event untuk box
+      document.querySelectorAll('.box').forEach(box => {
+        box.addEventListener('click', () => {
+          const t = box.dataset.target;
+          if (t) window.location.href = t;
+        });
+        box.addEventListener('keydown', e => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            const t = box.dataset.target;
+            if (t) window.location.href = t;
+          }
+        });
+      });
+
+      // Popup account
+      document.getElementById("accountBtn").addEventListener("click", () => showAccountPopup(uid9, isAdmin));
+    }
+
+    async function handleLogin() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+      } catch (e) {
+        alert("Login gagal: " + e.message);
+      }
+    }
+
+    async function handleRegister() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      if (password.length < 6) {
+        alert("Password minimal 6 karakter!");
+        return;
+      }
+      try {
+        await auth.createUserWithEmailAndPassword(email, password);
+      } catch (e) {
+        alert("Register gagal: " + e.message);
+      }
+    }
+
+    async function handleResetPassword() {
+      const email = prompt("Masukkan email Anda untuk reset password:");
+      if (email) {
+        try {
+          await auth.sendPasswordResetEmail(email);
+          alert("Link reset password telah dikirim ke email Anda!");
+        } catch (e) {
+          alert("Gagal kirim email: " + e.message);
+        }
+      }
+    }
+
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        const userDoc = await db.collection("users").doc(user.uid).get();
+        if (userDoc.exists) {
+          const data = userDoc.data();
+          const bannedUntil = data.bannedUntil;
+          if (bannedUntil && bannedUntil.toDate() > new Date()) {
+            showBannedPopup(bannedUntil.toDate(), data.banNote);
+            return;
+          }
+          const uid9 = await ensureUserUID(user);
+          const role = data.role || "user";
+          renderMenu(uid9, role);
+        } else {
+          const uid9 = await ensureUserUID(user);
+          renderMenu(uid9, "user");
+        }
+      } else {
+        renderLogin();
+      }
     });
+
+    renderLogin();
   </script>
 </body>
 </html>

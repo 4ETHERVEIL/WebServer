@@ -13,6 +13,7 @@
       --accent: #3ce0c3;
       --accent-2: #7c5cff;
       --muted: #b6c0d6;
+      --box: #121826;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -205,16 +206,16 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
   <script>
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyC5HS7vsJVs9dtarPkzhQmiqNaeCKkJw_A",
-  authDomain: "noxius-panel.firebaseapp.com",
-  projectId: "noxius-panel",
-  storageBucket: "noxius-panel.firebasestorage.app",
-  messagingSenderId: "873696240519",
-  appId: "1:873696240519:web:401f9efb0d71b32363a922",
-  measurementId: "G-YNC6NQT179"
-};
+    // 🔥 KONFIGURASI FIREBASE ANDA
+    const firebaseConfig = {
+      apiKey: "AIzaSyC5HS7vsJVs9dtarPkzhQmiqNaeCKkJw_A",
+      authDomain: "noxius-panel.firebaseapp.com",
+      projectId: "noxius-panel",
+      storageBucket: "noxius-panel.firebasestorage.app",
+      messagingSenderId: "873696240519",
+      appId: "1:873696240519:web:401f9efb0d71b32363a922",
+      measurementId: "G-YNC6NQT179"
+    };
 
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
@@ -234,6 +235,7 @@ const firebaseConfig = {
           uid9: customUID,
           role: "user",
           bannedUntil: null,
+          banNote: null,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
         return customUID;
@@ -242,7 +244,7 @@ const firebaseConfig = {
       }
     }
 
-    function showBannedPopup(unbanTime) {
+    function showBannedPopup(unbanTime, banNote) {
       const now = new Date();
       let timeLeft = Math.ceil((unbanTime - now) / 1000);
       
@@ -252,7 +254,7 @@ const firebaseConfig = {
         <div style="position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 9999;">
           <div style="background: #220000; color: #ff6666; padding: 20px; border: 2px solid #ff0000; border-radius: 8px; max-width: 300px; width: 90%; text-align: center; font-family: 'Press Start 2P', monospace; font-size: 10px;">
             <h2>⛔ DIBANNED!</h2>
-            <p>Akun Anda dibanned sementara.</p>
+            <p>${banNote || "Akun Anda dibanned sementara."}</p>
             <p>Waktu tersisa: <span id="countdown">${timeLeft}s</span></p>
             <button onclick="location.reload()" style="background: #555; color: white; border: none; padding: 5px 10px; border-radius: 4px; margin-top: 10px;">Refresh</button>
           </div>
@@ -273,7 +275,11 @@ const firebaseConfig = {
       }, 1000);
     }
 
-    function showAccountPopup(uid9) {
+    function showAccountPopup(uid9, isAdmin) {
+      const adminButton = isAdmin ? `
+        <br><button onclick="window.location.href='admin.html'" style="background: gold; border: none; padding: 4px 8px; color: black; border-radius: 4px; font-size: 9px; margin-top: 6px;">Admin Panel</button>
+      ` : '';
+
       const popup = document.createElement("div");
       popup.id = "accountPopup";
       popup.innerHTML = `
@@ -287,8 +293,9 @@ const firebaseConfig = {
             <h3>AKUN</h3>
             <p>ID: <strong>${uid9}</strong></p>
             <button id="copyBtn" style="background: var(--accent); border: none; padding: 4px 8px; color: black; border-radius: 4px; font-size: 9px; margin: 6px 0;">Salin UID</button><br>
+            ${adminButton}
             <button onclick="auth.signOut().then(() => location.reload()); document.getElementById('accountPopup').remove();" 
-                    style="background: #ff4d4d; border: none; padding: 4px 8px; color: white; border-radius: 4px; font-size: 9px;">Logout</button>
+                    style="background: #ff4d4d; border: none; padding: 4px 8px; color: white; border-radius: 4px; font-size: 9px; margin-top: 8px;">Logout</button>
           </div>
         </div>
       `;
@@ -328,17 +335,39 @@ const firebaseConfig = {
       `;
     }
 
-    // ✅ DIPERBARUI: TERIMA ROLE DAN TAMPILKAN TOMBOL ADMIN JIKA SESUAI
-    function renderMenu(uid9, role) {
+    // ✅ RENDER MENU DINAMIS DARI FIRESTORE
+    async function renderMenu(uid9, role) {
       const isAdmin = (role === "admin");
-      const adminButton = isAdmin ? `
-        <br>
-        <button id="adminBtn" style="
-          background: gold; border: none; padding: 4px 8px; color: black;
-          border-radius: 4px; font-family: 'Press Start 2P', monospace; font-size: 8px;
-          cursor: pointer; margin-top: 6px;
-        ">Admin Panel</button>
-      ` : '';
+      
+      // Muat item menu dari Firestore
+      let menuItems = [];
+      try {
+        const snapshot = await db.collection("menuItems").orderBy("createdAt", "asc").get();
+        snapshot.forEach(doc => {
+          menuItems.push(doc.data());
+        });
+      } catch (e) {
+        console.error("Gagal muat menu:", e);
+        // Fallback ke menu default jika error
+        menuItems = [
+          { title: "QR Generator", icon: "🗺️", target: "QR.html", subtitle: null },
+          { title: "Fake Tweet", icon: "🐦", target: "fake-tweet.html", subtitle: null },
+          { title: "eChat", icon: "💬", target: "fake-iphone.html", subtitle: "Fake iPhone" },
+          { title: "Spam NGL", icon: "✉️", target: "spam-NGL.html", subtitle: "Anonymous Q&A" }
+        ];
+      }
+
+      // Bangun grid menu
+      let gridHTML = '';
+      menuItems.forEach(item => {
+        gridHTML += `
+          <div class="box" tabindex="0" data-target="${item.target}">
+            <div class="icon">${item.icon}</div>
+            <div class="title">${item.title}</div>
+            ${item.subtitle ? `<div class="subtitle">${item.subtitle}</div>` : ''}
+          </div>
+        `;
+      });
 
       document.getElementById("mainContainer").innerHTML = `
         <div role="main">
@@ -348,24 +377,7 @@ const firebaseConfig = {
           </header>
 
           <div class="grid" id="menuGrid">
-            <div class="box" tabindex="0" data-target="QR.html">
-              <div class="icon">🗺️</div>
-              <div class="title">QR Generator</div>
-            </div>
-            <div class="box" tabindex="0" data-target="fake-tweet.html">
-              <div class="icon">🐦</div>
-              <div class="title">Fake Tweet</div>
-            </div>
-            <div class="box" tabindex="0" data-target="fake-iphone.html">
-              <div class="icon">💬</div>
-              <div class="title">eChat</div>
-              <div class="subtitle">Fake iPhone</div>
-            </div>
-            <div class="box" tabindex="0" data-target="spam-NGL.html">
-              <div class="icon">✉️</div>
-              <div class="title">Spam NGL</div>
-              <div class="subtitle">Anonymous Q&A</div>
-            </div>
+            ${gridHTML}
           </div>
 
           <footer>
@@ -374,12 +386,12 @@ const firebaseConfig = {
               border-radius: 4px; font-family: 'Press Start 2P', monospace; font-size: 8px;
               cursor: pointer;
             ">Account</button>
-            ${adminButton}
             <br>2025 Pixel Art Project<br>KentangDev.
           </footer>
         </div>
       `;
 
+      // Event untuk box
       document.querySelectorAll('.box').forEach(box => {
         box.addEventListener('click', () => {
           const t = box.dataset.target;
@@ -394,13 +406,8 @@ const firebaseConfig = {
         });
       });
 
-      document.getElementById("accountBtn").addEventListener("click", () => showAccountPopup(uid9));
-
-      if (isAdmin) {
-        document.getElementById("adminBtn").addEventListener("click", () => {
-          window.location.href = "admin.html";
-        });
-      }
+      // Popup account
+      document.getElementById("accountBtn").addEventListener("click", () => showAccountPopup(uid9, isAdmin));
     }
 
     async function handleLogin() {
@@ -439,7 +446,6 @@ const firebaseConfig = {
       }
     }
 
-    // ✅ DIPERBARUI: AMBIL ROLE DARI FIRESTORE
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         const userDoc = await db.collection("users").doc(user.uid).get();
@@ -447,7 +453,7 @@ const firebaseConfig = {
           const data = userDoc.data();
           const bannedUntil = data.bannedUntil;
           if (bannedUntil && bannedUntil.toDate() > new Date()) {
-            showBannedPopup(bannedUntil.toDate());
+            showBannedPopup(bannedUntil.toDate(), data.banNote);
             return;
           }
           const uid9 = await ensureUserUID(user);

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin Dashboard — Pixel Art</title>
+  <title>Admin Panel — Pixel Art</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -29,6 +29,11 @@
       border: 2px solid #071022;
       border-radius: 8px;
     }
+    h2 {
+      text-align: center;
+      color: gold;
+      margin-bottom: 20px;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -37,8 +42,11 @@
     }
     th, td {
       border: 1px solid #333;
-      padding: 8px;
+      padding: 10px;
       text-align: center;
+    }
+    th {
+      background: #0a111e;
     }
     button {
       padding: 4px 8px;
@@ -51,12 +59,23 @@
     .ban-btn { background: #ff4d4d; color: white; }
     .unban-btn { background: #3ce0c3; color: black; }
     .admin-tag { color: gold; font-weight: bold; }
-    h2 { text-align: center; color: var(--accent-2); }
+    .back-btn {
+      background: var(--accent-2);
+      color: white;
+      padding: 6px 12px;
+      font-size: 10px;
+      margin-bottom: 16px;
+      display: inline-block;
+      text-decoration: none;
+    }
+    .banned-cell { color: #ff6666; font-weight: bold; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>ADMIN DASHBOARD</h2>
+    <a href="index.html" class="back-btn">← Kembali ke Menu</a>
+    <h2>🔒 ADMIN DASHBOARD</h2>
+    
     <table id="userTable">
       <thead>
         <tr>
@@ -67,13 +86,17 @@
           <th>Aksi</th>
         </tr>
       </thead>
-      <tbody id="userList"></tbody>
+      <tbody id="userList">
+        <tr><td colspan="5">Memuat data...</td></tr>
+      </tbody>
     </table>
   </div>
 
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
   <script>
     // 🔥 GANTI DENGAN KONFIGURASI FIREBASE ANDA (sama seperti index.html)
     const firebaseConfig = {
@@ -89,58 +112,90 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    auth.onAuthStateChanged(async user => {
-      if (!user) return window.location.href = "login.html";
-      
-      const doc = await db.collection("users").doc(user.uid).get();
-      if (!doc.exists || doc.data().role !== "admin") {
-        alert("Akses ditolak! Hanya admin yang boleh masuk.");
+    // Cek apakah user adalah admin
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        alert("Silakan login terlebih dahulu!");
         window.location.href = "index.html";
+        return;
       }
+
+      const userDoc = await db.collection("users").doc(user.uid).get();
+      if (!userDoc.exists || userDoc.data().role !== "admin") {
+        alert("Akses ditolak! Hanya admin yang boleh membuka halaman ini.");
+        window.location.href = "index.html";
+        return;
+      }
+
       loadUsers();
     });
 
     async function loadUsers() {
       const list = document.getElementById("userList");
-      const snapshot = await db.collection("users").get();
-      list.innerHTML = "";
-      snapshot.forEach(doc => {
-        const d = doc.data();
-        const isBanned = d.bannedUntil && d.bannedUntil.toDate() > new Date();
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${d.uid9 || '—'}</td>
-          <td>${d.email || '—'}</td>
-          <td>${d.role === "admin" ? '<span class="admin-tag">ADMIN</span>' : 'user'}</td>
-          <td>${isBanned ? "Ya" : "Tidak"}</td>
-          <td>
-            ${isBanned ? 
-              `<button class="unban-btn" onclick="unban('${doc.id}')">Unban</button>` :
-              `<input type="number" id="min-${doc.id}" value="10" min="1" max="1440" style="width:60px;font-size:9px;"> 
-               <button class="ban-btn" onclick="ban('${doc.id}', document.getElementById('min-${doc.id}').value)">Ban</button>`
-            }
-          </td>
-        `;
-        list.appendChild(row);
-      });
+      try {
+        const snapshot = await db.collection("users").get();
+        if (snapshot.empty) {
+          list.innerHTML = `<tr><td colspan="5">Tidak ada user.</td></tr>`;
+          return;
+        }
+
+        list.innerHTML = "";
+        snapshot.forEach(doc => {
+          const d = doc.data();
+          const isBanned = d.bannedUntil && d.bannedUntil.toDate() > new Date();
+          const bannedText = isBanned 
+            ? `Ya (sampai ${d.bannedUntil.toDate().toLocaleTimeString()})` 
+            : "Tidak";
+
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${d.uid9 || '—'}</td>
+            <td>${d.email || '—'}</td>
+            <td>${d.role === "admin" ? '<span class="admin-tag">ADMIN</span>' : 'user'}</td>
+            <td class="${isBanned ? 'banned-cell' : ''}">${bannedText}</td>
+            <td>
+              ${isBanned ? 
+                `<button class="unban-btn" onclick="unban('${doc.id}')">Unban</button>` :
+                `<input type="number" id="min-${doc.id}" value="10" min="1" max="1440" style="width:60px;font-size:9px;"> 
+                 <button class="ban-btn" onclick="ban('${doc.id}', document.getElementById('min-${doc.id}').value)">Ban</button>`
+              }
+            </td>
+          `;
+          list.appendChild(row);
+        });
+      } catch (e) {
+        console.error("Error loading users:", e);
+        list.innerHTML = `<tr><td colspan="5">Gagal memuat data.</td></tr>`;
+      }
     }
 
     async function ban(uid, minutesStr) {
-      const minutes = parseInt(minutesStr) || 10;
-      if (minutes < 1) return alert("Minimal 1 menit!");
-      const banUntil = new Date();
-      banUntil.setMinutes(banUntil.getMinutes() + minutes);
-      await db.collection("users").doc(uid).update({
-        bannedUntil: firebase.firestore.Timestamp.fromDate(banUntil)
-      });
-      loadUsers();
+      const minutes = parseInt(minutesStr);
+      if (isNaN(minutes) || minutes < 1) {
+        alert("Masukkan durasi banned minimal 1 menit!");
+        return;
+      }
+      try {
+        const banUntil = new Date();
+        banUntil.setMinutes(banUntil.getMinutes() + minutes);
+        await db.collection("users").doc(uid).update({
+          bannedUntil: firebase.firestore.Timestamp.fromDate(banUntil)
+        });
+        loadUsers();
+      } catch (e) {
+        alert("Gagal banned user: " + e.message);
+      }
     }
 
     async function unban(uid) {
-      await db.collection("users").doc(uid).update({
-        bannedUntil: null
-      });
-      loadUsers();
+      try {
+        await db.collection("users").doc(uid).update({
+          bannedUntil: null
+        });
+        loadUsers();
+      } catch (e) {
+        alert("Gagal unban user: " + e.message);
+      }
     }
   </script>
 </body>

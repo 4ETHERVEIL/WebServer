@@ -115,10 +115,10 @@
     }
 
     /* Daftar Menu Items */
-    #menuList, #fileList {
+    #menuList {
       margin-top: 16px;
     }
-    .menu-item, .file-item {
+    .menu-item {
       background: #0f1625;
       border: 1px solid #333;
       padding: 10px;
@@ -126,17 +126,17 @@
       border-radius: 4px;
       font-size: 10px;
     }
-    .menu-item-header, .file-header {
+    .menu-item-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 6px;
     }
-    .menu-item-title, .file-name {
+    .menu-item-title {
       font-weight: bold;
       color: var(--accent);
     }
-    .menu-item-actions button, .file-actions button {
+    .menu-item-actions button {
       margin-left: 4px;
       padding: 3px 6px;
       font-size: 8px;
@@ -208,21 +208,6 @@
       background: #ff4d4d;
       color: white;
     }
-
-    /* Progress Upload */
-    .upload-progress {
-      height: 6px;
-      background: #333;
-      border-radius: 3px;
-      margin-top: 8px;
-      overflow: hidden;
-    }
-    .progress-bar {
-      height: 100%;
-      background: var(--accent);
-      width: 0%;
-      transition: width 0.2s;
-    }
   </style>
 </head>
 <body>
@@ -234,7 +219,6 @@
     <div class="admin-menu">
       <button class="menu-btn active" data-panel="users">Kelola User</button>
       <button class="menu-btn" data-panel="menu">Kelola Menu</button>
-      <button class="menu-btn" data-panel="files">File Manager</button>
     </div>
 
     <!-- Panel: Kelola User -->
@@ -263,18 +247,6 @@
       </button>
       <h3 style="margin-bottom:12px; font-size:12px;">Daftar Box:</h3>
       <div id="menuList">
-        Memuat...
-      </div>
-    </div>
-
-    <!-- Panel: File Manager -->
-    <div id="files-panel" class="panel">
-      <input type="file" id="fileInput" style="width:100%; margin-bottom:10px; font-size:10px;">
-      <button class="confirm-btn" onclick="uploadFile()" style="width:100%; padding:8px; font-size:10px; margin-bottom:16px;">
-        📤 Upload File
-      </button>
-      <h3 style="margin-bottom:12px; font-size:12px;">File yang Diupload:</h3>
-      <div id="fileList">
         Memuat...
       </div>
     </div>
@@ -344,7 +316,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 
   <script>
     // 🔥 KONFIGURASI FIREBASE ANDA
@@ -361,7 +332,6 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-    const storage = firebase.storage();
 
     // Navigasi Menu
     document.querySelectorAll('.menu-btn').forEach(btn => {
@@ -374,8 +344,6 @@
         
         if (panelId === 'menu') {
           loadMenuItems();
-        } else if (panelId === 'files') {
-          listFiles();
         }
       });
     });
@@ -499,16 +467,18 @@
         let html = "";
         snapshot.forEach(doc => {
           const d = doc.data();
+          // Encode data sebagai base64 untuk keamanan
+          const safeData = btoa(unescape(encodeURIComponent(JSON.stringify(d))));
           html += `
             <div class="menu-item">
               <div class="menu-item-header">
-                <span class="menu-item-title">${d.title}</span>
-                <span>${d.icon}</span>
+                <span class="menu-item-title">${d.title || '—'}</span>
+                <span>${d.icon || '❓'}</span>
               </div>
-              <div>File: ${d.target}</div>
+              <div>File: ${d.target || '—'}</div>
               ${d.subtitle ? `<div>Deskripsi: ${d.subtitle}</div>` : ''}
               <div class="menu-item-actions">
-                <button class="edit-btn" onclick="openEditMenuPopup('${doc.id}', ${JSON.stringify(d).replace(/'/g, "\\'")})">Edit</button>
+                <button class="edit-btn" onclick="openEditMenuPopup('${doc.id}', '${safeData}')">Edit</button>
                 <button class="delete-btn" onclick="openDeletePopup('menu', '${doc.id}')">Hapus</button>
               </div>
             </div>
@@ -516,6 +486,7 @@
         });
         container.innerHTML = html;
       } catch (e) {
+        console.error("Error loading menu:", e);
         container.innerHTML = "<p>Gagal memuat daftar box.</p>";
       }
     }
@@ -530,14 +501,20 @@
       document.getElementById("menuPopup").style.display = "flex";
     }
 
-    function openEditMenuPopup(id, data) {
-      document.getElementById("menuPopupTitle").textContent = "✏️ EDIT BOX";
-      document.getElementById("boxTitle").value = data.title;
-      document.getElementById("boxIcon").value = data.icon;
-      document.getElementById("boxTarget").value = data.target;
-      document.getElementById("boxSubtitle").value = data.subtitle || "";
-      document.getElementById("editMenuId").value = id;
-      document.getElementById("menuPopup").style.display = "flex";
+    function openEditMenuPopup(id, encodedData) {
+      try {
+        const data = JSON.parse(decodeURIComponent(escape(atob(encodedData))));
+        document.getElementById("menuPopupTitle").textContent = "✏️ EDIT BOX";
+        document.getElementById("boxTitle").value = data.title || "";
+        document.getElementById("boxIcon").value = data.icon || "";
+        document.getElementById("boxTarget").value = data.target || "";
+        document.getElementById("boxSubtitle").value = data.subtitle || "";
+        document.getElementById("editMenuId").value = id;
+        document.getElementById("menuPopup").style.display = "flex";
+      } catch (e) {
+        alert("Gagal memuat data edit: " + e.message);
+        console.error(e);
+      }
     }
 
     function closeMenuPopup() {
@@ -586,67 +563,13 @@
       }
     }
 
-    // === FILE MANAGEMENT ===
-    async function listFiles() {
-      const container = document.getElementById("fileList");
-      try {
-        const listRef = storage.ref();
-        const res = await listRef.listAll();
-        if (res.items.length === 0) {
-          container.innerHTML = "<p>Belum ada file.</p>";
-          return;
-        }
-        let html = "";
-        res.items.forEach(itemRef => {
-          const name = itemRef.name;
-          const url = `https://firebasestorage.googleapis.com/v0/b/${firebaseConfig.storageBucket}/o/${encodeURIComponent(name)}?alt=media`;
-          html += `
-            <div class="file-item">
-              <div class="file-header">
-                <span class="file-name">${name}</span>
-                <a href="${url}" target="_blank" style="color:var(--accent); text-decoration:underline; font-size:8px;">Lihat</a>
-              </div>
-              <div class="file-actions">
-                <button class="delete-btn" onclick="openDeletePopup('file', '${name}')">Hapus</button>
-              </div>
-            </div>
-          `;
-        });
-        container.innerHTML = html;
-      } catch (e) {
-        console.error("Error listing files:", e);
-        container.innerHTML = "<p>Gagal memuat daftar file.</p>";
-      }
-    }
-
-    async function uploadFile() {
-      const fileInput = document.getElementById("fileInput");
-      const file = fileInput.files[0];
-      if (!file) {
-        alert("Pilih file terlebih dahulu!");
-        return;
-      }
-
-      const fileName = file.name;
-      const fileRef = storage.ref(fileName);
-
-      try {
-        await fileRef.put(file);
-        alert("File berhasil diupload!");
-        fileInput.value = "";
-        listFiles();
-      } catch (e) {
-        alert("Gagal upload file: " + e.message);
-      }
-    }
-
     // === HAPUS UMUM ===
     function openDeletePopup(type, id) {
       document.getElementById("deleteType").value = type;
       document.getElementById("deleteId").value = id;
       const message = type === 'menu' 
         ? "Yakin ingin menghapus item menu ini?" 
-        : "Yakin ingin menghapus file ini? Tindakan ini tidak bisa dibatalkan.";
+        : "Yakin ingin menghapus item ini?";
       document.getElementById("deleteMessage").textContent = message;
       document.getElementById("deletePopup").style.display = "flex";
     }
@@ -661,15 +584,10 @@
       try {
         if (type === 'menu') {
           await db.collection("menuItems").doc(id).delete();
-        } else if (type === 'file') {
-          const fileRef = storage.ref(id);
-          await fileRef.delete();
         }
         closeDeletePopup();
         if (type === 'menu') {
           loadMenuItems();
-        } else {
-          listFiles();
         }
         alert("Item berhasil dihapus!");
       } catch (e) {

@@ -70,14 +70,6 @@
       font-size: 8px;
       cursor: pointer;
     }
-    input, select {
-      background: #0a111e;
-      border: 1px solid #333;
-      color: white;
-      font-family: "Press Start 2P", monospace;
-      font-size: 8px;
-      text-align: center;
-    }
     .ban-btn { background: #ff4d4d; color: white; }
     .unban-btn { background: #3ce0c3; color: black; }
     .admin-tag { color: gold; font-weight: bold; }
@@ -87,6 +79,61 @@
       color: #aaa;
       max-width: 120px;
       word-wrap: break-word;
+    }
+
+    /* === Popup Ban === */
+    #banPopup {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .popup-content {
+      background: #0f1625;
+      border: 2px solid var(--accent-2);
+      border-radius: 8px;
+      padding: 16px;
+      width: 90%;
+      max-width: 320px;
+      font-size: 10px;
+      text-align: center;
+    }
+    .popup-content h3 {
+      color: gold;
+      margin: 0 0 12px;
+    }
+    .popup-content label {
+      display: block;
+      margin: 8px 0 4px;
+      font-size: 9px;
+    }
+    .popup-content select,
+    .popup-content input[type="number"],
+    .popup-content input[type="text"] {
+      width: 100%;
+      padding: 6px;
+      margin: 4px 0;
+      background: #0a111e;
+      border: 1px solid #333;
+      color: white;
+      font-family: "Press Start 2P", monospace;
+      font-size: 9px;
+      text-align: center;
+    }
+    .popup-buttons {
+      margin-top: 12px;
+    }
+    .popup-buttons button {
+      width: 48%;
+      padding: 5px;
+      font-size: 9px;
+    }
+    .cancel-btn {
+      background: #555;
+      color: white;
     }
   </style>
 </head>
@@ -110,6 +157,29 @@
         <tr><td colspan="6">Memuat data...</td></tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- Popup Ban -->
+  <div id="banPopup">
+    <div class="popup-content">
+      <h3>⛔ BAN USER</h3>
+      <label for="banUnit">Durasi:</label>
+      <select id="banUnit">
+        <option value="min">Menit</option>
+        <option value="hour">Jam</option>
+        <option value="custom">Custom (Menit)</option>
+      </select>
+      <input type="number" id="banDuration" min="1" value="10" placeholder="Durasi">
+      <label for="banNote">Catatan (opsional):</label>
+      <input type="text" id="banNote" placeholder="Alasan banned">
+      
+      <input type="hidden" id="banTargetUid">
+      
+      <div class="popup-buttons">
+        <button class="ban-confirm-btn" onclick="confirmBan()">Ban</button>
+        <button class="cancel-btn" onclick="closeBanPopup()">Batal</button>
+      </div>
+    </div>
   </div>
 
   <!-- Firebase SDK -->
@@ -181,16 +251,7 @@
             <td>
               ${isBanned ? 
                 `<button class="unban-btn" onclick="unban('${doc.id}')">Unban</button>` :
-                `
-                <select id="unit-${doc.id}" style="width:60px;" onchange="toggleCustomInput('${doc.id}')">
-                  <option value="min">Menit</option>
-                  <option value="hour">Jam</option>
-                  <option value="custom">Custom</option>
-                </select>
-                <input type="number" id="dur-${doc.id}" value="10" min="1" style="width:60px;"> 
-                <input type="text" id="note-${doc.id}" placeholder="Catatan" style="width:80px;font-size:7px;padding:2px;">
-                <button class="ban-btn" onclick="banWithNote('${doc.id}')">Ban</button>
-                `
+                `<button class="ban-btn" onclick="openBanPopup('${doc.id}')">Ban</button>`
               }
             </td>
           `;
@@ -202,30 +263,23 @@
       }
     }
 
-    function toggleCustomInput(uid) {
-      const select = document.getElementById(`unit-${uid}`);
-      const input = document.getElementById(`dur-${uid}`);
-      if (select.value === "custom") {
-        input.min = "1";
-        input.placeholder = "Menit";
-        input.value = "60"; // default 1 jam
-      } else if (select.value === "hour") {
-        input.min = "1";
-        input.max = "24";
-        input.placeholder = "Jam";
-        input.value = Math.min(input.value, 24);
-      } else {
-        input.min = "1";
-        input.max = "1440";
-        input.placeholder = "Menit";
-        input.value = Math.min(input.value, 1440);
-      }
+    function openBanPopup(uid) {
+      document.getElementById("banTargetUid").value = uid;
+      document.getElementById("banDuration").value = "10";
+      document.getElementById("banNote").value = "";
+      document.getElementById("banUnit").value = "min";
+      document.getElementById("banPopup").style.display = "flex";
     }
 
-    async function banWithNote(uid) {
-      const unit = document.getElementById(`unit-${uid}`).value;
-      const durStr = document.getElementById(`dur-${uid}`).value;
-      const note = (document.getElementById(`note-${uid}`).value || "Dibanned oleh admin").trim();
+    function closeBanPopup() {
+      document.getElementById("banPopup").style.display = "none";
+    }
+
+    async function confirmBan() {
+      const uid = document.getElementById("banTargetUid").value;
+      const unit = document.getElementById("banUnit").value;
+      const durStr = document.getElementById("banDuration").value;
+      const note = (document.getElementById("banNote").value || "Dibanned oleh admin").trim();
       
       const dur = parseInt(durStr);
       if (isNaN(dur) || dur < 1) {
@@ -236,12 +290,9 @@
       let minutes;
       if (unit === "hour") {
         minutes = dur * 60;
-      } else if (unit === "min") {
+      } else {
+        // "min" dan "custom" sama-sama dalam menit
         minutes = dur;
-      } else if (unit === "custom") {
-        // Custom = input langsung dalam menit, tanpa batas atas
-        minutes = dur;
-        // Tidak ada batas maksimal
       }
 
       try {
@@ -251,6 +302,7 @@
           bannedUntil: firebase.firestore.Timestamp.fromDate(banUntil),
           banNote: note
         });
+        closeBanPopup();
         loadUsers();
       } catch (e) {
         alert("Gagal banned user: " + e.message);
@@ -268,6 +320,13 @@
         alert("Gagal unban user: " + e.message);
       }
     }
+
+    // Tutup popup saat klik di luar konten
+    document.getElementById("banPopup").addEventListener("click", (e) => {
+      if (e.target.id === "banPopup") {
+        closeBanPopup();
+      }
+    });
   </script>
 </body>
 </html>

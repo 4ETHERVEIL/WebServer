@@ -3,55 +3,25 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Menu Pilihan — Matrix Arcade</title>
+  <title>Menu Pilihan — Pixel Art</title>
   <link rel="icon" href="foto/foto.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     :root {
-      --matrix-green: #00ff41;
-      --matrix-dark: #000000;
-      --matrix-darker: #000a00;
-      --text-muted: #00551a;
+      --matrix: #00ff41;
+      --dark: #000000;
+      --darker: #000a00;
+      --muted: #00aa33;
       --border: #003311;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { 
-      height: 100%; 
-      background-color: var(--matrix-dark);
-      overflow: hidden;
-    }
-
-    /* Efek falling code (opsional, bisa dihapus) */
-    body::before {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: 
-        repeating-linear-gradient(
-          to bottom,
-          transparent 0%,
-          transparent 1.5%,
-          rgba(0, 255, 65, 0.02) 2%,
-          rgba(0, 255, 65, 0.02) 2.5%
-        ),
-        var(--matrix-dark);
-      pointer-events: none;
-      z-index: -2;
-      animation: matrix-fall 20s linear infinite;
-    }
-
-    @keyframes matrix-fall {
-      0% { background-position: 0 0; }
-      100% { background-position: 100px 100vh; }
-    }
+    html, body { height: 100%; }
 
     body {
       font-family: "Press Start 2P", monospace;
-      color: var(--matrix-green);
+      background-color: var(--dark);
+      color: var(--matrix);
       padding: 16px;
       display: flex;
       align-items: center;
@@ -61,29 +31,24 @@
     .container {
       width: 100%;
       max-width: 1100px;
-      background: rgba(0, 10, 0, 0.7);
-      border: 2px solid var(--matrix-green);
+      background: rgba(0, 10, 0, 0.85);
+      border: 2px solid var(--matrix);
       padding: 20px;
       border-radius: 4px;
-      box-shadow: 
-        0 0 10px rgba(0, 255, 65, 0.2),
-        inset 0 0 8px rgba(0, 255, 65, 0.1);
+      box-shadow: 0 0 12px rgba(0, 255, 65, 0.2);
       backdrop-filter: blur(2px);
       -webkit-backdrop-filter: blur(2px);
-      position: relative;
     }
 
-    /* Judul Matrix */
     header h1 {
       margin: 0 0 8px;
-      font-size: clamp(12px, 3.8vw, 16px);
-      color: var(--matrix-green);
+      font-size: clamp(14px, 4vw, 18px);
+      color: var(--matrix);
       text-align: center;
-      text-shadow: 0 0 5px rgba(0, 255, 65, 0.7);
-      letter-spacing: 1px;
+      position: relative;
+      text-shadow: 0 0 4px rgba(0, 255, 65, 0.6);
     }
 
-    /* Glitch Matrix */
     header h1::before,
     header h1::after {
       content: attr(data-text);
@@ -97,142 +62,131 @@
 
     header h1::before {
       color: #008822;
-      clip-path: polygon(0 0, 100% 0, 100% 48%, 0 48%);
-      animation: glitch-matrix-1 5s infinite;
+      clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+      animation: glitch-1 4s infinite;
     }
 
     header h1::after {
       color: #00cc33;
-      clip-path: polygon(0 52%, 100% 52%, 100% 100%, 0 100%);
-      animation: glitch-matrix-2 5.3s infinite;
+      clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+      animation: glitch-2 4.2s infinite;
     }
 
-    @keyframes glitch-matrix-1 {
-      0%, 96%, 100% { transform: translateX(0); }
-      97% { transform: translateX(-1px); }
-      99% { transform: translateX(1px); }
+    @keyframes glitch-1 {
+      0%, 95%, 100% { transform: translateX(0); }
+      96% { transform: translateX(-1px); }
+      98% { transform: translateX(1px); }
     }
 
-    @keyframes glitch-matrix-2 {
-      0%, 96%, 100% { transform: translateX(0); }
-      97% { transform: translateX(1px); }
-      99% { transform: translateX(-1px); }
+    @keyframes glitch-2 {
+      0%, 95%, 100% { transform: translateX(0); }
+      96% { transform: translateX(1px); }
+      98% { transform: translateX(-1px); }
     }
 
     header p {
       text-align: center;
-      font-size: clamp(6px, 2.2vw, 8px);
+      font-size: clamp(7px, 2.4vw, 9px);
       color: #00aa33;
       margin-bottom: 16px;
-      letter-spacing: 0.5px;
     }
 
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-      gap: 12px;
+      gap: 14px;
     }
 
     .box {
-      background: rgba(0, 15, 0, 0.6);
+      background: rgba(0, 15, 0, 0.7);
       border: 2px solid var(--border);
       border-radius: 4px;
-      padding: 12px;
-      height: 130px;
+      padding: 14px;
+      height: 140px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+      transition: transform 0.2s, border-color 0.2s;
     }
 
     .box:hover {
-      transform: translateY(-3px);
-      border-color: var(--matrix-green);
-      background: rgba(0, 25, 0, 0.7);
-      box-shadow: 0 0 8px rgba(0, 255, 65, 0.2);
+      transform: translateY(-4px);
+      border-color: var(--matrix);
     }
 
     .box:hover .icon {
-      animation: flicker 0.5s infinite alternate;
+      animation: glitch-icon 0.6s;
     }
 
-    @keyframes flicker {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.8; }
+    @keyframes glitch-icon {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.3); }
     }
 
     .icon {
-      font-size: 26px;
-      margin-bottom: 6px;
-      color: var(--matrix-green);
+      font-size: 28px;
+      margin-bottom: 8px;
+      color: var(--matrix);
     }
 
     .title {
-      font-size: clamp(7px, 2.4vw, 9px);
+      font-size: clamp(8px, 2.6vw, 10px);
       text-align: center;
-      color: var(--matrix-green);
-      text-shadow: 0 0 3px rgba(0, 255, 65, 0.4);
+      color: var(--matrix);
     }
 
     .subtitle {
-      font-size: clamp(6px, 2.0vw, 7px);
+      font-size: clamp(7px, 2.2vw, 8px);
       color: #00aa33;
-      margin-top: 3px;
+      margin-top: 4px;
     }
 
     footer {
       margin-top: 16px;
       text-align: center;
-      font-size: clamp(6px, 1.8vw, 7px);
+      font-size: clamp(7px, 2vw, 8px);
       color: #007722;
-      letter-spacing: 1px;
     }
 
     @media (max-width: 360px) {
-      .box { height: 110px; padding: 8px; }
-      .icon { font-size: 22px; }
+      .box { height: 120px; padding: 10px; }
+      .icon { font-size: 24px; }
     }
 
-    /* Popup Matrix */
+    /* Popup */
     #warningPopup1 {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.9);
+      background: rgba(0,0,0,0.9);
       display: none;
       align-items: center;
       justify-content: center;
       z-index: 9999;
     }
     #warningPopup1 .popup-box1 {
-      background: rgba(0, 10, 0, 0.9);
-      color: var(--matrix-green);
-      padding: 16px;
-      border: 2px solid var(--matrix-green);
+      background: rgba(0, 10, 0, 0.95);
+      color: var(--matrix);
+      padding: 18px;
+      border: 2px solid var(--matrix);
       border-radius: 4px;
       max-width: 280px;
       width: 90%;
       text-align: center;
       font-family: "Press Start 2P", monospace;
-      font-size: 9px;
-      box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+      font-size: 10px;
     }
     #warningPopup1 button1 {
-      background: rgba(0, 255, 65, 0.2);
-      border: 1px solid var(--matrix-green);
-      padding: 4px 8px;
-      color: var(--matrix-green);
+      background: transparent;
+      border: 1px solid var(--matrix);
+      padding: 5px 10px;
+      color: var(--matrix);
       border-radius: 3px;
       font-family: "Press Start 2P", monospace;
-      font-size: 8px;
-      margin-top: 8px;
+      font-size: 9px;
+      margin-top: 10px;
       cursor: pointer;
-      transition: background 0.2s;
-    }
-    #warningPopup1 button1:hover {
-      background: rgba(0, 255, 65, 0.3);
     }
   </style>
 </head>
@@ -240,45 +194,45 @@
 
   <div class="container" role="main">
     <header>
-      <h1 data-text="MATRIX ARCADE">MATRIX ARCADE</h1>
-      <p>SELECT OPTION TO PROCEED. (CLICK OR PRESS ENTER)</p>
+      <h1 data-text="PILIHAN — PIXEL PANEL">PILIHAN — PIXEL PANEL</h1>
+      <p>Pilih box untuk membuka file terkait. (Klik / tekan Enter pada kotak fokus)</p>
     </header>
 
     <div class="grid" id="menuGrid">
       <div class="box" tabindex="0" data-target="QR.html">
         <div class="icon">🗺️</div>
-        <div class="title">QR GEN</div>
+        <div class="title">QR Generator</div>
       </div>
 
       <div class="box" tabindex="0" data-target="fake-tweet.html">
         <div class="icon">🐦</div>
-        <div class="title">FAKE TWEET</div>
+        <div class="title">Fake Tweet</div>
       </div>
 
       <div class="box" tabindex="0" data-target="fake-iphone.html">
         <div class="icon">💬</div>
-        <div class="title">ECHAT</div>
-        <div class="subtitle">IPHONE SIM</div>
+        <div class="title">eChat</div>
+        <div class="subtitle">Fake iPhone</div>
       </div>
 
       <div class="box" tabindex="0" data-target="spam-NGL.html">
         <div class="icon">✉️</div>
-        <div class="title">SPAM NGL</div>
-        <div class="subtitle">ANON Q&A</div>
+        <div class="title">Spam NGL</div>
+        <div class="subtitle">Anonymous Q&A</div>
       </div>
     </div>
 
     <footer>
-      SYSTEM v2.05<br>KENTANGDEV // 2025
+      2025 Pixel Art Project<br>KentangDev.
     </footer>
   </div>
 
   <!-- Popup Peringatan -->
   <div id="warningPopup1">
     <div class="popup-box1">
-      <h21>⚠ SYSTEM ALERT</h21>
+      <h21>⚠️ Peringatan!</h21>
       <p1 id="warningMessage1"></p1>
-      <button1 onclick="closeWarning1()">ACKNOWLEDGE</button1>
+      <button1 onclick="closeWarning1()">OK</button1>
     </div>
   </div>
 
@@ -297,7 +251,7 @@
         localStorage.setItem("blockedUntil", Date.now() + 120000);
         window.location.href = "banned.html";
       } else {
-        document.getElementById("warningMessage1").innerText = `WARNING (${a}/${MAX_ATTEMPTS})`;
+        document.getElementById("warningMessage1").innerText = `Peringatan (${a}/${MAX_ATTEMPTS})`;
         document.getElementById("warningPopup1").style.display = "flex";
       }
     }

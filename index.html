@@ -45,7 +45,6 @@
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(5px);
       -webkit-backdrop-filter: blur(5px);
-      position: relative;
     }
 
     header h1 {
@@ -99,22 +98,20 @@
       margin-bottom: 16px;
     }
 
-    /* TOP RIGHT BOX */
-    .top-right-box {
-      position: absolute;
-      top: 20px;
-      right: 20px;
+    /* ACCOUNT MODAL */
+    .account-modal {
       background: #0f1625;
       border: 1px solid var(--accent);
       border-radius: 4px;
       padding: 8px;
-      width: 80px;
+      width: 120px;
+      margin: 8px auto;
       text-align: center;
       font-size: 8px;
-      z-index: 999;
+      display: none;
     }
 
-    .top-right-box #userUid {
+    .account-modal #userUid {
       font-family: monospace;
       color: white;
       font-size: 10px;
@@ -122,7 +119,7 @@
       margin: 4px 0;
     }
 
-    .top-right-box button {
+    .account-modal button {
       width: 100%;
       background: #ff5555;
       color: white;
@@ -201,7 +198,7 @@
     @media (max-width: 360px) {
       .box { height: 120px; padding: 10px; }
       .icon { font-size: 24px; }
-      .top-right-box { right: 10px; top: 10px; width: 70px; }
+      .account-modal { width: 100px; }
     }
 
     /* Popup */
@@ -413,7 +410,7 @@
         });
     }
 
-    // === RENDER MENU DENGAN TOP RIGHT BOX ===
+    // === RENDER MENU DENGAN TOMBOL ACCOUNT DI BAWAH MENU ===
     async function renderMenu() {
       const user = auth.currentUser;
       if (!user) {
@@ -444,14 +441,6 @@
           <p>Pilih box untuk membuka file terkait.</p>
         </header>
 
-        <!-- TOP RIGHT BOX -->
-        <div class="top-right-box">
-          <div style="font-size:8px; color:#b6c0d6; margin-bottom:4px;">ID:</div>
-          <div id="userUid">${displayUid}</div>
-          <button id="logoutBtn">🚪 LOGOUT</button>
-        </div>
-
-        <!-- MENU GRID -->
         <div class="grid" id="menuGrid">
           <div class="box" tabindex="0" data-target="QR.html">
             <div class="icon">🗺️</div>
@@ -473,12 +462,34 @@
           </div>
         </div>
 
+        <!-- TOMBOL ACCOUNT DI BAWAH MENU -->
+        <button id="accountBtn" style="background:#7c5cff; color:white; border:none; padding:6px 12px; border-radius:4px; font-family:'Press Start 2P', monospace; font-size:9px; cursor:pointer; margin-top:16px; width:100%; max-width:150px; text-align:center;">
+          👤 Account
+        </button>
+
+        <!-- MODAL ACCOUNT -->
+        <div id="accountModal" class="account-modal">
+          <div style="font-size:8px; color:#b6c0d6; margin-bottom:4px;">ID:</div>
+          <div id="userUid">${displayUid}</div>
+          <button id="logoutBtn">🚪 LOGOUT</button>
+        </div>
+
         <footer>
           2025 Pixel Art Project<br>KentangDev.
         </footer>
       `;
 
-      // Salin UID saat klik di ID
+      // Toggle account modal
+      document.getElementById('accountBtn').addEventListener('click', () => {
+        const modal = document.getElementById('accountModal');
+        if (modal.style.display === 'none') {
+          modal.style.display = 'block';
+        } else {
+          modal.style.display = 'none';
+        }
+      });
+
+      // Salin UID saat klik
       document.getElementById('userUid').addEventListener('click', async () => {
         try {
           await navigator.clipboard.writeText(displayUid);

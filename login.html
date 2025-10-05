@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login — Pixel Art</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #0f1724;
+      --accent: #3ce0c3;
+      --accent-2: #7c5cff;
+      --muted: #b6c0d6;
+    }
+    body {
+      background: #0b1220;
+      color: var(--muted);
+      font-family: "Press Start 2P", monospace;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      padding: 16px;
+    }
+    .form-box {
+      background: var(--panel);
+      padding: 20px;
+      border: 3px solid #071022;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 320px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin: 6px 0;
+      background: #0a111e;
+      border: 1px solid #333;
+      color: white;
+      font-family: inherit;
+      font-size: 12px;
+    }
+    button {
+      width: 100%;
+      padding: 8px;
+      background: var(--accent-2);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 12px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    .link {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 10px;
+      display: block;
+      margin-top: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-box">
+    <h2 style="text-align:center; font-size:16px;">LOGIN</h2>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button onclick="login()">Login</button>
+    <button onclick="register()" style="background: var(--accent); color: black;">Register</button>
+    <a href="#" class="link" onclick="resetPassword()">Lupa Password?</a>
+    <a href="index.html" class="link">Kembali ke Menu</a>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script>
+    const firebaseConfig = { /* SAMAKAN DENGAN index.html */ };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => window.location.href = "index.html")
+        .catch(e => alert("Error: " + e.message));
+    }
+
+    function register() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(() => window.location.href = "index.html")
+        .catch(e => alert("Error: " + e.message));
+    }
+
+    function resetPassword() {
+      const email = prompt("Masukkan email Anda:");
+      if (email) {
+        auth.sendPasswordResetEmail(email)
+          .then(() => alert("Link reset dikirim ke email Anda!"))
+          .catch(e => alert("Error: " + e.message));
+      }
+    }
+  </script>
+</body>
+</html>

@@ -3,15 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login — Noxius Tools</title>
+  <title>Menu Pilihan — Pixel Art</title>
   <link rel="icon" href="foto/foto.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-
   <style>
     :root {
       --bg: #0b1220;
@@ -168,86 +162,8 @@
       .icon { font-size: 24px; }
     }
 
-    /* Auth Overlay */
-    #loginContainer, #registerContainer, #forgotPasswordContainer {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.85);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      padding: 20px;
-    }
-    .auth-box {
-      background: rgba(11, 18, 32, 0.8);
-      border: 4px solid #071022;
-      padding: 24px;
-      border-radius: 8px;
-      max-width: 400px;
-      width: 90%;
-      text-align: center;
-      backdrop-filter: blur(5px);
-      -webkit-backdrop-filter: blur(5px);
-    }
-    .auth-box h2 {
-      color: var(--accent);
-      font-size: clamp(14px, 4vw, 18px);
-      margin-bottom: 20px;
-    }
-    .form-group {
-      margin: 12px 0;
-    }
-    .form-group label {
-      display: block;
-      font-size: 10px;
-      margin-bottom: 6px;
-      color: #9fb1d6;
-    }
-    .form-group input {
-      width: 100%;
-      padding: 8px;
-      background: #0f1625;
-      border: 2px solid #071022;
-      color: var(--muted);
-      font-family: "Press Start 2P", monospace;
-      font-size: 10px;
-      border-radius: 4px;
-      outline: none;
-    }
-    .form-group input:focus {
-      border-color: var(--accent-2);
-    }
-    .auth-box button {
-      background: var(--accent-2);
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      font-family: "Press Start 2P", monospace;
-      font-size: 10px;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-top: 16px;
-      width: 100%;
-    }
-    .error {
-      color: #ff5555;
-      font-size: 9px;
-      margin-top: 8px;
-    }
-    .link {
-      color: var(--accent);
-      text-decoration: none;
-      font-size: 9px;
-      display: block;
-      margin-top: 8px;
-    }
-    .link:hover {
-      text-decoration: underline;
-    }
-
-    /* Popup Peringatan & Sukses */
-    #warningPopup1, #successPopup {
+    /* Popup */
+    #warningPopup1 {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.7);
@@ -256,11 +172,11 @@
       justify-content: center;
       z-index: 9999;
     }
-    #warningPopup1 .popup-box1,
-    #successPopup .popup-box {
+    #warningPopup1 .popup-box1 {
       background: #0f1625;
       color: white;
       padding: 18px;
+      border: 2px solid var(--accent-2);
       border-radius: 8px;
       max-width: 280px;
       width: 90%;
@@ -268,14 +184,8 @@
       font-family: "Press Start 2P", monospace;
       font-size: 10px;
     }
-    #warningPopup1 .popup-box1 {
-      border: 2px solid var(--accent-2);
-    }
-    #successPopup .popup-box {
-      border: 2px solid var(--accent);
-    }
-    #warningPopup1 button1,
-    #successPopup button {
+    #warningPopup1 button1 {
+      background: var(--accent-2);
       border: none;
       padding: 5px 10px;
       color: white;
@@ -285,71 +195,123 @@
       margin-top: 10px;
       cursor: pointer;
     }
-    #warningPopup1 button1 {
-      background: var(--accent-2);
+
+    /* === CYBERPUNK PIXEL ENHANCEMENTS === */
+
+    /* Efek scanline CRT */
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent 1px,
+        rgba(0, 255, 255, 0.03) 1px,
+        rgba(0, 255, 255, 0.03) 2px
+      );
+      pointer-events: none;
+      z-index: 9998;
+      animation: scanline 8s linear infinite;
     }
-    #successPopup button {
-      background: var(--accent);
+
+    @keyframes scanline {
+      0% { background-position: 0 0; }
+      100% { background-position: 0 100vh; }
+    }
+
+    /* Border neon pada container */
+    .container {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container::before {
+      content: "";
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, 
+        var(--accent), 
+        var(--accent-2), 
+        #ff00c8, 
+        var(--accent)
+      );
+      z-index: -1;
+      border-radius: 10px;
+      animation: border-glow 3s infinite alternate;
+      filter: blur(8px);
+      opacity: 0.7;
+    }
+
+    @keyframes border-glow {
+      0% { opacity: 0.5; }
+      100% { opacity: 0.9; }
+    }
+
+    /* Efek neon pada box saat hover */
+    .box:hover {
+      box-shadow: 
+        0 0 8px var(--accent-2),
+        0 0 16px rgba(124, 92, 255, 0.6),
+        0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Teks judul: tambah glow */
+    header h1 {
+      text-shadow: 
+        0 0 5px var(--accent),
+        0 0 10px var(--accent),
+        0 0 15px rgba(60, 224, 195, 0.5);
+    }
+
+    /* Efek flicker pada ikon */
+    .icon {
+      transition: filter 0.3s ease;
+    }
+
+    .box:hover .icon {
+      filter: brightness(1.4) saturate(1.8);
+      text-shadow: 
+        0 0 6px var(--accent-2),
+        0 0 12px rgba(124, 92, 255, 0.7);
+    }
+
+    /* Footer: tambah sedikit glow */
+    footer {
+      text-shadow: 0 0 4px rgba(142, 160, 198, 0.4);
+    }
+
+    /* Perbaiki animasi glitch ikon agar lebih cyberpunk */
+    @keyframes glitch-icon {
+      0%, 100% { filter: hue-rotate(0deg) brightness(1); }
+      20% { filter: hue-rotate(20deg) brightness(1.2); }
+      40% { filter: hue-rotate(-20deg) brightness(0.9); }
+      60% { filter: hue-rotate(10deg) brightness(1.1); }
+      80% { filter: hue-rotate(-10deg) brightness(0.95); }
+    }
+
+    /* Efek kedip pada popup */
+    #warningPopup1 .popup-box1 {
+      animation: pulse-border 2s infinite;
+    }
+
+    @keyframes pulse-border {
+      0%, 100% { box-shadow: 0 0 8px var(--accent-2); }
+      50% { box-shadow: 0 0 16px var(--accent-2), 0 0 24px rgba(124, 92, 255, 0.6); }
     }
   </style>
 </head>
 <body>
 
-  <!-- Login Form -->
-  <div id="loginContainer">
-    <div class="auth-box">
-      <h2>NOXIUS TOOLS</h2>
-      <div class="form-group">
-        <label for="email">EMAIL</label>
-        <input type="email" id="email" placeholder="user@example.com" autocomplete="off" />
-      </div>
-      <div class="form-group">
-        <label for="password">PASSWORD</label>
-        <input type="password" id="password" />
-      </div>
-      <button onclick="login()">LOGIN</button>
-      <div id="loginError" class="error"></div>
-      <a href="#" class="link" onclick="showRegister()">Buat Akun Baru</a>
-      <a href="#" class="link" onclick="showForgotPassword()">Lupa Password?</a>
-    </div>
-  </div>
-
-  <!-- Register Form -->
-  <div id="registerContainer">
-    <div class="auth-box">
-      <h2>DAFTAR</h2>
-      <div class="form-group">
-        <label for="regEmail">EMAIL</label>
-        <input type="email" id="regEmail" placeholder="user@example.com" autocomplete="off" />
-      </div>
-      <div class="form-group">
-        <label for="regPassword">PASSWORD</label>
-        <input type="password" id="regPassword" />
-      </div>
-      <button onclick="register()">DAFTAR</button>
-      <div id="registerError" class="error"></div>
-      <a href="#" class="link" onclick="showLogin()">Sudah Punya Akun?</a>
-    </div>
-  </div>
-
-  <!-- Forgot Password Form -->
-  <div id="forgotPasswordContainer">
-    <div class="auth-box">
-      <h2>LUPA PASSWORD</h2>
-      <div class="form-group">
-        <label for="resetEmail">EMAIL</label>
-        <input type="email" id="resetEmail" placeholder="user@example.com" autocomplete="off" />
-      </div>
-      <button onclick="sendPasswordReset()">KIRIM LINK RESET</button>
-      <div id="resetError" class="error"></div>
-      <a href="#" class="link" onclick="showLogin()">Kembali ke Login</a>
-    </div>
-  </div>
-
-  <!-- Menu Utama -->
-  <div id="menuContainer" class="container" role="main" style="display:none;">
+  <div class="container" role="main">
     <header>
-      <h1 data-text="PILIHAN — NOXIUS TOOLS">PILIHAN — NOXIUS TOOLS</h1>
+      <h1 data-text="PILIHAN — PIXEL PANEL">PILIHAN — PIXEL PANEL</h1>
       <p>Pilih box untuk membuka file terkait. (Klik / tekan Enter pada kotak fokus)</p>
     </header>
 
@@ -377,53 +339,9 @@
       </div>
     </div>
 
-    <!-- UID & Email Container -->
-    <div style="margin-top:16px;display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;">
-
-      <!-- UID + Salin Button -->
-      <div style="display:flex;align-items:center;gap:8px;background:#0f1625;border:2px solid var(--accent-2);padding:8px 12px;border-radius:6px;width:90%;max-width:300px;justify-content:space-between;">
-        <div style="display:flex;align-items:center;gap:4px;font-size:clamp(7px,2vw,8px);color:#9fb1d6;">
-          🔑 <span id="uidDisplay"></span>
-        </div>
-        <button 
-          onclick="copyUID()" 
-          style="background:var(--accent-2);color:white;border:none;padding:2px 6px;border-radius:4px;font-family:'Press Start 2P';font-size:7px;cursor:pointer;transition:all 0.2s;"
-          onmouseover="this.style.transform='scale(1.1)'" 
-          onmouseout="this.style.transform='scale(1)'">
-          SALIN
-        </button>
-      </div>
-
-      <!-- Email + Toggle Hide -->
-      <div style="display:flex;align-items:center;gap:8px;background:#0f1625;border:2px solid var(--accent-2);padding:8px 12px;border-radius:6px;width:90%;max-width:300px;justify-content:space-between;">
-        <div style="display:flex;align-items:center;gap:4px;font-size:clamp(7px,2vw,8px);color:#9fb1d6;">
-          📧 <span id="emailDisplay" style="word-break:break-all;"></span>
-        </div>
-        <button 
-          onclick="toggleEmailVisibility()" 
-          style="background:transparent;border:1px solid var(--accent);color:var(--accent);padding:2px 6px;border-radius:4px;font-family:'Press Start 2P';font-size:7px;cursor:pointer;transition:all 0.2s;"
-          onmouseover="this.style.backgroundColor='rgba(124,92,255,0.2)'" 
-          onmouseout="this.style.backgroundColor='transparent'">
-          <span id="hideEmailText">HIDE</span>
-        </button>
-      </div>
-
-      <!-- Logout Button -->
-      <button 
-        onclick="logout()" 
-        style="background:transparent;border:none;color:var(--accent);font-family:'Press Start 2P';font-size:8px;margin-top:8px;cursor:pointer;padding:4px 8px;border:1px solid var(--accent);border-radius:4px;transition:all 0.2s;"
-        onmouseover="this.style.backgroundColor='rgba(124,92,255,0.2)'" 
-        onmouseout="this.style.backgroundColor='transparent'">
-        [LOGOUT]
-      </button>
-
-      <!-- Copyright -->
-      <div style="font-size:clamp(7px,2vw,8px);color:#8ea0c6;text-align:center;margin-top:8px;">
-        2025 Pixel Art Project<br>
-        NoxiusDev.
-      </div>
-
-    </div>
+    <footer>
+      2025 Pixel Art Project<br>KentangDev.
+    </footer>
   </div>
 
   <!-- Popup Peringatan -->
@@ -435,197 +353,7 @@
     </div>
   </div>
 
-  <!-- Notifikasi Sukses -->
-  <div id="successPopup">
-    <div class="popup-box">
-      <h2>✅ Sukses!</h2>
-      <p id="successMessage"></p>
-      <button onclick="closeSuccessPopup()">Oke</button>
-    </div>
-  </div>
-
   <script>
-    // ✅ KONFIGURASI FIREBASE ANDA
-    const firebaseConfig = {
-      apiKey: "AIzaSyC5HS7vsJVs9dtarPkzhQmiqNaeCKkJw_A",
-      authDomain: "noxius-panel.firebaseapp.com",
-      projectId: "noxius-panel",
-      storageBucket: "noxius-panel.firebasestorage.app",
-      messagingSenderId: "873696240519",
-      appId: "1:873696240519:web:401f9efb0d71b32363a922",
-      measurementId: "G-YNC6NQT179"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // === Dapatkan atau buat 9-digit UID dari Firestore ===
-    async function getOrCreatePersistentUID(user) {
-      const userDoc = db.collection("user_uids").doc(user.uid);
-      const doc = await userDoc.get();
-
-      if (doc.exists) {
-        return doc.data().shortUID;
-      } else {
-        const shortUID = Math.floor(100000000 + Math.random() * 900000000).toString();
-        await userDoc.set({
-          shortUID: shortUID,
-          email: user.email,
-          createdAt: new Date()
-        });
-        return shortUID;
-      }
-    }
-
-    // === UI ===
-    function showLogin() {
-      document.getElementById("loginContainer").style.display = "flex";
-      document.getElementById("registerContainer").style.display = "none";
-      document.getElementById("forgotPasswordContainer").style.display = "none";
-      document.getElementById("menuContainer").style.display = "none";
-      document.getElementById("loginError").textContent = "";
-    }
-
-    function showRegister() {
-      document.getElementById("registerContainer").style.display = "flex";
-      document.getElementById("loginContainer").style.display = "none";
-      document.getElementById("forgotPasswordContainer").style.display = "none";
-      document.getElementById("menuContainer").style.display = "none";
-      document.getElementById("registerError").textContent = "";
-    }
-
-    function showForgotPassword() {
-      document.getElementById("forgotPasswordContainer").style.display = "flex";
-      document.getElementById("loginContainer").style.display = "none";
-      document.getElementById("registerContainer").style.display = "none";
-      document.getElementById("resetError").textContent = "";
-    }
-
-    function showMenu(shortUID, email) {
-      document.getElementById("uidDisplay").textContent = shortUID;
-      document.getElementById("emailDisplay").textContent = email;
-      document.getElementById("loginContainer").style.display = "none";
-      document.getElementById("registerContainer").style.display = "none";
-      document.getElementById("forgotPasswordContainer").style.display = "none";
-      document.getElementById("menuContainer").style.display = "block";
-    }
-
-    function showError(id, msg) {
-      document.getElementById(id).textContent = msg;
-    }
-
-    // === AUTH FUNCTIONS ===
-    function login() {
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-      if (!email || !password) return showError("loginError", "Isi email & password!");
-      auth.signInWithEmailAndPassword(email, password)
-        .catch(err => {
-          let msg = "Login gagal!";
-          if (err.code === "auth/user-not-found") msg = "Akun tidak ditemukan.";
-          else if (err.code === "auth/wrong-password") msg = "Password salah.";
-          showError("loginError", msg);
-        });
-    }
-
-    function register() {
-      const email = document.getElementById("regEmail").value.trim();
-      const password = document.getElementById("regPassword").value;
-      if (!email || password.length < 6) return showError("registerError", "Password minimal 6 karakter!");
-      auth.createUserWithEmailAndPassword(email, password)
-        .catch(err => {
-          let msg = "Pendaftaran gagal!";
-          if (err.code === "auth/email-already-in-use") msg = "Email sudah terdaftar.";
-          showError("registerError", msg);
-        });
-    }
-
-    function sendPasswordReset() {
-      const email = document.getElementById("resetEmail").value.trim();
-      if (!email) {
-        document.getElementById("resetError").textContent = "Masukkan email!";
-        return;
-      }
-
-      auth.sendPasswordResetEmail(email)
-        .then(() => {
-          showSuccess("Link reset password telah dikirim ke email Anda.\nPeriksa folder spam jika tidak muncul.");
-        })
-        .catch(err => {
-          let msg = "Gagal mengirim email reset.";
-          if (err.code === "auth/user-not-found") {
-            msg = "Email tidak terdaftar.";
-          } else if (err.code === "auth/invalid-email") {
-            msg = "Format email tidak valid.";
-          }
-          document.getElementById("resetError").textContent = msg;
-        });
-    }
-
-    function logout() {
-      auth.signOut().then(() => showLogin());
-    }
-
-    // === FITUR BARU ===
-    function copyUID() {
-      const uid = document.getElementById("uidDisplay").textContent;
-      if (!uid) return;
-      navigator.clipboard.writeText(uid).then(() => {
-        showSuccess("✅ UID telah disalin ke clipboard!");
-      }).catch(() => {
-        showError("loginError", "Gagal menyalin UID.");
-      });
-    }
-
-    let isEmailHidden = false;
-    function toggleEmailVisibility() {
-      const emailEl = document.getElementById("emailDisplay");
-      const hideBtn = document.getElementById("hideEmailText");
-
-      if (isEmailHidden) {
-        emailEl.style.display = "inline";
-        hideBtn.textContent = "HIDE";
-        isEmailHidden = false;
-      } else {
-        emailEl.style.display = "none";
-        hideBtn.textContent = "SHOW";
-        isEmailHidden = true;
-      }
-    }
-
-    // === POPUP FUNCTIONS ===
-    function closeWarning1() {
-      document.getElementById("warningPopup1").style.display = "none";
-    }
-
-    function showSuccess(message) {
-      document.getElementById("successMessage").textContent = message;
-      document.getElementById("successPopup").style.display = "flex";
-    }
-
-    function closeSuccessPopup() {
-      document.getElementById("successPopup").style.display = "none";
-      showLogin();
-    }
-
-    // === ON AUTH STATE CHANGE ===
-    auth.onAuthStateChanged(async user => {
-      if (user) {
-        try {
-          const shortUID = await getOrCreatePersistentUID(user);
-          showMenu(shortUID, user.email);
-        } catch (err) {
-          console.error("Gagal dapat UID:", err);
-          showError("loginError", "Gagal memuat UID. Coba lagi.");
-          auth.signOut();
-        }
-      } else {
-        showLogin();
-      }
-    });
-
-    // === PROTEKSI DEVELOPER TOOLS ===
     const MAX_ATTEMPTS = 3;
     function getAttempts() {
       return parseInt(localStorage.getItem("inspectAttempts") || "0", 10);
@@ -643,6 +371,9 @@
         document.getElementById("warningMessage1").innerText = `Peringatan (${a}/${MAX_ATTEMPTS})`;
         document.getElementById("warningPopup1").style.display = "flex";
       }
+    }
+    function closeWarning1() {
+      document.getElementById("warningPopup1").style.display = "none";
     }
 
     document.addEventListener('contextmenu', e => { e.preventDefault(); addAttempt(); });

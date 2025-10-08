@@ -5,23 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Coming Soon</title>
 
-  <!-- Preload Fixel Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fixel+Display:wght@400;500;600;700&family=Fixel+Text:wght@400;500&display=swap" rel="stylesheet">
+  <!-- Font Pixel Retro -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
   <style>
-    /* Pastikan font default jika Fixel gagal */
-    :root {
-      --font-display: 'Fixel Display', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      --font-text: 'Fixel Text', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: var(--font-text);
+      font-family: 'Press Start 2P', monospace;
     }
 
     body {
@@ -35,7 +27,7 @@
       position: relative;
     }
 
-    /* Grid overlay */
+    /* Grid overlay for cyberpunk feel */
     body::before {
       content: "";
       position: absolute;
@@ -50,11 +42,11 @@
 
     .container {
       text-align: center;
-      padding: 30px;
-      max-width: 650px;
+      padding: 25px;
+      max-width: 600px;
       background: rgba(8, 2, 20, 0.6);
       border: 1px solid #6a0dad;
-      border-radius: 12px;
+      border-radius: 8px;
       box-shadow:
         0 0 15px rgba(106, 13, 173, 0.6),
         inset 0 0 10px rgba(106, 13, 173, 0.3);
@@ -63,20 +55,18 @@
     }
 
     h1 {
-      font-family: var(--font-display);
-      font-size: 3rem;
+      font-size: 2rem;
       margin-bottom: 15px;
       color: #ff00ff;
       text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
-      letter-spacing: 2px;
+      letter-spacing: 1px;
       opacity: 0;
       animation: fadeIn 1.5s forwards;
     }
 
     .subtitle {
-      font-family: var(--font-text);
-      font-size: 1.2rem;
-      margin-bottom: 25px;
+      font-size: 0.8rem;
+      margin-bottom: 20px;
       color: #a0a0ff;
       opacity: 0;
       animation: fadeIn 1.5s 0.3s forwards;
@@ -85,20 +75,20 @@
     .countdown {
       display: flex;
       justify-content: center;
-      gap: 10px;
-      margin: 25px 0;
+      gap: 8px;
+      margin: 20px 0;
     }
 
     .time-box {
       background: rgba(10, 0, 30, 0.7);
       border: 1px solid #8a2be2;
-      border-radius: 8px;
-      padding: 12px 8px;
-      min-width: 65px;
+      border-radius: 6px;
+      padding: 10px 6px;
+      min-width: 60px;
       opacity: 0;
       transform: translateY(20px);
       animation: slideUp 0.8s forwards;
-      box-shadow: 0 0 8px rgba(138, 43, 226, 0.5);
+      box-shadow: 0 0 6px rgba(138, 43, 226, 0.5);
     }
 
     .time-box:nth-child(1) { animation-delay: 0.5s; }
@@ -107,32 +97,29 @@
     .time-box:nth-child(4) { animation-delay: 0.8s; }
 
     .time-value {
-      font-family: var(--font-display);
-      font-size: 2rem;
+      font-size: 1.4rem;
       font-weight: 700;
       color: #00ffff;
-      text-shadow: 0 0 8px #00ffff;
+      text-shadow: 0 0 6px #00ffff;
     }
 
     .time-label {
-      font-family: var(--font-text);
-      font-size: 0.8rem;
+      font-size: 0.6rem;
       text-transform: uppercase;
-      letter-spacing: 1.5px;
+      letter-spacing: 1px;
       color: #ff66ff;
     }
 
     .status {
-      margin-top: 20px;
-      font-family: var(--font-text);
-      font-size: 1rem;
+      margin-top: 15px;
+      font-size: 0.7rem;
       font-weight: 600;
       color: #ffcc00;
       text-shadow: 0 0 6px rgba(255, 204, 0, 0.7);
       opacity: 0;
       animation: fadeIn 1.5s 1.2s forwards;
-      padding: 8px 12px;
-      border-radius: 6px;
+      padding: 6px 10px;
+      border-radius: 4px;
       background: rgba(0, 0, 0, 0.3);
       display: inline-block;
       word-wrap: break-word;
@@ -141,24 +128,23 @@
     .back-button {
       display: block;
       margin-top: 15px;
-      padding: 10px 20px;
-      font-family: var(--font-display);
-      font-size: 1rem;
+      padding: 8px 16px;
+      font-size: 0.7rem;
       background: transparent;
       color: #ff00ff;
       border: 2px solid #ff00ff;
-      border-radius: 6px;
+      border-radius: 4px;
       cursor: pointer;
       text-transform: uppercase;
-      letter-spacing: 1.5px;
+      letter-spacing: 1px;
       transition: all 0.3s ease;
-      box-shadow: 0 0 10px rgba(255, 0, 255, 0.4);
+      box-shadow: 0 0 8px rgba(255, 0, 255, 0.4);
       text-decoration: none;
     }
 
     .back-button:hover {
       background: rgba(255, 0, 255, 0.1);
-      box-shadow: 0 0 15px rgba(255, 0, 255, 0.8);
+      box-shadow: 0 0 12px rgba(255, 0, 255, 0.8);
       color: white;
     }
 
@@ -174,13 +160,13 @@
     }
 
     @media (max-width: 600px) {
-      h1 { font-size: 2.5rem; }
-      .time-box { min-width: 55px; padding: 10px 4px; }
-      .time-value { font-size: 1.8rem; }
-      .status { font-size: 0.9rem; padding: 6px 10px; }
+      h1 { font-size: 1.6rem; }
+      .time-box { min-width: 50px; padding: 8px 4px; }
+      .time-value { font-size: 1.2rem; }
+      .status { font-size: 0.6rem; padding: 4px 8px; }
       .back-button { 
-        padding: 8px 16px; 
-        font-size: 0.9rem;
+        padding: 6px 12px; 
+        font-size: 0.6rem;
         margin-top: 10px;
       }
     }

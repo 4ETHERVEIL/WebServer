@@ -1,3 +1,461 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Panel — Pixel Art</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #0f1724;
+      --accent: #3ce0c3;
+      --accent-2: #7c5cff;
+      --muted: #b6c0d6;
+      --danger: #ff4d4d;
+      --success: #3ce0c3;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #090f1a, #0b1220, #0d1528);
+      background-size: 400% 400%;
+      animation: gradientBG 20s ease infinite;
+      color: var(--muted);
+      font-family: "Press Start 2P", monospace;
+      padding: 16px;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .container {
+      width: 100%;
+      max-width: 850px;
+      background: rgba(11, 18, 32, 0.7);
+      border: 2px solid rgba(124, 92, 255, 0.3);
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow:
+        0 0 0 1px rgba(124, 92, 255, 0.2),
+        0 10px 30px rgba(0, 0, 0, 0.6),
+        inset 0 0 15px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.8s ease forwards;
+    }
+
+    .container::before {
+      content: "";
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, var(--accent), var(--accent-2), var(--accent));
+      z-index: -1;
+      border-radius: 18px;
+      opacity: 0.6;
+      animation: borderGlow 4s infinite alternate;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes borderGlow {
+      0% { opacity: 0.3; }
+      100% { opacity: 0.7; }
+    }
+
+    h2 {
+      text-align: center;
+      color: gold;
+      margin: 0 0 24px;
+      font-size: 18px;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+      letter-spacing: 1px;
+    }
+
+    .back-btn {
+      display: inline-block;
+      background: linear-gradient(45deg, var(--accent-2), #5a3fcf);
+      color: white;
+      text-decoration: none;
+      padding: 6px 16px;
+      border-radius: 30px;
+      font-size: 10px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(124, 92, 255, 0.5);
+      transition: all 0.3s ease;
+      box-shadow: 0 0 8px rgba(124, 92, 255, 0.3);
+    }
+
+    .back-btn:hover {
+      transform: translateX(-3px);
+      box-shadow: 0 0 12px rgba(124, 92, 255, 0.6);
+    }
+
+    /* Menu Navigasi */
+    .admin-menu {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .menu-btn {
+      padding: 10px 16px;
+      background: rgba(10, 17, 30, 0.7);
+      border: 1px solid rgba(124, 92, 255, 0.4);
+      color: var(--muted);
+      font-family: "Press Start 2P", monospace;
+      font-size: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .menu-btn::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(124, 92, 255, 0.2), transparent);
+      transition: 0.5s;
+    }
+
+    .menu-btn:hover::after {
+      left: 100%;
+    }
+
+    .menu-btn:hover {
+      color: white;
+      border-color: var(--accent-2);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .menu-btn.active {
+      background: var(--accent-2);
+      color: black;
+      font-weight: bold;
+      border-color: var(--accent-2);
+      box-shadow: 0 0 15px rgba(124, 92, 255, 0.5);
+      transform: scale(1.03);
+    }
+
+    /* Panel Konten */
+    .panel {
+      display: none;
+      animation: slideIn 0.5s ease forwards;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* Tabel User */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9px;
+      margin-top: 8px;
+    }
+
+    th, td {
+      border: 1px solid rgba(51, 51, 51, 0.6);
+      padding: 10px 6px;
+      text-align: center;
+      transition: background 0.2s;
+    }
+
+    tr:hover td {
+      background: rgba(20, 30, 50, 0.4);
+    }
+
+    th {
+      background: rgba(10, 17, 30, 0.8);
+      color: var(--accent);
+      font-weight: bold;
+    }
+
+    button {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      font-family: "Press Start 2P", monospace;
+      font-size: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: bold;
+    }
+
+    .ban-btn {
+      background: var(--danger);
+      color: white;
+      box-shadow: 0 2px 5px rgba(255, 77, 77, 0.4);
+    }
+
+    .ban-btn:hover {
+      background: #ff3333;
+      transform: scale(1.05);
+    }
+
+    .unban-btn {
+      background: var(--success);
+      color: black;
+      box-shadow: 0 2px 5px rgba(60, 224, 195, 0.4);
+    }
+
+    .unban-btn:hover {
+      background: #28d0b0;
+      transform: scale(1.05);
+    }
+
+    .admin-tag {
+      color: gold;
+      font-weight: bold;
+      text-shadow: 0 0 6px rgba(255, 215, 0, 0.7);
+    }
+
+    .banned-yes {
+      color: #ff6666;
+      font-weight: bold;
+    }
+
+    .note-cell {
+      font-size: 7px;
+      color: #aaa;
+      max-width: 120px;
+      word-wrap: break-word;
+    }
+
+    /* Daftar Menu Items */
+    #menuList {
+      margin-top: 16px;
+    }
+
+    .menu-item {
+      background: rgba(15, 22, 37, 0.6);
+      border: 1px solid rgba(51, 51, 51, 0.5);
+      padding: 12px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      font-size: 10px;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .menu-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+      border-color: var(--accent);
+    }
+
+    .menu-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .menu-item-title {
+      font-weight: bold;
+      color: var(--accent);
+      font-size: 11px;
+    }
+
+    .menu-item-actions button {
+      margin-left: 6px;
+      padding: 4px 8px;
+      font-size: 8px;
+    }
+
+    .edit-btn {
+      background: var(--accent);
+      color: black;
+    }
+
+    .edit-btn:hover {
+      background: #28d0b0;
+      transform: scale(1.05);
+    }
+
+    .delete-btn {
+      background: var(--danger);
+      color: white;
+    }
+
+    .delete-btn:hover {
+      background: #ff3333;
+      transform: scale(1.05);
+    }
+
+    /* Popup Umum */
+    .popup-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.88);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      backdrop-filter: blur(5px);
+    }
+
+    .popup-content {
+      background: rgba(15, 22, 37, 0.95);
+      border: 2px solid var(--accent-2);
+      border-radius: 12px;
+      padding: 20px;
+      width: 90%;
+      max-width: 360px;
+      font-size: 10px;
+      text-align: left;
+      box-shadow: 0 0 25px rgba(124, 92, 255, 0.4);
+      transform: scale(0.9);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .popup-overlay[style*="flex"] .popup-content {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    .popup-content h3 {
+      color: gold;
+      margin: 0 0 14px;
+      text-align: center;
+      text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+    }
+
+    .popup-content label {
+      display: block;
+      margin: 10px 0 5px;
+      font-size: 9px;
+      color: var(--muted);
+    }
+
+    .popup-content input,
+    .popup-content select,
+    .popup-content textarea {
+      width: 100%;
+      padding: 8px;
+      margin: 4px 0;
+      background: rgba(10, 17, 30, 0.8);
+      border: 1px solid rgba(124, 92, 255, 0.3);
+      color: white;
+      font-family: "Press Start 2P", monospace;
+      font-size: 9px;
+      border-radius: 4px;
+    }
+
+    .popup-buttons {
+      margin-top: 16px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .popup-buttons button {
+      flex: 1;
+      padding: 6px;
+      font-size: 9px;
+      border-radius: 6px;
+    }
+
+    .cancel-btn {
+      background: #555;
+      color: white;
+    }
+
+    .cancel-btn:hover {
+      background: #666;
+    }
+
+    .confirm-btn {
+      background: var(--accent-2);
+      color: white;
+    }
+
+    .confirm-btn:hover {
+      background: #6a4de0;
+      transform: translateY(-2px);
+    }
+
+    .delete-confirm-btn {
+      background: var(--danger);
+      color: white;
+    }
+
+    .delete-confirm-btn:hover {
+      background: #ff3333;
+      transform: translateY(-2px);
+    }
+
+    /* Coming Soon Panel Enhancements */
+    #comingsoon-panel input[type="datetime-local"] {
+      background: rgba(10, 17, 30, 0.8) !important;
+      border: 1px solid rgba(124, 92, 255, 0.4) !important;
+      color: white !important;
+      font-family: "Press Start 2P", monospace !important;
+      font-size: 9px !important;
+      border-radius: 6px !important;
+      padding: 8px !important;
+    }
+
+    #comingSoonStatus {
+      min-height: 16px;
+    }
+
+    /* Loading animation */
+    @keyframes pulse {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+
+    #userList tr td[colspan] {
+      animation: pulse 1.5s infinite;
+    }
+  </style>
+</head>
 <body>
   <div class="container">
     <a href="index.html" class="back-btn">← Kembali ke Menu</a>
@@ -462,3 +920,4 @@
     });
   </script>
 </body>
+</html>

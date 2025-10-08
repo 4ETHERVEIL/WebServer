@@ -4,48 +4,72 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Coming Soon</title>
+  <!-- Fixel Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fixel+Display:wght@400;500;600;700&family=Fixel+Text:wght@400;500&display=swap" rel="stylesheet">
+
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     body {
-      background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-      background-size: 400% 400%;
-      animation: gradientBG 15s ease infinite;
+      background: #0a0a14;
+      color: #e0e0ff;
+      font-family: 'Fixel Text', sans-serif;
       height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      color: white;
       overflow: hidden;
+      position: relative;
     }
 
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    /* Grid overlay for cyberpunk feel */
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: 
+        linear-gradient(rgba(30, 2, 40, 0.2) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(30, 2, 40, 0.2) 1px, transparent 1px);
+      background-size: 30px 30px;
+      pointer-events: none;
+      z-index: -1;
     }
 
     .container {
       text-align: center;
-      padding: 30px;
-      max-width: 600px;
+      padding: 40px;
+      max-width: 650px;
+      background: rgba(8, 2, 20, 0.6);
+      border: 1px solid #6a0dad;
+      border-radius: 12px;
+      box-shadow:
+        0 0 15px rgba(106, 13, 173, 0.6),
+        inset 0 0 10px rgba(106, 13, 173, 0.3);
+      position: relative;
+      z-index: 2;
     }
 
     h1 {
-      font-size: 3.5rem;
+      font-family: 'Fixel Display', sans-serif;
+      font-size: 4rem;
       margin-bottom: 20px;
+      color: #ff00ff;
+      text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+      letter-spacing: 2px;
       opacity: 0;
       animation: fadeIn 1.5s forwards;
     }
 
     .subtitle {
-      font-size: 1.2rem;
-      margin-bottom: 40px;
+      font-size: 1.3rem;
+      margin-bottom: 30px;
+      color: #a0a0ff;
       opacity: 0;
       animation: fadeIn 1.5s 0.3s forwards;
     }
@@ -53,19 +77,20 @@
     .countdown {
       display: flex;
       justify-content: center;
-      gap: 15px;
+      gap: 12px;
       margin: 30px 0;
     }
 
     .time-box {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border-radius: 10px;
-      padding: 15px 10px;
-      min-width: 80px;
+      background: rgba(10, 0, 30, 0.7);
+      border: 1px solid #8a2be2;
+      border-radius: 8px;
+      padding: 16px 8px;
+      min-width: 70px;
       opacity: 0;
       transform: translateY(20px);
       animation: slideUp 0.8s forwards;
+      box-shadow: 0 0 8px rgba(138, 43, 226, 0.5);
     }
 
     .time-box:nth-child(1) { animation-delay: 0.5s; }
@@ -74,23 +99,67 @@
     .time-box:nth-child(4) { animation-delay: 0.8s; }
 
     .time-value {
-      font-size: 2.2rem;
+      font-family: 'Fixel Display', sans-serif;
+      font-size: 2.4rem;
       font-weight: 700;
+      color: #00ffff;
+      text-shadow: 0 0 8px #00ffff;
     }
 
     .time-label {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 1.5px;
+      color: #ff66ff;
     }
 
     .status {
-      margin-top: 20px;
+      margin-top: 25px;
       font-size: 1.1rem;
-      font-weight: bold;
+      font-weight: 600;
       color: #ffcc00;
+      text-shadow: 0 0 6px rgba(255, 204, 0, 0.7);
       opacity: 0;
       animation: fadeIn 1.5s 1.2s forwards;
+    }
+
+    /* Cyberpunk Button */
+    .back-button {
+      margin-top: 30px;
+      padding: 12px 30px;
+      font-family: 'Fixel Display', sans-serif;
+      font-size: 1.1rem;
+      background: transparent;
+      color: #ff00ff;
+      border: 2px solid #ff00ff;
+      border-radius: 6px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(255, 0, 255, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .back-button::before {
+      content: "";
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 0, 255, 0.4), transparent);
+      transition: 0.5s;
+    }
+
+    .back-button:hover {
+      background: rgba(255, 0, 255, 0.1);
+      box-shadow: 0 0 15px rgba(255, 0, 255, 0.8);
+      color: white;
+    }
+
+    .back-button:hover::before {
+      left: 100%;
     }
 
     @keyframes fadeIn {
@@ -105,15 +174,16 @@
     }
 
     @media (max-width: 600px) {
-      h1 { font-size: 2.5rem; }
-      .time-box { min-width: 60px; padding: 12px 5px; }
-      .time-value { font-size: 1.8rem; }
+      h1 { font-size: 2.8rem; }
+      .time-box { min-width: 55px; padding: 12px 4px; }
+      .time-value { font-size: 1.9rem; }
+      .back-button { padding: 10px 20px; font-size: 1rem; }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Coming Soon</h1>
+    <h1>COMING SOON</h1>
     <p class="subtitle">Situs kami sedang dalam pengembangan. Tunggu kehadirannya!</p>
 
     <div class="countdown" id="countdown">
@@ -136,13 +206,15 @@
     </div>
 
     <div class="status" id="statusMessage">Memuat...</div>
+
+    <!-- Tombol Kembali ke Index -->
+    <a href="index.html" class="back-button">Kembali ke Beranda</a>
   </div>
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script>
-    // 🔥 Konfigurasi Firebase (SAMA seperti di admin)
     const firebaseConfig = {
       apiKey: "AIzaSyC5HS7vsJVs9dtarPkzhQmiqNaeCKkJw_A",
       authDomain: "noxius-panel.firebaseapp.com",
@@ -158,7 +230,6 @@
     let launchDate = null;
     let countdownInterval = null;
 
-    // Ambil tanggal rilis dari Firestore
     async function fetchLaunchDate() {
       try {
         const doc = await db.collection("settings").doc("comingSoon").get();
@@ -185,7 +256,7 @@
 
         if (distance < 0) {
           clearInterval(countdownInterval);
-          document.getElementById("countdown").innerHTML = "<h2 style='color:#ffcc00;'>🎉 SUDAH HADIR!</h2>";
+          document.getElementById("countdown").innerHTML = "<h2 style='color:#00ffff; text-shadow: 0 0 10px #00ffff;'>🎉 SUDAH HADIR!</h2>";
           document.getElementById("statusMessage").textContent = "";
           return;
         }
@@ -202,7 +273,6 @@
       }, 1000);
     }
 
-    // Jalankan saat halaman dimuat
     window.addEventListener("load", fetchLaunchDate);
   </script>
 </body>

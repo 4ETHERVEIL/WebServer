@@ -4,13 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Coming Soon</title>
-  <!-- Gunakan font standar untuk keandalan -->
+
+  <!-- Preload Fixel Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fixel+Display:wght@400;500;600;700&family=Fixel+Text:wght@400;500&display=swap" rel="stylesheet">
+
   <style>
+    /* Pastikan font default jika Fixel gagal */
+    :root {
+      --font-display: 'Fixel Display', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      --font-text: 'Fixel Text', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: var(--font-text);
     }
 
     body {
@@ -52,6 +63,7 @@
     }
 
     h1 {
+      font-family: var(--font-display);
       font-size: 3rem;
       margin-bottom: 15px;
       color: #ff00ff;
@@ -62,6 +74,7 @@
     }
 
     .subtitle {
+      font-family: var(--font-text);
       font-size: 1.2rem;
       margin-bottom: 25px;
       color: #a0a0ff;
@@ -94,6 +107,7 @@
     .time-box:nth-child(4) { animation-delay: 0.8s; }
 
     .time-value {
+      font-family: var(--font-display);
       font-size: 2rem;
       font-weight: 700;
       color: #00ffff;
@@ -101,6 +115,7 @@
     }
 
     .time-label {
+      font-family: var(--font-text);
       font-size: 0.8rem;
       text-transform: uppercase;
       letter-spacing: 1.5px;
@@ -109,6 +124,7 @@
 
     .status {
       margin-top: 20px;
+      font-family: var(--font-text);
       font-size: 1rem;
       font-weight: 600;
       color: #ffcc00;
@@ -126,6 +142,7 @@
       display: block;
       margin-top: 15px;
       padding: 10px 20px;
+      font-family: var(--font-display);
       font-size: 1rem;
       background: transparent;
       color: #ff00ff;

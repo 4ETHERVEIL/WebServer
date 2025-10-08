@@ -1,215 +1,3 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin Panel — Pixel Art</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #0b1220;
-      --panel: #0f1724;
-      --accent: #3ce0c3;
-      --accent-2: #7c5cff;
-      --muted: #b6c0d6;
-    }
-    body {
-      background: var(--bg);
-      color: var(--muted);
-      font-family: "Press Start 2P", monospace;
-      padding: 16px;
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-    }
-    .container {
-      width: 100%;
-      max-width: 850px;
-      background: rgba(11, 18, 32, 0.65);
-      border: 4px solid #071022;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(5px);
-    }
-    h2 {
-      text-align: center;
-      color: gold;
-      margin: 0 0 20px;
-      font-size: 18px;
-    }
-    .back-btn {
-      display: inline-block;
-      background: var(--accent-2);
-      color: white;
-      text-decoration: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      font-size: 10px;
-      margin-bottom: 16px;
-    }
-    
-    /* Menu Navigasi */
-    .admin-menu {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .menu-btn {
-      padding: 8px 12px;
-      background: #0a111e;
-      border: 1px solid var(--accent-2);
-      color: var(--muted);
-      font-family: "Press Start 2P", monospace;
-      font-size: 10px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .menu-btn.active {
-      background: var(--accent-2);
-      color: black;
-    }
-
-    /* Panel Konten */
-    .panel {
-      display: none;
-    }
-    .panel.active {
-      display: block;
-    }
-
-    /* Tabel User */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 9px;
-    }
-    th, td {
-      border: 1px solid #333;
-      padding: 8px;
-      text-align: center;
-    }
-    th {
-      background: #0a111e;
-    }
-    button {
-      padding: 4px 6px;
-      border: none;
-      border-radius: 3px;
-      font-family: "Press Start 2P", monospace;
-      font-size: 8px;
-      cursor: pointer;
-    }
-    .ban-btn { background: #ff4d4d; color: white; }
-    .unban-btn { background: #3ce0c3; color: black; }
-    .admin-tag { color: gold; font-weight: bold; }
-    .banned-yes { color: #ff6666; font-weight: bold; }
-    .note-cell {
-      font-size: 7px;
-      color: #aaa;
-      max-width: 120px;
-      word-wrap: break-word;
-    }
-
-    /* Daftar Menu Items */
-    #menuList {
-      margin-top: 16px;
-    }
-    .menu-item {
-      background: #0f1625;
-      border: 1px solid #333;
-      padding: 10px;
-      margin-bottom: 8px;
-      border-radius: 4px;
-      font-size: 10px;
-    }
-    .menu-item-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-    }
-    .menu-item-title {
-      font-weight: bold;
-      color: var(--accent);
-    }
-    .menu-item-actions button {
-      margin-left: 4px;
-      padding: 3px 6px;
-      font-size: 8px;
-    }
-    .edit-btn { background: var(--accent); color: black; }
-    .delete-btn { background: #ff4d4d; color: white; }
-
-    /* Popup Umum */
-    .popup-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.85);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-    }
-    .popup-content {
-      background: #0f1625;
-      border: 2px solid var(--accent-2);
-      border-radius: 8px;
-      padding: 16px;
-      width: 90%;
-      max-width: 340px;
-      font-size: 10px;
-      text-align: left;
-    }
-    .popup-content h3 {
-      color: gold;
-      margin: 0 0 12px;
-      text-align: center;
-    }
-    .popup-content label {
-      display: block;
-      margin: 8px 0 4px;
-      font-size: 9px;
-    }
-    .popup-content input,
-    .popup-content select,
-    .popup-content textarea {
-      width: 100%;
-      padding: 6px;
-      margin: 4px 0;
-      background: #0a111e;
-      border: 1px solid #333;
-      color: white;
-      font-family: "Press Start 2P", monospace;
-      font-size: 9px;
-    }
-    .popup-buttons {
-      margin-top: 12px;
-      display: flex;
-      gap: 8px;
-    }
-    .popup-buttons button {
-      flex: 1;
-      padding: 5px;
-      font-size: 9px;
-    }
-    .cancel-btn {
-      background: #555;
-      color: white;
-    }
-    .confirm-btn {
-      background: var(--accent-2);
-      color: white;
-    }
-    .delete-confirm-btn {
-      background: #ff4d4d;
-      color: white;
-    }
-  </style>
-</head>
 <body>
   <div class="container">
     <a href="index.html" class="back-btn">← Kembali ke Menu</a>
@@ -219,6 +7,7 @@
     <div class="admin-menu">
       <button class="menu-btn active" data-panel="users">Kelola User</button>
       <button class="menu-btn" data-panel="menu">Kelola Menu</button>
+      <button class="menu-btn" data-panel="comingsoon">Coming Soon</button>
     </div>
 
     <!-- Panel: Kelola User -->
@@ -249,6 +38,28 @@
       <div id="menuList">
         Memuat...
       </div>
+    </div>
+
+    <!-- Panel: Coming Soon -->
+    <div id="comingsoon-panel" class="panel">
+      <h3 style="margin-bottom:12px; font-size:12px;">Atur Waktu Rilis</h3>
+      <p style="font-size:9px; margin-bottom:10px; color:#aaa;">Tanggal & waktu saat situs akan "live".</p>
+      
+      <div style="background:#0a111e; padding:12px; border-radius:4px; margin-bottom:16px;">
+        <label for="launchDateInput" style="display:block; margin-bottom:6px; font-size:9px;">Tanggal Rilis:</label>
+        <input type="datetime-local" id="launchDateInput" style="width:100%; padding:6px; background:#070d18; border:1px solid #333; color:white; font-family:'Press Start 2P', monospace; font-size:9px;">
+        
+        <div style="margin-top:12px; font-size:9px;">
+          <strong>Preview:</strong> 
+          <span id="previewDate" style="color:var(--accent);">—</span>
+        </div>
+      </div>
+
+      <button class="confirm-btn" onclick="saveLaunchDate()" style="width:100%; padding:8px; font-size:10px;">
+        Simpan Waktu Rilis
+      </button>
+
+      <div id="comingSoonStatus" style="margin-top:12px; font-size:9px; text-align:center;"></div>
     </div>
   </div>
 
@@ -344,6 +155,8 @@
         
         if (panelId === 'menu') {
           loadMenuItems();
+        } else if (panelId === 'comingsoon') {
+          loadLaunchDate();
         }
       });
     });
@@ -562,6 +375,58 @@
       }
     }
 
+    // === COMING SOON MANAGEMENT ===
+    async function loadLaunchDate() {
+      try {
+        const doc = await db.collection("settings").doc("comingSoon").get();
+        const input = document.getElementById("launchDateInput");
+        const preview = document.getElementById("previewDate");
+        const status = document.getElementById("comingSoonStatus");
+        
+        if (doc.exists && doc.data().launchDate) {
+          const date = doc.data().launchDate.toDate();
+          const iso = date.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:mm
+          input.value = iso;
+          preview.textContent = date.toLocaleString('id-ID');
+          status.innerHTML = `<span style="color:var(--accent);">✅ Tersimpan</span>`;
+        } else {
+          input.value = "";
+          preview.textContent = "—";
+          status.innerHTML = `<span style="color:#ff6666;">⚠️ Belum diatur</span>`;
+        }
+      } catch (e) {
+        console.error("Gagal memuat tanggal rilis:", e);
+        document.getElementById("comingSoonStatus").innerHTML = `<span style="color:#ff6666;">❌ Error</span>`;
+      }
+    }
+
+    async function saveLaunchDate() {
+      const input = document.getElementById("launchDateInput").value;
+      if (!input) {
+        alert("Pilih tanggal dan waktu rilis!");
+        return;
+      }
+      
+      try {
+        const date = new Date(input);
+        if (isNaN(date.getTime())) {
+          alert("Format tanggal tidak valid!");
+          return;
+        }
+        
+        await db.collection("settings").doc("comingSoon").set({
+          launchDate: firebase.firestore.Timestamp.fromDate(date)
+        }, { merge: true });
+        
+        document.getElementById("comingSoonStatus").innerHTML = `<span style="color:var(--accent);">✅ Berhasil disimpan!</span>`;
+        setTimeout(() => {
+          document.getElementById("comingSoonStatus").textContent = "";
+        }, 2000);
+      } catch (e) {
+        alert("Gagal menyimpan: " + e.message);
+      }
+    }
+
     // === HAPUS UMUM ===
     function openDeletePopup(type, id) {
       document.getElementById("deleteType").value = type;
@@ -597,4 +462,3 @@
     });
   </script>
 </body>
-</html>

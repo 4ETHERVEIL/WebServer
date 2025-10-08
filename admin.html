@@ -5,9 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Admin Panel — Pixel Art</title>
 
-  <!-- Font Pixel untuk judul -->
+  <!-- Font Pixel untuk judul & tombol -->
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-
   <!-- Font bersih untuk konten -->
   <link href="https://fonts.googleapis.com/css2?family=Fixel+Text:wght@400;500&display=swap" rel="stylesheet">
 
@@ -36,7 +35,7 @@
         repeating-linear-gradient(90deg, rgba(255, 0, 255, 0.03) 0px, rgba(255, 0, 255, 0.03) 1px, transparent 1px, transparent 20px),
         #000;
       color: var(--text);
-      font-family: 'Fixel Text', sans-serif; /* ✅ Font bersih untuk konten */
+      font-family: 'Fixel Text', sans-serif;
       padding: 16px;
       min-height: 100vh;
       display: flex;
@@ -88,7 +87,7 @@
       letter-spacing: 2px;
       position: relative;
       text-shadow: 0 0 8px var(--neon-cyan);
-      font-family: 'Press Start 2P', monospace; /* ✅ Pixel untuk judul */
+      font-family: 'Press Start 2P', monospace;
     }
 
     .back-btn {
@@ -97,7 +96,7 @@
       color: var(--neon-purple);
       text-decoration: none;
       padding: 8px 16px;
-      font-family: 'Press Start 2P', monospace; /* ✅ Pixel */
+      font-family: 'Press Start 2P', monospace;
       font-size: 10px;
       margin-bottom: 20px;
       border: 1px solid var(--neon-purple);
@@ -112,22 +111,33 @@
       transform: translateX(-3px);
     }
 
-    /* Menu Navigasi */
+    /* === MENU NAVIGASI — HORIZONTAL DENGAN SCROLL === */
     .admin-menu {
       display: flex;
-      gap: 8px;
+      flex-wrap: nowrap;
+      gap: 10px;
       margin-bottom: 24px;
-      justify-content: center;
-      flex-wrap: wrap;
+      justify-content: flex-start;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: var(--neon-purple) transparent;
+      padding-bottom: 8px;
+      -ms-overflow-style: none; /* Sembunyikan scrollbar di IE/Edge */
+    }
+
+    /* Sembunyikan scrollbar di WebKit (Chrome, Safari) */
+    .admin-menu::-webkit-scrollbar {
+      display: none;
     }
 
     .menu-btn {
-      padding: 8px 12px;
+      padding: 10px 16px;
       background: rgba(15, 15, 26, 0.8);
       border: 1px solid var(--border);
       color: var(--text-muted);
-      font-family: 'Press Start 2P', monospace; /* ✅ Pixel */
-      font-size: 9px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
       font-weight: normal;
       border-radius: 0;
       cursor: pointer;
@@ -135,7 +145,9 @@
       text-transform: uppercase;
       letter-spacing: 1px;
       white-space: nowrap;
-      min-width: 100px;
+      flex-shrink: 0;
+      min-width: 120px;
+      text-align: center;
     }
 
     .menu-btn:hover {
@@ -176,7 +188,7 @@
       width: 100%;
       border-collapse: collapse;
       margin-top: 12px;
-      font-family: 'Fixel Text', sans-serif; /* ✅ Bersih untuk tabel */
+      font-family: 'Fixel Text', sans-serif;
       font-size: 8px;
     }
 
@@ -194,7 +206,7 @@
       text-transform: uppercase;
       letter-spacing: 1px;
       text-shadow: 0 0 4px var(--neon-cyan);
-      font-family: 'Press Start 2P', monospace; /* ✅ Header pakai pixel */
+      font-family: 'Press Start 2P', monospace;
     }
 
     tr:hover td {
@@ -206,7 +218,7 @@
       padding: 6px 10px;
       border: 1px solid;
       border-radius: 0;
-      font-family: 'Fixel Text', sans-serif; /* ✅ Bersih */
+      font-family: 'Fixel Text', sans-serif;
       font-size: 8px;
       font-weight: bold;
       cursor: pointer;
@@ -262,7 +274,7 @@
       border: 1px solid var(--border);
       padding: 12px;
       margin-bottom: 12px;
-      font-family: 'Fixel Text', sans-serif; /* ✅ Bersih */
+      font-family: 'Fixel Text', sans-serif;
       font-size: 9px;
       transition: all 0.3s ease;
     }
@@ -282,7 +294,7 @@
 
     .menu-item-title {
       color: var(--neon-purple);
-      font-family: 'Press Start 2P', monospace; /* ✅ Pixel */
+      font-family: 'Press Start 2P', monospace;
       text-shadow: 0 0 4px rgba(185, 103, 255, 0.4);
     }
 
@@ -336,13 +348,13 @@
       text-transform: uppercase;
       letter-spacing: 2px;
       text-shadow: 0 0 8px var(--neon-cyan);
-      font-family: 'Press Start 2P', monospace; /* ✅ Pixel */
+      font-family: 'Press Start 2P', monospace;
     }
 
     .popup-content label {
       display: block;
       margin: 12px 0 6px;
-      font-family: 'Press Start 2P', monospace; /* ✅ Pixel */
+      font-family: 'Press Start 2P', monospace;
       font-size: 9px;
       color: var(--neon-cyan);
       text-transform: uppercase;
@@ -357,7 +369,7 @@
       background: rgba(5, 5, 15, 0.7);
       border: 1px solid var(--border);
       color: white;
-      font-family: 'Fixel Text', sans-serif; /* ✅ Bersih */
+      font-family: 'Fixel Text', sans-serif;
       font-size: 9px;
       border-radius: 0;
     }
@@ -396,7 +408,7 @@
     #comingsoon-panel label {
       display: block;
       margin: 12px 0 6px;
-      font-family: 'Press Start 2P', monospace; /* ✅ Pixel */
+      font-family: 'Press Start 2P', monospace;
       font-size: 9px;
       color: var(--neon-cyan);
       text-transform: uppercase;
@@ -409,7 +421,7 @@
       background: rgba(5, 5, 15, 0.7);
       border: 1px solid var(--border);
       color: white;
-      font-family: 'Fixel Text', sans-serif; /* ✅ Bersih */
+      font-family: 'Fixel Text', sans-serif;
       font-size: 9px;
       border-radius: 0;
     }
@@ -418,7 +430,7 @@
       margin-top: 12px;
       text-align: center;
       min-height: 16px;
-      font-family: 'Fixel Text', sans-serif; /* ✅ Bersih */
+      font-family: 'Fixel Text', sans-serif;
       font-size: 9px;
       color: var(--neon-cyan);
       text-shadow: 0 0 4px rgba(0, 255, 255, 0.4);
@@ -428,19 +440,6 @@
     @media (max-width: 600px) {
       .container {
         padding: 12px;
-      }
-      
-      .admin-menu {
-        flex-direction: column;
-        align-items: center;
-        gap: 6px;
-      }
-      
-      .menu-btn {
-        width: 100%;
-        max-width: 240px;
-        font-size: 8px;
-        padding: 6px 10px;
       }
       
       th, td {
@@ -464,11 +463,11 @@
     <a href="index.html" class="back-btn">← KEMBALI</a>
     <h2>🔒 ADMIN DASHBOARD</h2>
     
-    <!-- Menu Navigasi -->
-    <div class="admin-menu">
-      <button class="menu-btn active" data-panel="users">USER</button>
-      <button class="menu-btn" data-panel="menu">MENU</button>
-      <button class="menu-btn" data-panel="comingsoon">COMING SOON</button>
+    <!-- Menu Navigasi Horizontal dengan Scroll -->
+    <div class="admin-menu" role="tablist">
+      <button class="menu-btn active" data-panel="users">Kelola User</button>
+      <button class="menu-btn" data-panel="menu">Kelola Menu</button>
+      <button class="menu-btn" data-panel="comingsoon">Coming Soon</button>
     </div>
 
     <!-- Panel: Kelola User -->

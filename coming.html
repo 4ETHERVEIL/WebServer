@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Coming Soon</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      overflow: hidden;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .container {
+      text-align: center;
+      padding: 30px;
+      max-width: 600px;
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: fadeIn 1.5s forwards;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      margin-bottom: 40px;
+      opacity: 0;
+      animation: fadeIn 1.5s 0.3s forwards;
+    }
+
+    .countdown {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 30px 0;
+    }
+
+    .time-box {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 10px;
+      padding: 15px 10px;
+      min-width: 80px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: slideUp 0.8s forwards;
+    }
+
+    .time-box:nth-child(1) { animation-delay: 0.5s; }
+    .time-box:nth-child(2) { animation-delay: 0.6s; }
+    .time-box:nth-child(3) { animation-delay: 0.7s; }
+    .time-box:nth-child(4) { animation-delay: 0.8s; }
+
+    .time-value {
+      font-size: 2.2rem;
+      font-weight: 700;
+    }
+
+    .time-label {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .status {
+      margin-top: 20px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #ffcc00;
+      opacity: 0;
+      animation: fadeIn 1.5s 1.2s forwards;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 2.5rem; }
+      .time-box { min-width: 60px; padding: 12px 5px; }
+      .time-value { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Coming Soon</h1>
+    <p class="subtitle">Situs kami sedang dalam pengembangan. Tunggu kehadirannya!</p>
+
+    <div class="countdown" id="countdown">
+      <div class="time-box">
+        <div class="time-value" id="days">00</div>
+        <div class="time-label">Hari</div>
+      </div>
+      <div class="time-box">
+        <div class="time-value" id="hours">00</div>
+        <div class="time-label">Jam</div>
+      </div>
+      <div class="time-box">
+        <div class="time-value" id="minutes">00</div>
+        <div class="time-label">Menit</div>
+      </div>
+      <div class="time-box">
+        <div class="time-value" id="seconds">00</div>
+        <div class="time-label">Detik</div>
+      </div>
+    </div>
+
+    <div class="status" id="statusMessage">Memuat...</div>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script>
+    // 🔥 Konfigurasi Firebase (SAMA seperti di admin)
+    const firebaseConfig = {
+      apiKey: "AIzaSyC5HS7vsJVs9dtarPkzhQmiqNaeCKkJw_A",
+      authDomain: "noxius-panel.firebaseapp.com",
+      projectId: "noxius-panel",
+      storageBucket: "noxius-panel.firebasestorage.app",
+      messagingSenderId: "873696240519",
+      appId: "1:873696240519:web:401f9efb0d71b32363a922"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let launchDate = null;
+    let countdownInterval = null;
+
+    // Ambil tanggal rilis dari Firestore
+    async function fetchLaunchDate() {
+      try {
+        const doc = await db.collection("settings").doc("comingSoon").get();
+        if (doc.exists && doc.data().launchDate) {
+          launchDate = doc.data().launchDate.toDate();
+          document.getElementById("statusMessage").textContent = "Hitung mundur dimulai!";
+          startCountdown();
+        } else {
+          document.getElementById("statusMessage").textContent = "Tanggal rilis belum diatur.";
+        }
+      } catch (e) {
+        console.error("Gagal memuat tanggal:", e);
+        document.getElementById("statusMessage").textContent = "Gagal memuat data.";
+      }
+    }
+
+    function startCountdown() {
+      clearInterval(countdownInterval);
+      countdownInterval = setInterval(() => {
+        if (!launchDate) return;
+
+        const now = new Date().getTime();
+        const distance = launchDate.getTime() - now;
+
+        if (distance < 0) {
+          clearInterval(countdownInterval);
+          document.getElementById("countdown").innerHTML = "<h2 style='color:#ffcc00;'>🎉 SUDAH HADIR!</h2>";
+          document.getElementById("statusMessage").textContent = "";
+          return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        document.getElementById("days").innerText = days.toString().padStart(2, "0");
+        document.getElementById("hours").innerText = hours.toString().padStart(2, "0");
+        document.getElementById("minutes").innerText = minutes.toString().padStart(2, "0");
+        document.getElementById("seconds").innerText = seconds.toString().padStart(2, "0");
+      }, 1000);
+    }
+
+    // Jalankan saat halaman dimuat
+    window.addEventListener("load", fetchLaunchDate);
+  </script>
+</body>
+</html>

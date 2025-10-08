@@ -4,7 +4,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Admin Panel — Pixel Art</title>
-  <!-- Gunakan Press Start 2P seperti di index.html -->
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -32,8 +31,8 @@
       repeating-linear-gradient(90deg, rgba(255, 0, 255, 0.03) 0px, rgba(255, 0, 255, 0.03) 1px, transparent 1px, transparent 20px),
       #000;
     color: var(--text);
-    font-family: 'Press Start 2P', monospace; /* ✅ Ganti ke Press Start 2P */
-    padding: 16px;
+    font-family: 'Orbitron', 'Arial', sans-serif;
+    padding: 20px;
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -42,13 +41,16 @@
     position: relative;
   }
 
+  /* Font Cyberpunk */
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap');
+
   .container {
     width: 100%;
     max-width: 900px;
     background: var(--surface);
     border: 1px solid var(--neon-purple);
     border-radius: 0;
-    padding: 24px;
+    padding: 32px;
     position: relative;
     overflow: hidden;
     box-shadow:
@@ -75,15 +77,26 @@
     z-index: 10;
   }
 
+  /* Glitch hover effect */
+  @keyframes glitch-1 {
+    0% { text-shadow: 2px 0 var(--neon-cyan); }
+    25% { text-shadow: -2px 0 var(--neon-pink); }
+    50% { text-shadow: 2px 0 var(--neon-cyan); }
+    75% { text-shadow: -2px 0 var(--neon-pink); }
+    100% { text-shadow: 2px 0 var(--neon-cyan); }
+  }
+
   h2 {
     text-align: center;
-    font-size: 16px; /* Lebih kecil agar muat */
-    margin-bottom: 24px;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 32px;
     color: white;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     position: relative;
-    text-shadow: 0 0 8px var(--neon-cyan);
+    text-shadow: 0 0 10px var(--neon-cyan);
+    animation: glitch-1 5s infinite;
   }
 
   .back-btn {
@@ -91,10 +104,10 @@
     background: rgba(185, 103, 255, 0.15);
     color: var(--neon-purple);
     text-decoration: none;
-    padding: 8px 16px;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 10px;
-    margin-bottom: 20px;
+    padding: 10px 20px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+    margin-bottom: 28px;
     border: 1px solid var(--neon-purple);
     transition: all 0.3s ease;
     position: relative;
@@ -102,49 +115,79 @@
     letter-spacing: 1px;
   }
 
-  .back-btn:hover {
-    box-shadow: 0 0 12px rgba(185, 103, 255, 0.6);
-    transform: translateX(-3px);
+  .back-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(185, 103, 255, 0.3), transparent);
+    transition: 0.5s;
   }
 
-  /* ✅ MENU NAVIGASI YANG DIRAPIHKAN */
+  .back-btn:hover {
+    box-shadow: 0 0 15px rgba(185, 103, 255, 0.6);
+    transform: translateX(-5px);
+  }
+
+  .back-btn:hover::before {
+    left: 100%;
+  }
+
+  /* Menu Navigasi */
   .admin-menu {
     display: flex;
-    gap: 8px; /* Lebih rapat */
-    margin-bottom: 24px;
+    gap: 12px;
+    margin-bottom: 32px;
     justify-content: center;
     flex-wrap: wrap;
   }
 
   .menu-btn {
-    padding: 8px 12px; /* Lebih kecil */
+    padding: 12px 24px;
     background: rgba(15, 15, 26, 0.8);
     border: 1px solid var(--border);
     color: var(--text-muted);
-    font-family: 'Press Start 2P', monospace;
-    font-size: 9px; /* Ukuran kecil tapi terbaca */
-    font-weight: normal;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
     border-radius: 0;
     cursor: pointer;
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 1px;
-    white-space: nowrap;
-    min-width: 100px; /* Pastikan tombol tidak terlalu sempit */
+    position: relative;
+    overflow: hidden;
+  }
+
+  .menu-btn::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--neon-cyan);
+    transition: width 0.3s ease;
   }
 
   .menu-btn:hover {
     color: white;
     border-color: var(--neon-cyan);
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    box-shadow: 0 0 12px rgba(0, 255, 255, 0.3);
+  }
+
+  .menu-btn:hover::after {
+    width: 100%;
   }
 
   .menu-btn.active {
     background: rgba(0, 20, 30, 0.6);
     color: white;
     border-color: var(--neon-cyan);
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
-    text-shadow: 0 0 6px var(--neon-cyan);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    text-shadow: 0 0 8px var(--neon-cyan);
   }
 
   /* Panel */
@@ -170,13 +213,13 @@
   table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 12px;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 8px; /* Ukuran kecil */
+    margin-top: 16px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
   }
 
   th, td {
-    padding: 8px 6px;
+    padding: 14px 10px;
     text-align: center;
     border: 1px solid var(--border);
     transition: background 0.2s;
@@ -185,10 +228,10 @@
   th {
     background: rgba(10, 10, 20, 0.7);
     color: var(--neon-cyan);
-    font-weight: bold;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
-    text-shadow: 0 0 4px var(--neon-cyan);
+    text-shadow: 0 0 5px var(--neon-cyan);
   }
 
   tr:hover td {
@@ -197,12 +240,12 @@
   }
 
   button {
-    padding: 6px 10px;
+    padding: 8px 16px;
     border: 1px solid;
     border-radius: 0;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 8px;
-    font-weight: bold;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
     cursor: pointer;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -217,7 +260,7 @@
 
   .ban-btn:hover {
     background: rgba(255, 0, 100, 0.4);
-    box-shadow: 0 0 8px rgba(255, 0, 255, 0.5);
+    box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
     transform: scale(1.05);
   }
 
@@ -229,24 +272,26 @@
 
   .unban-btn:hover {
     background: rgba(0, 255, 200, 0.4);
-    box-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
     transform: scale(1.05);
   }
 
   .admin-tag {
     color: #ffd700;
-    text-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+    font-weight: bold;
   }
 
   .banned-yes {
     color: var(--neon-pink);
-    text-shadow: 0 0 4px rgba(255, 0, 255, 0.4);
+    font-weight: bold;
+    text-shadow: 0 0 6px rgba(255, 0, 255, 0.4);
   }
 
   .note-cell {
-    font-size: 7px;
+    font-size: 10px;
     color: var(--text-muted);
-    max-width: 100px;
+    max-width: 140px;
     word-wrap: break-word;
   }
 
@@ -254,16 +299,16 @@
   .menu-item {
     background: rgba(15, 15, 26, 0.6);
     border: 1px solid var(--border);
-    padding: 12px;
-    margin-bottom: 12px;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 9px;
+    padding: 18px;
+    margin-bottom: 16px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 13px;
     transition: all 0.3s ease;
   }
 
   .menu-item:hover {
     border-color: var(--neon-purple);
-    box-shadow: 0 0 12px rgba(185, 103, 255, 0.3);
+    box-shadow: 0 0 15px rgba(185, 103, 255, 0.3);
     transform: translateY(-2px);
   }
 
@@ -271,24 +316,42 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
   }
 
   .menu-item-title {
     color: var(--neon-purple);
-    text-shadow: 0 0 4px rgba(185, 103, 255, 0.4);
+    font-weight: 700;
+    text-shadow: 0 0 6px rgba(185, 103, 255, 0.4);
   }
 
   .menu-item-actions {
-    margin-top: 8px;
+    margin-top: 12px;
     display: flex;
-    gap: 8px;
+    gap: 10px;
     justify-content: flex-end;
   }
 
-  .edit-btn, .delete-btn {
-    padding: 5px 8px;
-    font-size: 8px;
+  .edit-btn {
+    background: rgba(185, 103, 255, 0.2);
+    border-color: var(--neon-purple);
+    color: var(--neon-purple);
+  }
+
+  .edit-btn:hover {
+    background: rgba(185, 103, 255, 0.4);
+    box-shadow: 0 0 10px rgba(185, 103, 255, 0.5);
+  }
+
+  .delete-btn {
+    background: rgba(255, 0, 100, 0.2);
+    border-color: var(--neon-pink);
+    color: var(--neon-pink);
+  }
+
+  .delete-btn:hover {
+    background: rgba(255, 0, 100, 0.4);
+    box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
   }
 
   /* Popup */
@@ -306,11 +369,11 @@
   .popup-content {
     background: var(--surface);
     border: 1px solid var(--neon-purple);
-    padding: 20px;
+    padding: 28px;
     width: 90%;
-    max-width: 400px;
+    max-width: 420px;
     position: relative;
-    box-shadow: 0 0 20px rgba(185, 103, 255, 0.4);
+    box-shadow: 0 0 25px rgba(185, 103, 255, 0.4);
     transform: scale(0.9);
     opacity: 0;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -323,19 +386,20 @@
 
   .popup-content h3 {
     text-align: center;
-    margin-bottom: 18px;
-    font-size: 12px;
+    margin-bottom: 24px;
+    font-size: 20px;
+    font-weight: 700;
     color: white;
     text-transform: uppercase;
     letter-spacing: 2px;
-    text-shadow: 0 0 8px var(--neon-cyan);
+    text-shadow: 0 0 10px var(--neon-cyan);
   }
 
   .popup-content label {
     display: block;
-    margin: 12px 0 6px;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 9px;
+    margin: 16px 0 8px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
     color: var(--neon-cyan);
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -345,25 +409,25 @@
   .popup-content select,
   .popup-content textarea {
     width: 100%;
-    padding: 8px;
+    padding: 12px;
     background: rgba(5, 5, 15, 0.7);
     border: 1px solid var(--border);
     color: white;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 9px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
     border-radius: 0;
   }
 
   .popup-buttons {
-    margin-top: 18px;
+    margin-top: 24px;
     display: flex;
-    gap: 10px;
+    gap: 12px;
   }
 
   .popup-buttons button {
     flex: 1;
-    padding: 8px;
-    font-size: 9px;
+    padding: 12px;
+    font-size: 12px;
   }
 
   .cancel-btn {
@@ -387,9 +451,9 @@
   /* Coming Soon Panel */
   #comingsoon-panel label {
     display: block;
-    margin: 12px 0 6px;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 9px;
+    margin: 16px 0 8px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
     color: var(--neon-cyan);
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -397,70 +461,75 @@
 
   #comingsoon-panel input[type="datetime-local"] {
     width: 100%;
-    padding: 8px;
+    padding: 12px;
     background: rgba(5, 5, 15, 0.7);
     border: 1px solid var(--border);
     color: white;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 9px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
     border-radius: 0;
   }
 
   #comingSoonStatus {
-    margin-top: 12px;
+    margin-top: 16px;
     text-align: center;
-    min-height: 16px;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 9px;
+    min-height: 20px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
     color: var(--neon-cyan);
-    text-shadow: 0 0 4px rgba(0, 255, 255, 0.4);
+    text-shadow: 0 0 6px rgba(0, 255, 255, 0.4);
+  }
+
+  /* Animasi loading */
+  @keyframes pulse-neon {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+  }
+
+  #userList tr td[colspan] {
+    animation: pulse-neon 1.8s infinite;
+    color: var(--neon-cyan);
   }
 
   /* Responsif */
   @media (max-width: 600px) {
     .container {
-      padding: 12px;
+      padding: 16px;
     }
     
     .admin-menu {
       flex-direction: column;
       align-items: center;
-      gap: 6px;
     }
     
     .menu-btn {
       width: 100%;
-      max-width: 240px;
-      font-size: 8px;
-      padding: 6px 10px;
+      max-width: 280px;
     }
     
     th, td {
-      padding: 6px 4px;
-      font-size: 7px;
+      padding: 10px 4px;
+      font-size: 10px;
     }
     
     button {
-      font-size: 7px;
-      padding: 5px 8px;
-    }
-    
-    h2 {
-      font-size: 14px;
+      font-size: 10px;
+      padding: 6px 10px;
     }
   }
 </style>
 </head>
 <body>
   <div class="container">
-    <a href="index.html" class="back-btn">← KEMBALI</a>
+    <a href="index.html" class="back-btn">← Kembali ke Menu</a>
     <h2>🔒 ADMIN DASHBOARD</h2>
     
     <!-- Menu Navigasi -->
     <div class="admin-menu">
-      <button class="menu-btn active" data-panel="users">USER</button>
-      <button class="menu-btn" data-panel="menu">MENU</button>
-      <button class="menu-btn" data-panel="comingsoon">COMING SOON</button>
+      <button class="menu-btn active" data-panel="users">Kelola User</button>
+      <button class="menu-btn" data-panel="menu">Kelola Menu</button>
+      <button class="menu-btn" data-panel="comingsoon">Coming Soon</button>
     </div>
 
     <!-- Panel: Kelola User -->
@@ -468,51 +537,51 @@
       <table id="userTable">
         <thead>
           <tr>
-            <th>UID</th>
-            <th>EMAIL</th>
-            <th>ROLE</th>
-            <th>BANNED</th>
-            <th>CATATAN</th>
-            <th>AKSI</th>
+            <th>UID 9 Digit</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Banned?</th>
+            <th>Catatan</th>
+            <th>Aksi</th>
           </tr>
         </thead>
         <tbody id="userList">
-          <tr><td colspan="6">MEMUAT...</td></tr>
+          <tr><td colspan="6">Memuat data...</td></tr>
         </tbody>
       </table>
     </div>
 
     <!-- Panel: Kelola Menu -->
     <div id="menu-panel" class="panel">
-      <button class="confirm-btn" onclick="openUploadMenuPopup()" style="width:100%; padding:6px; font-size:8px; margin-bottom:12px;">
-        + TAMBAH BOX
+      <button class="confirm-btn" onclick="openUploadMenuPopup()" style="width:100%; padding:8px; font-size:10px; margin-bottom:16px;">
+        + Tambah Box Baru
       </button>
-      <h3 style="margin-bottom:8px; font-size:10px;">DAFTAR BOX:</h3>
+      <h3 style="margin-bottom:12px; font-size:12px;">Daftar Box:</h3>
       <div id="menuList">
-        MEMUAT...
+        Memuat...
       </div>
     </div>
 
     <!-- Panel: Coming Soon -->
     <div id="comingsoon-panel" class="panel">
-      <h3 style="margin-bottom:8px; font-size:10px;">ATUR RILIS</h3>
-      <p style="font-size:7px; margin-bottom:8px; color:#aaa;">TANGGAL & WAKTU RILIS.</p>
+      <h3 style="margin-bottom:12px; font-size:12px;">Atur Waktu Rilis</h3>
+      <p style="font-size:9px; margin-bottom:10px; color:#aaa;">Tanggal & waktu saat situs akan "live".</p>
       
-      <div style="background:#0a111e; padding:10px; border-radius:4px; margin-bottom:12px;">
-        <label for="launchDateInput" style="display:block; margin-bottom:4px; font-size:8px;">TANGGAL RILIS:</label>
-        <input type="datetime-local" id="launchDateInput" style="width:100%; padding:6px; background:#070d18; border:1px solid #333; color:white; font-family:'Press Start 2P', monospace; font-size:8px;">
+      <div style="background:#0a111e; padding:12px; border-radius:4px; margin-bottom:16px;">
+        <label for="launchDateInput" style="display:block; margin-bottom:6px; font-size:9px;">Tanggal Rilis:</label>
+        <input type="datetime-local" id="launchDateInput" style="width:100%; padding:6px; background:#070d18; border:1px solid #333; color:white; font-family:'Press Start 2P', monospace; font-size:9px;">
         
-        <div style="margin-top:8px; font-size:8px;">
-          <strong>PREVIEW:</strong> 
-          <span id="previewDate" style="color:var(--neon-cyan);">—</span>
+        <div style="margin-top:12px; font-size:9px;">
+          <strong>Preview:</strong> 
+          <span id="previewDate" style="color:var(--accent);">—</span>
         </div>
       </div>
 
-      <button class="confirm-btn" onclick="saveLaunchDate()" style="width:100%; padding:6px; font-size:8px;">
-        SIMPAN
+      <button class="confirm-btn" onclick="saveLaunchDate()" style="width:100%; padding:8px; font-size:10px;">
+        Simpan Waktu Rilis
       </button>
 
-      <div id="comingSoonStatus" style="margin-top:10px; font-size:8px; text-align:center;"></div>
+      <div id="comingSoonStatus" style="margin-top:12px; font-size:9px; text-align:center;"></div>
     </div>
   </div>
 
@@ -520,19 +589,19 @@
   <div id="banPopup" class="popup-overlay">
     <div class="popup-content">
       <h3>⛔ BAN USER</h3>
-      <label for="banUnit">DURASI:</label>
+      <label for="banUnit">Durasi:</label>
       <select id="banUnit">
-        <option value="min">MENIT</option>
-        <option value="hour">JAM</option>
-        <option value="custom">CUSTOM</option>
+        <option value="min">Menit</option>
+        <option value="hour">Jam</option>
+        <option value="custom">Custom (Menit)</option>
       </select>
-      <input type="number" id="banDuration" min="1" value="10" placeholder="DURASI">
-      <label for="banNote">CATATAN:</label>
-      <input type="text" id="banNote" placeholder="ALASAN">
+      <input type="number" id="banDuration" min="1" value="10" placeholder="Durasi">
+      <label for="banNote">Catatan (opsional):</label>
+      <input type="text" id="banNote" placeholder="Alasan banned">
       <input type="hidden" id="banTargetUid">
       <div class="popup-buttons">
-        <button class="confirm-btn" onclick="confirmBan()">BAN</button>
-        <button class="cancel-btn" onclick="closeBanPopup()">BATAL</button>
+        <button class="confirm-btn" onclick="confirmBan()">Ban</button>
+        <button class="cancel-btn" onclick="closeBanPopup()">Batal</button>
       </div>
     </div>
   </div>
@@ -540,24 +609,24 @@
   <!-- Popup: Tambah/Edit Menu -->
   <div id="menuPopup" class="popup-overlay">
     <div class="popup-content">
-      <h3 id="menuPopupTitle">➕ TAMBAH BOX</h3>
-      <label for="boxTitle">JUDUL:</label>
-      <input type="text" id="boxTitle" placeholder="CONTOH: GAME BARU" required>
+      <h3 id="menuPopupTitle">➕ TAMBAH BOX BARU</h3>
+      <label for="boxTitle">Judul:</label>
+      <input type="text" id="boxTitle" placeholder="Contoh: Game Baru" required>
       
-      <label for="boxIcon">IKON:</label>
-      <input type="text" id="boxIcon" placeholder="CONTOH: 🎮" maxlength="2" required>
+      <label for="boxIcon">Ikon (Emoji):</label>
+      <input type="text" id="boxIcon" placeholder="Contoh: 🎮" maxlength="2" required>
       
-      <label for="boxTarget">FILE:</label>
-      <input type="text" id="boxTarget" placeholder="CONTOH: GAME.HTML" required>
+      <label for="boxTarget">File Target:</label>
+      <input type="text" id="boxTarget" placeholder="Contoh: game-baru.html" required>
       
-      <label for="boxSubtitle">DESKRIPSI:</label>
-      <input type="text" id="boxSubtitle" placeholder="OPSIONAL">
+      <label for="boxSubtitle">Deskripsi (opsional):</label>
+      <input type="text" id="boxSubtitle" placeholder="Opsional">
       
       <input type="hidden" id="editMenuId">
       
       <div class="popup-buttons">
-        <button class="confirm-btn" onclick="submitMenu()">SIMPAN</button>
-        <button class="cancel-btn" onclick="closeMenuPopup()">BATAL</button>
+        <button class="confirm-btn" onclick="submitMenu()">Simpan</button>
+        <button class="cancel-btn" onclick="closeMenuPopup()">Batal</button>
       </div>
     </div>
   </div>
@@ -566,12 +635,12 @@
   <div id="deletePopup" class="popup-overlay">
     <div class="popup-content">
       <h3>🗑️ HAPUS ITEM</h3>
-      <p id="deleteMessage">YAKIN HAPUS?</p>
+      <p id="deleteMessage">Yakin ingin menghapus item ini?</p>
       <input type="hidden" id="deleteType">
       <input type="hidden" id="deleteId">
       <div class="popup-buttons">
-        <button class="delete-confirm-btn" onclick="confirmDelete()">HAPUS</button>
-        <button class="cancel-btn" onclick="closeDeletePopup()">BATAL</button>
+        <button class="delete-confirm-btn" onclick="confirmDelete()">Hapus</button>
+        <button class="cancel-btn" onclick="closeDeletePopup()">Batal</button>
       </div>
     </div>
   </div>
@@ -616,14 +685,14 @@
 
     auth.onAuthStateChanged(async (user) => {
       if (!user) {
-        alert("SILAKAN LOGIN!");
+        alert("Silakan login terlebih dahulu!");
         window.location.href = "index.html";
         return;
       }
 
       const userDoc = await db.collection("users").doc(user.uid).get();
       if (!userDoc.exists || userDoc.data().role !== "admin") {
-        alert("AKSES DITOLAK!");
+        alert("Akses ditolak! Hanya admin yang boleh membuka halaman ini.");
         window.location.href = "index.html";
         return;
       }
@@ -638,29 +707,29 @@
         const snapshot = await db.collection("users").orderBy("createdAt", "asc").get();
         list.innerHTML = "";
         if (snapshot.empty) {
-          list.innerHTML = `<tr><td colspan="6">BELUM ADA USER.</td></tr>`;
+          list.innerHTML = `<tr><td colspan="6">Belum ada user.</td></tr>`;
           return;
         }
         snapshot.forEach(doc => {
           const d = doc.data();
           const isBanned = d.bannedUntil && d.bannedUntil.toDate() > new Date();
-          let bannedDisplay = "TIDAK";
+          let bannedDisplay = "Tidak";
           if (isBanned) {
             const endTime = d.bannedUntil.toDate();
             const timeStr = endTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-            bannedDisplay = `YA (${timeStr})`;
+            bannedDisplay = `Ya (sampai ${timeStr})`;
           }
           const row = document.createElement("tr");
           row.innerHTML = `
             <td>${d.uid9 || '—'}</td>
             <td>${d.email || '—'}</td>
-            <td>${d.role === "admin" ? '<span class="admin-tag">ADMIN</span>' : 'USER'}</td>
+            <td>${d.role === "admin" ? '<span class="admin-tag">ADMIN</span>' : 'user'}</td>
             <td class="${isBanned ? 'banned-yes' : ''}">${bannedDisplay}</td>
             <td class="note-cell">${d.banNote || '—'}</td>
             <td>
               ${isBanned ? 
-                `<button class="unban-btn" onclick="unban('${doc.id}')">UNBAN</button>` :
-                `<button class="ban-btn" onclick="openBanPopup('${doc.id}')">BAN</button>`
+                `<button class="unban-btn" onclick="unban('${doc.id}')">Unban</button>` :
+                `<button class="ban-btn" onclick="openBanPopup('${doc.id}')">Ban</button>`
               }
             </td>
           `;
@@ -668,7 +737,7 @@
         });
       } catch (e) {
         console.error("Error:", e);
-        list.innerHTML = `<tr><td colspan="6">GAGAL MEMUAT.</td></tr>`;
+        list.innerHTML = `<tr><td colspan="6">Gagal memuat data.</td></tr>`;
       }
     }
 
@@ -688,10 +757,10 @@
       const uid = document.getElementById("banTargetUid").value;
       const unit = document.getElementById("banUnit").value;
       const durStr = document.getElementById("banDuration").value;
-      const note = (document.getElementById("banNote").value || "DIBANNED").trim();
+      const note = (document.getElementById("banNote").value || "Dibanned oleh admin").trim();
       const dur = parseInt(durStr);
       if (isNaN(dur) || dur < 1) {
-        alert("DURASI MINIMAL 1!");
+        alert("Durasi harus minimal 1!");
         return;
       }
       let minutes = (unit === "hour") ? dur * 60 : dur;
@@ -705,7 +774,7 @@
         closeBanPopup();
         loadUsers();
       } catch (e) {
-        alert("GAGAL BAN: " + e.message);
+        alert("Gagal banned user: " + e.message);
       }
     }
 
@@ -717,7 +786,7 @@
         });
         loadUsers();
       } catch (e) {
-        alert("GAGAL UNBAN: " + e.message);
+        alert("Gagal unban user: " + e.message);
       }
     }
 
@@ -727,7 +796,7 @@
       try {
         const snapshot = await db.collection("menuItems").orderBy("createdAt", "asc").get();
         if (snapshot.empty) {
-          container.innerHTML = "<p>BELUM ADA BOX.</p>";
+          container.innerHTML = "<p>Belum ada box.</p>";
           return;
         }
         let html = "";
@@ -740,11 +809,11 @@
                 <span class="menu-item-title">${d.title || '—'}</span>
                 <span>${d.icon || '❓'}</span>
               </div>
-              <div>FILE: ${d.target || '—'}</div>
-              ${d.subtitle ? `<div>DESKRIPSI: ${d.subtitle}</div>` : ''}
+              <div>File: ${d.target || '—'}</div>
+              ${d.subtitle ? `<div>Deskripsi: ${d.subtitle}</div>` : ''}
               <div class="menu-item-actions">
-                <button class="edit-btn" onclick="openEditMenuPopup('${doc.id}', '${safeData}')">EDIT</button>
-                <button class="delete-btn" onclick="openDeletePopup('menu', '${doc.id}')">HAPUS</button>
+                <button class="edit-btn" onclick="openEditMenuPopup('${doc.id}', '${safeData}')">Edit</button>
+                <button class="delete-btn" onclick="openDeletePopup('menu', '${doc.id}')">Hapus</button>
               </div>
             </div>
           `;
@@ -752,12 +821,12 @@
         container.innerHTML = html;
       } catch (e) {
         console.error("Error loading menu:", e);
-        container.innerHTML = "<p>GAGAL MEMUAT.</p>";
+        container.innerHTML = "<p>Gagal memuat daftar box.</p>";
       }
     }
 
     function openUploadMenuPopup() {
-      document.getElementById("menuPopupTitle").textContent = "➕ TAMBAH BOX";
+      document.getElementById("menuPopupTitle").textContent = "➕ TAMBAH BOX BARU";
       document.getElementById("boxTitle").value = "";
       document.getElementById("boxIcon").value = "";
       document.getElementById("boxTarget").value = "";
@@ -777,7 +846,7 @@
         document.getElementById("editMenuId").value = id;
         document.getElementById("menuPopup").style.display = "flex";
       } catch (e) {
-        alert("GAGAL MEMUAT EDIT: " + e.message);
+        alert("Gagal memuat data edit: " + e.message);
         console.error(e);
       }
     }
@@ -794,12 +863,12 @@
       const editId = document.getElementById("editMenuId").value;
 
       if (!title || !icon || !target) {
-        alert("JUDUL, IKON, FILE WAJIB!");
+        alert("Judul, ikon, dan file target wajib diisi!");
         return;
       }
 
       if (!target.endsWith('.html')) {
-        alert("FILE HARUS .HTML!");
+        alert("File target harus berakhiran .html!");
         return;
       }
 
@@ -822,9 +891,9 @@
         }
         closeMenuPopup();
         loadMenuItems();
-        alert(editId ? "BERHASIL DIPERBARUI!" : "BERHASIL DITAMBAHKAN!");
+        alert(editId ? "Box berhasil diperbarui!" : "Box baru berhasil ditambahkan!");
       } catch (e) {
-        alert("GAGAL SIMPAN: " + e.message);
+        alert("Gagal menyimpan box: " + e.message);
       }
     }
 
@@ -838,32 +907,32 @@
         
         if (doc.exists && doc.data().launchDate) {
           const date = doc.data().launchDate.toDate();
-          const iso = date.toISOString().slice(0, 16);
+          const iso = date.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:mm
           input.value = iso;
           preview.textContent = date.toLocaleString('id-ID');
-          status.innerHTML = `<span style="color:var(--accent);">✅ TERSIMPAN</span>`;
+          status.innerHTML = `<span style="color:var(--accent);">✅ Tersimpan</span>`;
         } else {
           input.value = "";
           preview.textContent = "—";
-          status.innerHTML = `<span style="color:#ff6666;">⚠️ BELUM DIATUR</span>`;
+          status.innerHTML = `<span style="color:#ff6666;">⚠️ Belum diatur</span>`;
         }
       } catch (e) {
         console.error("Gagal memuat tanggal rilis:", e);
-        document.getElementById("comingSoonStatus").innerHTML = `<span style="color:#ff6666;">❌ ERROR</span>`;
+        document.getElementById("comingSoonStatus").innerHTML = `<span style="color:#ff6666;">❌ Error</span>`;
       }
     }
 
     async function saveLaunchDate() {
       const input = document.getElementById("launchDateInput").value;
       if (!input) {
-        alert("PILIH TANGGAL!");
+        alert("Pilih tanggal dan waktu rilis!");
         return;
       }
       
       try {
         const date = new Date(input);
         if (isNaN(date.getTime())) {
-          alert("TANGGAL TIDAK VALID!");
+          alert("Format tanggal tidak valid!");
           return;
         }
         
@@ -871,12 +940,12 @@
           launchDate: firebase.firestore.Timestamp.fromDate(date)
         }, { merge: true });
         
-        document.getElementById("comingSoonStatus").innerHTML = `<span style="color:var(--accent);">✅ BERHASIL!</span>`;
+        document.getElementById("comingSoonStatus").innerHTML = `<span style="color:var(--accent);">✅ Berhasil disimpan!</span>`;
         setTimeout(() => {
           document.getElementById("comingSoonStatus").textContent = "";
         }, 2000);
       } catch (e) {
-        alert("GAGAL SIMPAN: " + e.message);
+        alert("Gagal menyimpan: " + e.message);
       }
     }
 
@@ -884,7 +953,7 @@
     function openDeletePopup(type, id) {
       document.getElementById("deleteType").value = type;
       document.getElementById("deleteId").value = id;
-      const message = "YAKIN HAPUS?";
+      const message = "Yakin ingin menghapus item ini?";
       document.getElementById("deleteMessage").textContent = message;
       document.getElementById("deletePopup").style.display = "flex";
     }
@@ -899,9 +968,9 @@
         await db.collection("menuItems").doc(id).delete();
         closeDeletePopup();
         loadMenuItems();
-        alert("BERHASIL DIHAPUS!");
+        alert("Item berhasil dihapus!");
       } catch (e) {
-        alert("GAGAL HAPUS: " + e.message);
+        alert("Gagal menghapus item: " + e.message);
       }
     }
 

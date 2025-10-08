@@ -121,11 +121,18 @@
       text-shadow: 0 0 6px rgba(255, 204, 0, 0.7);
       opacity: 0;
       animation: fadeIn 1.5s 1.2s forwards;
+      position: relative;
+      z-index: 10;
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.3);
+      display: inline-block;
+      max-width: 100%;
+      word-wrap: break-word;
     }
 
-    /* Cyberpunk Button */
     .back-button {
-      margin-top: 30px;
+      margin-top: 20px;
       padding: 12px 30px;
       font-family: 'Fixel Display', sans-serif;
       font-size: 1.1rem;
@@ -140,6 +147,7 @@
       box-shadow: 0 0 10px rgba(255, 0, 255, 0.4);
       position: relative;
       overflow: hidden;
+      z-index: 5;
     }
 
     .back-button::before {
@@ -177,7 +185,15 @@
       h1 { font-size: 2.8rem; }
       .time-box { min-width: 55px; padding: 12px 4px; }
       .time-value { font-size: 1.9rem; }
-      .back-button { padding: 10px 20px; font-size: 1rem; }
+      .back-button { 
+        padding: 10px 20px; 
+        font-size: 1rem;
+        margin-top: 15px;
+      }
+      .status {
+        font-size: 1rem;
+        padding: 6px 10px;
+      }
     }
   </style>
 </head>

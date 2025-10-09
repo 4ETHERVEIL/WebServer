@@ -258,19 +258,20 @@
         <div style="
           position: fixed;
           top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(5, 0, 20, 0.95);
+          background: #000010;
           display: flex;
           align-items: center;
           justify-content: center;
           z-index: 9999;
           font-family: 'Press Start 2P', monospace;
+          padding: 20px;
         ">
           <div style="
-            background: #0a001a;
-            border: 3px solid #ff00ff;
+            background: #050010;
+            border: 2px solid #ff00ff;
             border-radius: 8px;
             padding: 24px;
-            max-width: 360px;
+            max-width: 400px;
             width: 90%;
             text-align: center;
             box-shadow: 
@@ -290,40 +291,91 @@
             "></div>
 
             <h2 style="
-              color: #ff0066;
-              font-size: 16px;
+              color: #ff00ff;
+              font-size: 20px;
               margin: 0 0 12px;
-              text-shadow: 0 0 8px #ff0066, 0 0 16px #ff0066;
+              text-shadow: 0 0 8px #ff00ff;
               letter-spacing: 1px;
+              text-transform: uppercase;
             ">⚠️ ACCESS DENIED</h2>
 
             <p style="color: #00ffff; font-size: 10px; margin: 8px 0; line-height: 1.4;">
-              ${banNote || "Your neural link has been temporarily severed."}
+              ${banNote || "Sistem keamanan telah memblokir akses Anda."}
             </p>
 
-            <p style="color: #ff33cc; font-size: 12px; margin: 12px 0;">
-              UNLOCK IN: <span id="countdown" style="
-                color: #00ff99;
-                text-shadow: 0 0 6px #00ff99;
-              ">${timeLeft}s</span>
+            <div style="margin: 20px 0; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+              <div class="time-box" id="daysBox" style="
+                background: #001a1a;
+                border: 2px solid #00ffff;
+                border-radius: 6px;
+                padding: 8px 12px;
+                min-width: 50px;
+                text-align: center;
+                box-shadow: 0 0 8px #00ffff;
+              ">
+                <div style="color: #00ffff; font-size: 16px; font-weight: bold;">00</div>
+                <div style="color: #00ffff; font-size: 8px; text-transform: uppercase;">Hari</div>
+              </div>
+              <div class="time-box" id="hoursBox" style="
+                background: #001a1a;
+                border: 2px solid #00ffff;
+                border-radius: 6px;
+                padding: 8px 12px;
+                min-width: 50px;
+                text-align: center;
+                box-shadow: 0 0 8px #00ffff;
+              ">
+                <div style="color: #00ffff; font-size: 16px; font-weight: bold;">00</div>
+                <div style="color: #00ffff; font-size: 8px; text-transform: uppercase;">Jam</div>
+              </div>
+              <div class="time-box" id="minutesBox" style="
+                background: #001a1a;
+                border: 2px solid #00ffff;
+                border-radius: 6px;
+                padding: 8px 12px;
+                min-width: 50px;
+                text-align: center;
+                box-shadow: 0 0 8px #00ffff;
+              ">
+                <div style="color: #00ffff; font-size: 16px; font-weight: bold;">00</div>
+                <div style="color: #00ffff; font-size: 8px; text-transform: uppercase;">Menit</div>
+              </div>
+              <div class="time-box" id="secondsBox" style="
+                background: #001a1a;
+                border: 2px solid #00ffff;
+                border-radius: 6px;
+                padding: 8px 12px;
+                min-width: 50px;
+                text-align: center;
+                box-shadow: 0 0 8px #00ffff;
+              ">
+                <div style="color: #00ffff; font-size: 16px; font-weight: bold;">00</div>
+                <div style="color: #00ffff; font-size: 8px; text-transform: uppercase;">Detik</div>
+              </div>
+            </div>
+
+            <p style="color: #ffff00; font-size: 10px; margin: 12px 0; font-weight: bold;">
+              Hitung mundur dimulai!
             </p>
 
             <button onclick="location.reload()" style="
-              background: #1a0033;
-              color: #00ffcc;
-              border: 2px solid #00ffcc;
-              padding: 6px 12px;
+              background: transparent;
+              color: #ff00ff;
+              border: 2px solid #ff00ff;
+              padding: 8px 16px;
               border-radius: 4px;
               font-family: 'Press Start 2P', monospace;
-              font-size: 9px;
+              font-size: 10px;
               cursor: pointer;
               margin-top: 12px;
               text-transform: uppercase;
               letter-spacing: 1px;
               transition: all 0.2s;
-            " onmouseover="this.style.color='#ff00ff';this.style.borderColor='#ff00ff';"
-               onmouseout="this.style.color='#00ffcc';this.style.borderColor='#00ffcc';">
-              REBOOT SYSTEM
+              width: 100%;
+              box-shadow: 0 0 8px #ff00ff;
+            " onmouseover="this.style.color='#00ffff';this.style.borderColor='#00ffff';"
+               onmouseout="this.style.color='#ff00ff';this.style.borderColor='#ff00ff';">
+              Kembali Ke Beranda
             </button>
           </div>
         </div>
@@ -340,17 +392,33 @@
       `;
       document.body.appendChild(popup);
 
-      const countdownEl = document.getElementById("countdown");
-      const timer = setInterval(() => {
-        timeLeft--;
+      // Fungsi update countdown
+      function updateCountdown() {
         if (timeLeft <= 0) {
           clearInterval(timer);
           document.getElementById("bannedPopup").remove();
           location.reload();
-        } else {
-          countdownEl.textContent = `${timeLeft}s`;
+          return;
         }
-      }, 1000);
+
+        const days = Math.floor(timeLeft / (24 * 60 * 60));
+        const hours = Math.floor((timeLeft % (24 * 60 * 60)) / (60 * 60));
+        const minutes = Math.floor((timeLeft % (60 * 60)) / 60);
+        const seconds = timeLeft % 60;
+
+        document.getElementById("daysBox").querySelector("div:first-child").textContent = String(days).padStart(2, '0');
+        document.getElementById("hoursBox").querySelector("div:first-child").textContent = String(hours).padStart(2, '0');
+        document.getElementById("minutesBox").querySelector("div:first-child").textContent = String(minutes).padStart(2, '0');
+        document.getElementById("secondsBox").querySelector("div:first-child").textContent = String(seconds).padStart(2, '0');
+
+        timeLeft--;
+      }
+
+      // Update setiap detik
+      const timer = setInterval(updateCountdown, 1000);
+
+      // Jalankan sekali saat pertama kali
+      updateCountdown();
     }
 
     function showAccountPopup(uid9, isAdmin) {

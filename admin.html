@@ -495,14 +495,14 @@
             <th>UID</th>
             <th>EMAIL</th>
             <th>ROLE</th>
-            <th>VIP</th> <!-- 🔹 KOLOM VIP DITAMBAHKAN -->
+            <th>VIP</th>
             <th>BANNED</th>
             <th>CATATAN</th>
             <th>AKSI</th>
           </tr>
         </thead>
         <tbody id="userList">
-          <tr><td colspan="7">MEMUAT...</td></tr> <!-- 🔹 colspan jadi 7 -->
+          <tr><td colspan="7">MEMUAT...</td></tr>
         </tbody>
       </table>
     </div>
@@ -648,7 +648,7 @@
 
       const userDoc = await db.collection("users").doc(user.uid).get();
       if (!userDoc.exists || userDoc.data().role !== "admin") {
-        alert("AKSES DITOLAK!");
+        alert("AKSES DITOLAK! HANYA ADMIN YANG BOLEH MASUK.");
         window.location.href = "index.html";
         return;
       }
@@ -660,6 +660,10 @@
     async function loadUsers() {
       const list = document.getElementById("userList");
       try {
+        // Ambil data admin saat ini
+        const currentUserDoc = await db.collection("users").doc(auth.currentUser.uid).get();
+        const isAdmin = currentUserDoc.exists && currentUserDoc.data().role === "admin";
+
         const snapshot = await db.collection("users").orderBy("createdAt", "asc").get();
         list.innerHTML = "";
         if (snapshot.empty) {
@@ -689,7 +693,7 @@
                 `<button class="unban-btn" onclick="unban('${doc.id}')">UNBAN</button>` :
                 `<button class="ban-btn" onclick="openBanPopup('${doc.id}')">BAN</button>`
               }
-              ${d.role !== "admin" ? `
+              ${isAdmin && d.role !== "admin" ? `
                 <br><button class="vip-btn" style="margin-top:4px; padding:4px 6px; font-size:7px;"
                         onclick="toggleVip('${doc.id}', ${isVip})">
                   ${isVip ? 'CABUT VIP' : 'JADIKAN VIP'}
@@ -705,8 +709,15 @@
       }
     }
 
-    // 🔹 FUNGSI TOGGLE VIP BARU
+    // 🔹 FUNGSI TOGGLE VIP (HANYA UNTUK ADMIN)
     async function toggleVip(uid, isCurrentlyVip) {
+      // Validasi tambahan: pastikan user saat ini adalah admin
+      const currentUserDoc = await db.collection("users").doc(auth.currentUser.uid).get();
+      if (!currentUserDoc.exists || currentUserDoc.data().role !== "admin") {
+        alert("HANYA ADMIN YANG BOLEH MENGUBAH STATUS VIP!");
+        return;
+      }
+
       try {
         await db.collection("users").doc(uid).update({
           isVip: !isCurrentlyVip

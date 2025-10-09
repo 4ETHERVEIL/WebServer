@@ -201,9 +201,9 @@
   </div>
 
   <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js "></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js "></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js "></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
   <script>
     // 🔥 KONFIGURASI FIREBASE ANDA
@@ -248,7 +248,6 @@
       const now = new Date();
       let timeLeft = Math.ceil((unbanTime - now) / 1000);
 
-      // Hapus popup lama jika ada
       const existing = document.getElementById("bannedPopup");
       if (existing) existing.remove();
 
@@ -280,7 +279,6 @@
             position: relative;
             overflow: hidden;
           ">
-            <!-- Glitch effect overlay -->
             <div style="
               position: absolute;
               top: 0; left: 0; right: 0; bottom: 0;
@@ -392,7 +390,6 @@
       `;
       document.body.appendChild(popup);
 
-      // Fungsi update countdown
       function updateCountdown() {
         if (timeLeft <= 0) {
           clearInterval(timer);
@@ -414,14 +411,11 @@
         timeLeft--;
       }
 
-      // Update setiap detik
       const timer = setInterval(updateCountdown, 1000);
-
-      // Jalankan sekali saat pertama kali
       updateCountdown();
     }
 
-    // 🚨 POPUP CUSTOM UNTUK ALERT DAN PROMPT
+    // ✅ POPUP CUSTOM YANG BENAR
     function showCustomAlert(message, callback = null) {
       const popup = document.createElement("div");
       popup.id = "customAlert";
@@ -451,7 +445,7 @@
             <p style="color: #b6c0d6; font-size: 10px; line-height: 1.4; margin: 0 0 16px;">
               ${message}
             </p>
-            <button onclick="document.getElementById('customAlert').remove(); ${callback ? callback : ''}" style="
+            <button id="alertOkBtn" style="
               background: #7c5cff;
               color: white;
               border: none;
@@ -466,6 +460,14 @@
         </div>
       `;
       document.body.appendChild(popup);
+
+      const okBtn = document.getElementById("alertOkBtn");
+      okBtn.addEventListener("click", () => {
+        popup.remove();
+        if (callback && typeof callback === "function") {
+          callback();
+        }
+      });
     }
 
     function showCustomPrompt(title, message, placeholder, onConfirm, onCancel) {
@@ -509,7 +511,7 @@
               border-radius: 4px;
             ">
             <div style="display: flex; gap: 8px; justify-content: center; margin-top: 12px;">
-              <button onclick="document.getElementById('customPrompt').remove(); if(typeof ${onCancel} === 'function') ${onCancel}();" style="
+              <button id="cancelBtn" style="
                 background: #555;
                 color: white;
                 border: none;
@@ -519,7 +521,7 @@
                 font-size: 10px;
                 cursor: pointer;
               ">Batal</button>
-              <button onclick="const val = document.getElementById('promptInput').value.trim(); if(val) { document.getElementById('customPrompt').remove(); ${onConfirm}(val); } else { showCustomAlert('Harap isi field!'); }" style="
+              <button id="confirmBtn" style="
                 background: #3ce0c3;
                 color: black;
                 border: none;
@@ -534,6 +536,31 @@
         </div>
       `;
       document.body.appendChild(popup);
+
+      const input = document.getElementById("promptInput");
+      const cancelBtn = document.getElementById("cancelBtn");
+      const confirmBtn = document.getElementById("confirmBtn");
+
+      cancelBtn.addEventListener("click", () => {
+        popup.remove();
+        if (onCancel && typeof onCancel === "function") onCancel();
+      });
+
+      confirmBtn.addEventListener("click", () => {
+        const value = input.value.trim();
+        if (value === "") {
+          showCustomAlert("Harap isi field!");
+          return;
+        }
+        popup.remove();
+        if (onConfirm && typeof onConfirm === "function") onConfirm(value);
+      });
+
+      input.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") confirmBtn.click();
+      });
+
+      input.focus();
     }
 
     function showAccountPopup(uid9, isAdmin) {
@@ -596,11 +623,9 @@
       `;
     }
 
-    // ✅ RENDER MENU DINAMIS DARI FIRESTORE
     async function renderMenu(uid9, role) {
       const isAdmin = (role === "admin");
       
-      // Muat item menu dari Firestore
       let menuItems = [];
       try {
         const snapshot = await db.collection("menuItems").orderBy("createdAt", "asc").get();
@@ -609,7 +634,6 @@
         });
       } catch (e) {
         console.error("Gagal muat menu:", e);
-        // Fallback ke menu default jika error
         menuItems = [
           { title: "QR Generator", icon: "🗺️", target: "QR.html", subtitle: null },
           { title: "Fake Tweet", icon: "🐦", target: "fake-tweet.html", subtitle: null },
@@ -618,7 +642,6 @@
         ];
       }
 
-      // Bangun grid menu
       let gridHTML = '';
       menuItems.forEach(item => {
         gridHTML += `
@@ -652,7 +675,6 @@
         </div>
       `;
 
-      // Event untuk box
       document.querySelectorAll('.box').forEach(box => {
         box.addEventListener('click', () => {
           const t = box.dataset.target;
@@ -667,7 +689,6 @@
         });
       });
 
-      // Popup account
       document.getElementById("accountBtn").addEventListener("click", () => showAccountPopup(uid9, isAdmin));
     }
 

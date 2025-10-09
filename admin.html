@@ -8,7 +8,7 @@
   <!-- Font Pixel untuk judul & tombol -->
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <!-- Font bersih untuk konten -->
-  <link href="https://fonts.googleapis.com/css2?family=Fixel+Text:wght@400;500&display=swap" rel="stylesheet">
+  <link href=" https://fonts.googleapis.com/css2?family=Fixel+Text:wght@400;500&display=swap" rel="stylesheet">
 
   <style>
     :root {
@@ -251,6 +251,18 @@
       transform: scale(1.05);
     }
 
+    .vip-btn {
+      background: rgba(255, 215, 0, 0.15);
+      border-color: gold;
+      color: gold;
+    }
+
+    .vip-btn:hover {
+      background: rgba(255, 215, 0, 0.3);
+      box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+      transform: scale(1.05);
+    }
+
     .admin-tag {
       color: #ffd700;
       text-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
@@ -259,6 +271,11 @@
     .banned-yes {
       color: var(--neon-pink);
       text-shadow: 0 0 4px rgba(255, 0, 255, 0.4);
+    }
+
+    .vip-yes {
+      color: gold;
+      text-shadow: 0 0 4px rgba(255, 215, 0, 0.6);
     }
 
     .note-cell {
@@ -478,13 +495,14 @@
             <th>UID</th>
             <th>EMAIL</th>
             <th>ROLE</th>
+            <th>VIP</th> <!-- 🔹 KOLOM VIP DITAMBAHKAN -->
             <th>BANNED</th>
             <th>CATATAN</th>
             <th>AKSI</th>
           </tr>
         </thead>
         <tbody id="userList">
-          <tr><td colspan="6">MEMUAT...</td></tr>
+          <tr><td colspan="7">MEMUAT...</td></tr> <!-- 🔹 colspan jadi 7 -->
         </tbody>
       </table>
     </div>
@@ -645,12 +663,13 @@
         const snapshot = await db.collection("users").orderBy("createdAt", "asc").get();
         list.innerHTML = "";
         if (snapshot.empty) {
-          list.innerHTML = `<tr><td colspan="6">BELUM ADA USER.</td></tr>`;
+          list.innerHTML = `<tr><td colspan="7">BELUM ADA USER.</td></tr>`;
           return;
         }
         snapshot.forEach(doc => {
           const d = doc.data();
           const isBanned = d.bannedUntil && d.bannedUntil.toDate() > new Date();
+          const isVip = d.isVip === true;
           let bannedDisplay = "TIDAK";
           if (isBanned) {
             const endTime = d.bannedUntil.toDate();
@@ -662,6 +681,7 @@
             <td>${d.uid9 || '—'}</td>
             <td>${d.email || '—'}</td>
             <td>${d.role === "admin" ? '<span class="admin-tag">ADMIN</span>' : 'USER'}</td>
+            <td class="${isVip ? 'vip-yes' : ''}">${isVip ? '💎 YA' : 'TIDAK'}</td>
             <td class="${isBanned ? 'banned-yes' : ''}">${bannedDisplay}</td>
             <td class="note-cell">${d.banNote || '—'}</td>
             <td>
@@ -669,13 +689,31 @@
                 `<button class="unban-btn" onclick="unban('${doc.id}')">UNBAN</button>` :
                 `<button class="ban-btn" onclick="openBanPopup('${doc.id}')">BAN</button>`
               }
+              ${d.role !== "admin" ? `
+                <br><button class="vip-btn" style="margin-top:4px; padding:4px 6px; font-size:7px;"
+                        onclick="toggleVip('${doc.id}', ${isVip})">
+                  ${isVip ? 'CABUT VIP' : 'JADIKAN VIP'}
+                </button>
+              ` : ''}
             </td>
           `;
           list.appendChild(row);
         });
       } catch (e) {
         console.error("Error:", e);
-        list.innerHTML = `<tr><td colspan="6">GAGAL MEMUAT.</td></tr>`;
+        list.innerHTML = `<tr><td colspan="7">GAGAL MEMUAT.</td></tr>`;
+      }
+    }
+
+    // 🔹 FUNGSI TOGGLE VIP BARU
+    async function toggleVip(uid, isCurrentlyVip) {
+      try {
+        await db.collection("users").doc(uid).update({
+          isVip: !isCurrentlyVip
+        });
+        loadUsers(); // refresh tabel
+      } catch (e) {
+        alert("Gagal ubah status VIP: " + e.message);
       }
     }
 

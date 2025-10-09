@@ -155,6 +155,7 @@
       cursor: pointer;
       transition: transform 0.2s, box-shadow 0.2s;
       box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+      position: relative;
     }
 
     .box:hover {
@@ -234,6 +235,7 @@
           email: user.email,
           uid9: customUID,
           role: "user",
+          isVip: false, // 🔹 DEFAULT BUKAN VIP
           bannedUntil: null,
           banNote: null,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -563,10 +565,12 @@
       input.focus();
     }
 
-    function showAccountPopup(uid9, isAdmin) {
+    function showAccountPopup(uid9, isAdmin, isVip) {
       const adminButton = isAdmin ? `
         <br><button onclick="window.location.href='admin.html'" style="background: gold; border: none; padding: 4px 8px; color: black; border-radius: 4px; font-size: 9px; margin-top: 6px;">Admin Panel</button>
       ` : '';
+
+      const vipBadge = isVip ? `<span style="color: gold; text-shadow: 0 0 4px yellow;">💎 VIP</span>` : '';
 
       const popup = document.createElement("div");
       popup.id = "accountPopup";
@@ -580,6 +584,7 @@
             
             <h3>AKUN</h3>
             <p>ID: <strong>${uid9}</strong></p>
+            <p>Status: ${vipBadge || "Biasa"}</p>
             <button id="copyBtn" style="background: var(--accent); border: none; padding: 4px 8px; color: black; border-radius: 4px; font-size: 9px; margin: 6px 0;">Salin UID</button><br>
             ${adminButton}
             <button onclick="auth.signOut().then(() => location.reload()); document.getElementById('accountPopup').remove();" 
@@ -623,9 +628,11 @@
       `;
     }
 
-    async function renderMenu(uid9, role) {
+    // ✅ RENDER MENU DINAMIS DARI FIRESTORE (DIPERBARUI DENGAN VIP)
+    async function renderMenu(uid9, role, isVip = false) {
       const isAdmin = (role === "admin");
       
+      // Muat item menu dari Firestore
       let menuItems = [];
       try {
         const snapshot = await db.collection("menuItems").orderBy("createdAt", "asc").get();
@@ -634,18 +641,28 @@
         });
       } catch (e) {
         console.error("Gagal muat menu:", e);
+        // Fallback ke menu default jika error
         menuItems = [
-          { title: "QR Generator", icon: "🗺️", target: "QR.html", subtitle: null },
-          { title: "Fake Tweet", icon: "🐦", target: "fake-tweet.html", subtitle: null },
-          { title: "eChat", icon: "💬", target: "fake-iphone.html", subtitle: "Fake iPhone" },
-          { title: "Spam NGL", icon: "✉️", target: "spam-NGL.html", subtitle: "Anonymous Q&A" }
+          { title: "QR Generator", icon: "🗺️", target: "QR.html", subtitle: null, vip: false },
+          { title: "Fake Tweet", icon: "🐦", target: "fake-tweet.html", subtitle: null, vip: false },
+          { title: "eChat", icon: "💬", target: "fake-iphone.html", subtitle: "Fake iPhone", vip: false },
+          { title: "Spam NGL", icon: "✉️", target: "spam-NGL.html", subtitle: "Anonymous Q&A", vip: false },
+          { title: "VIP Tool", icon: "💎", target: "vip-tool.html", subtitle: "Fitur Eksklusif", vip: true }
         ];
       }
 
+      // Filter: hanya tampilkan item VIP jika user adalah VIP atau admin
+      const filteredItems = menuItems.filter(item => 
+        !item.vip || isVip || isAdmin
+      );
+
+      // Bangun grid menu
       let gridHTML = '';
-      menuItems.forEach(item => {
+      filteredItems.forEach(item => {
+        const vipBadge = item.vip ? `<div style="position: absolute; top: 4px; right: 4px; background: gold; color: black; font-size: 8px; padding: 0 3px; border-radius: 3px; font-weight: bold;">VIP</div>` : '';
         gridHTML += `
-          <div class="box" tabindex="0" data-target="${item.target}">
+          <div class="box" tabindex="0" data-target="${item.target}" style="position: relative;">
+            ${vipBadge}
             <div class="icon">${item.icon}</div>
             <div class="title">${item.title}</div>
             ${item.subtitle ? `<div class="subtitle">${item.subtitle}</div>` : ''}
@@ -675,6 +692,7 @@
         </div>
       `;
 
+      // Event untuk box
       document.querySelectorAll('.box').forEach(box => {
         box.addEventListener('click', () => {
           const t = box.dataset.target;
@@ -689,7 +707,8 @@
         });
       });
 
-      document.getElementById("accountBtn").addEventListener("click", () => showAccountPopup(uid9, isAdmin));
+      // Popup account
+      document.getElementById("accountBtn").addEventListener("click", () => showAccountPopup(uid9, isAdmin, isVip));
     }
 
     async function handleLogin() {
@@ -698,7 +717,7 @@
       try {
         await auth.signInWithEmailAndPassword(email, password);
       } catch (e) {
-        showCustomAlert("Login gagal, periksa email dan password ");
+        showCustomAlert("Login gagal: " + e.message);
       }
     }
 
@@ -745,10 +764,11 @@
           }
           const uid9 = await ensureUserUID(user);
           const role = data.role || "user";
-          renderMenu(uid9, role);
+          const isVip = data.isVip === true; // 🔹 Baca status VIP
+          renderMenu(uid9, role, isVip);
         } else {
           const uid9 = await ensureUserUID(user);
-          renderMenu(uid9, "user");
+          renderMenu(uid9, "user", false);
         }
       } else {
         renderLogin();

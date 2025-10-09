@@ -21,7 +21,7 @@
 
     body {
       font-family: "Press Start 2P", monospace;
-      background: url('https://i.imgur.com/nvdnNzi.jpeg') center/cover no-repeat fixed;
+      background: url(' https://i.imgur.com/nvdnNzi.jpeg ') center/cover no-repeat fixed;
       color: var(--muted);
       padding: 16px;
       display: flex;
@@ -201,9 +201,9 @@
   </div>
 
   <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js "></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js "></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js "></script>
 
   <script>
     // 🔥 KONFIGURASI FIREBASE ANDA
@@ -247,18 +247,96 @@
     function showBannedPopup(unbanTime, banNote) {
       const now = new Date();
       let timeLeft = Math.ceil((unbanTime - now) / 1000);
-      
+
+      // Hapus popup lama jika ada
+      const existing = document.getElementById("bannedPopup");
+      if (existing) existing.remove();
+
       const popup = document.createElement("div");
       popup.id = "bannedPopup";
       popup.innerHTML = `
-        <div style="position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 9999;">
-          <div style="background: #220000; color: #ff6666; padding: 20px; border: 2px solid #ff0000; border-radius: 8px; max-width: 300px; width: 90%; text-align: center; font-family: 'Press Start 2P', monospace; font-size: 10px;">
-            <h2>⛔ DIBANNED!</h2>
-            <p>${banNote || "Akun Anda dibanned sementara."}</p>
-            <p>Waktu tersisa: <span id="countdown">${timeLeft}s</span></p>
-            <button onclick="location.reload()" style="background: #555; color: white; border: none; padding: 5px 10px; border-radius: 4px; margin-top: 10px;">Refresh</button>
+        <div style="
+          position: fixed;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: rgba(5, 0, 20, 0.95);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+          font-family: 'Press Start 2P', monospace;
+        ">
+          <div style="
+            background: #0a001a;
+            border: 3px solid #ff00ff;
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 360px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 
+              0 0 15px #ff00ff,
+              0 0 30px rgba(255, 0, 255, 0.4);
+            position: relative;
+            overflow: hidden;
+          ">
+            <!-- Glitch effect overlay -->
+            <div style="
+              position: absolute;
+              top: 0; left: 0; right: 0; bottom: 0;
+              background: transparent;
+              pointer-events: none;
+              opacity: 0.2;
+              animation: glitch-loop 3s infinite;
+            "></div>
+
+            <h2 style="
+              color: #ff0066;
+              font-size: 16px;
+              margin: 0 0 12px;
+              text-shadow: 0 0 8px #ff0066, 0 0 16px #ff0066;
+              letter-spacing: 1px;
+            ">⚠️ ACCESS DENIED</h2>
+
+            <p style="color: #00ffff; font-size: 10px; margin: 8px 0; line-height: 1.4;">
+              ${banNote || "Your neural link has been temporarily severed."}
+            </p>
+
+            <p style="color: #ff33cc; font-size: 12px; margin: 12px 0;">
+              UNLOCK IN: <span id="countdown" style="
+                color: #00ff99;
+                text-shadow: 0 0 6px #00ff99;
+              ">${timeLeft}s</span>
+            </p>
+
+            <button onclick="location.reload()" style="
+              background: #1a0033;
+              color: #00ffcc;
+              border: 2px solid #00ffcc;
+              padding: 6px 12px;
+              border-radius: 4px;
+              font-family: 'Press Start 2P', monospace;
+              font-size: 9px;
+              cursor: pointer;
+              margin-top: 12px;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              transition: all 0.2s;
+            " onmouseover="this.style.color='#ff00ff';this.style.borderColor='#ff00ff';"
+               onmouseout="this.style.color='#00ffcc';this.style.borderColor='#00ffcc';">
+              REBOOT SYSTEM
+            </button>
           </div>
         </div>
+
+        <style>
+          @keyframes glitch-loop {
+            0%, 100% { background: transparent; }
+            20% { background: rgba(255, 0, 255, 0.1); clip-path: polygon(0 0, 100% 0, 100% 20%, 0 20%); }
+            40% { background: rgba(0, 255, 255, 0.1); clip-path: polygon(0 80%, 100% 80%, 100% 100%, 0 100%); }
+            60% { background: rgba(255, 0, 0, 0.1); clip-path: polygon(0 40%, 100% 40%, 100% 60%, 0 60%); }
+            80% { background: rgba(0, 255, 0, 0.1); clip-path: polygon(20% 0, 80% 0, 80% 100%, 20% 100%); }
+          }
+        </style>
       `;
       document.body.appendChild(popup);
 

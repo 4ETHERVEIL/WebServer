@@ -578,6 +578,12 @@
       <label for="boxSubtitle">DESKRIPSI:</label>
       <input type="text" id="boxSubtitle" placeholder="OPSIONAL">
       
+      <div style="margin-top: 12px;">
+        <label for="boxVipOnly" style="display:block; margin-bottom:6px; font-family:'Press Start 2P', monospace; font-size:9px; color:var(--neon-cyan); text-transform:uppercase; letter-spacing:1px;">
+          <input type="checkbox" id="boxVipOnly" style="width:auto; margin-right:6px;"> HANYA UNTUK VIP
+        </label>
+      </div>
+      
       <input type="hidden" id="editMenuId">
       
       <div class="popup-buttons">
@@ -818,6 +824,7 @@
       document.getElementById("boxIcon").value = "";
       document.getElementById("boxTarget").value = "";
       document.getElementById("boxSubtitle").value = "";
+      document.getElementById("boxVipOnly").checked = false;
       document.getElementById("editMenuId").value = "";
       document.getElementById("menuPopup").style.display = "flex";
     }
@@ -830,6 +837,7 @@
         document.getElementById("boxIcon").value = data.icon || "";
         document.getElementById("boxTarget").value = data.target || "";
         document.getElementById("boxSubtitle").value = data.subtitle || "";
+        document.getElementById("boxVipOnly").checked = data.vipOnly === true;
         document.getElementById("editMenuId").value = id;
         document.getElementById("menuPopup").style.display = "flex";
       } catch (e) {
@@ -847,6 +855,7 @@
       const icon = document.getElementById("boxIcon").value.trim();
       const target = document.getElementById("boxTarget").value.trim();
       const subtitle = document.getElementById("boxSubtitle").value.trim();
+      const vipOnly = document.getElementById("boxVipOnly").checked;
       const editId = document.getElementById("editMenuId").value;
 
       if (!title || !icon || !target) {
@@ -865,7 +874,8 @@
             title: title,
             icon: icon,
             target: target,
-            subtitle: subtitle || null
+            subtitle: subtitle || null,
+            vipOnly: vipOnly
           });
         } else {
           await db.collection("menuItems").add({
@@ -873,6 +883,7 @@
             icon: icon,
             target: target,
             subtitle: subtitle || null,
+            vipOnly: vipOnly,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           });
         }

@@ -698,7 +698,7 @@
       try {
         await auth.signInWithEmailAndPassword(email, password);
       } catch (e) {
-        showCustomAlert("Login gagal: " + e.message);
+        showCustomAlert("Login gagal, periksa email dan password ");
       }
     }
 

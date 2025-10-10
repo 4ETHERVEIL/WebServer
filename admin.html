@@ -607,6 +607,9 @@
     </div>
   </div>
 
+  <!-- Popup: Atur Masa Berlaku VIP -->
+  <div id="vipPopup" class="popup-overlay" style="display:none;"></div>
+
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -701,8 +704,8 @@
               }
               ${isAdmin && d.role !== "admin" ? `
                 <br><button class="vip-btn" style="margin-top:4px; padding:4px 6px; font-size:7px;"
-                        onclick="toggleVip('${doc.id}', ${isVip})">
-                  ${isVip ? 'CABUT VIP' : 'JADIKAN VIP'}
+                        onclick="openVipPopup('${doc.id}', ${isVip})">
+                  ${isVip ? 'PERBARUI VIP' : 'JADIKAN VIP'}
                 </button>
               ` : ''}
             </td>
@@ -715,22 +718,88 @@
       }
     }
 
-    // 🔹 FUNGSI TOGGLE VIP (HANYA UNTUK ADMIN)
-    async function toggleVip(uid, isCurrentlyVip) {
-      // Validasi tambahan: pastikan user saat ini adalah admin
-      const currentUserDoc = await db.collection("users").doc(auth.currentUser.uid).get();
-      if (!currentUserDoc.exists || currentUserDoc.data().role !== "admin") {
-        alert("HANYA ADMIN YANG BOLEH MENGUBAH STATUS VIP!");
-        return;
+    // 🔹 Buka popup atur masa berlaku VIP
+    function openVipPopup(uid, isCurrentlyVip) {
+      const popup = document.createElement("div");
+      popup.id = "vipPopup";
+      popup.innerHTML = `
+        <div class="popup-overlay" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(10,10,20,0.92);display:flex;align-items:center;justify-content:center;z-index:1000;">
+          <div class="popup-content" style="background:#0f0f1a;border:1px solid var(--neon-purple);padding:20px;width:90%;max-width:400px;position:relative;box-shadow:0 0 20px rgba(185,103,255,0.4);">
+            <h3 style="text-align:center;margin-bottom:18px;font-size:12px;color:white;text-transform:uppercase;letter-spacing:2px;text-shadow:0 0 8px var(--neon-cyan);font-family:'Press Start 2P',monospace;">
+              ${isCurrentlyVip ? 'PERBARUI VIP' : 'JADIKAN VIP'}
+            </h3>
+            
+            <label style="display:block;margin:12px 0 6px;font-family:'Press Start 2P',monospace;font-size:9px;color:var(--neon-cyan);text-transform:uppercase;letter-spacing:1px;">
+              DURASI:
+            </label>
+            <select id="vipDuration" style="width:100%;padding:8px;background:rgba(5,5,15,0.7);border:1px solid var(--border);color:white;font-family:'Fixel Text',sans-serif;font-size:9px;">
+              <option value="1">1 JAM</option>
+              <option value="24">1 HARI</option>
+              <option value="720">1 BULAN</option>
+              <option value="8760">1 TAHUN</option>
+              <option value="custom">CUSTOM (JAM)</option>
+            </select>
+            <input type="number" id="customHours" min="1" placeholder="JUMLAH JAM" style="width:100%;padding:8px;margin-top:8px;background:rgba(5,5,15,0.7);border:1px solid var(--border);color:white;font-family:'Fixel Text',sans-serif;font-size:9px;display:none;">
+
+            <input type="hidden" id="vipTargetUid" value="${uid}">
+            <input type="hidden" id="isCurrentlyVip" value="${isCurrentlyVip}">
+
+            <div class="popup-buttons" style="margin-top:18px;display:flex;gap:10px;">
+              <button class="confirm-btn" onclick="confirmVip()" style="flex:1;padding:8px;font-size:9px;background:rgba(185,103,255,0.2);border-color:var(--neon-purple);color:var(--neon-purple);">SIMPAN</button>
+              <button class="cancel-btn" onclick="closeVipPopup()" style="flex:1;padding:8px;font-size:9px;background:rgba(100,100,120,0.2);border-color:#666;color:var(--text-muted);">BATAL</button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(popup);
+
+      // Tampilkan input custom jika dipilih
+      const durationSelect = document.getElementById("vipDuration");
+      const customInput = document.getElementById("customHours");
+      durationSelect.addEventListener("change", () => {
+        if (durationSelect.value === "custom") {
+          customInput.style.display = "block";
+          customInput.focus();
+        } else {
+          customInput.style.display = "none";
+        }
+      });
+    }
+
+    function closeVipPopup() {
+      const popup = document.getElementById("vipPopup");
+      if (popup) popup.remove();
+    }
+
+    async function confirmVip() {
+      const uid = document.getElementById("vipTargetUid").value;
+      const durationSelect = document.getElementById("vipDuration").value;
+      let hours = 0;
+
+      if (durationSelect === "custom") {
+        const custom = parseInt(document.getElementById("customHours").value);
+        if (isNaN(custom) || custom < 1) {
+          alert("MASUKKAN JUMLAH JAM YANG VALID!");
+          return;
+        }
+        hours = custom;
+      } else {
+        hours = parseInt(durationSelect);
       }
 
       try {
+        const vipUntil = new Date();
+        vipUntil.setHours(vipUntil.getHours() + hours);
+
         await db.collection("users").doc(uid).update({
-          isVip: !isCurrentlyVip
+          isVip: true,
+          vipUntil: firebase.firestore.Timestamp.fromDate(vipUntil)
         });
-        loadUsers(); // refresh tabel
+
+        closeVipPopup();
+        loadUsers();
       } catch (e) {
-        alert("Gagal ubah status VIP: " + e.message);
+        alert("Gagal atur VIP: " + e.message);
       }
     }
 

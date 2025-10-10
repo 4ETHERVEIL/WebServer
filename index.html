@@ -628,7 +628,7 @@
       `;
     }
 
-    // ✅ RENDER MENU DINAMIS DARI FIRESTORE (DIPERBARUI DENGAN VIP)
+    // ✅ RENDER MENU DINAMIS DARI FIRESTORE (DIPERBARUI DENGAN VIP BOX)
     async function renderMenu(uid9, role, isVip = false) {
       const isAdmin = (role === "admin");
       
@@ -643,23 +643,24 @@
         console.error("Gagal muat menu:", e);
         // Fallback ke menu default jika error
         menuItems = [
-          { title: "QR Generator", icon: "🗺️", target: "QR.html", subtitle: null, vip: false },
-          { title: "Fake Tweet", icon: "🐦", target: "fake-tweet.html", subtitle: null, vip: false },
-          { title: "eChat", icon: "💬", target: "fake-iphone.html", subtitle: "Fake iPhone", vip: false },
-          { title: "Spam NGL", icon: "✉️", target: "spam-NGL.html", subtitle: "Anonymous Q&A", vip: false },
-          { title: "VIP Tool", icon: "💎", target: "vip-tool.html", subtitle: "Fitur Eksklusif", vip: true }
+          { title: "QR Generator", icon: "🗺️", target: "QR.html", subtitle: null, vipOnly: false },
+          { title: "Fake Tweet", icon: "🐦", target: "fake-tweet.html", subtitle: null, vipOnly: false },
+          { title: "eChat", icon: "💬", target: "fake-iphone.html", subtitle: "Fake iPhone", vipOnly: false },
+          { title: "Spam NGL", icon: "✉️", target: "spam-NGL.html", subtitle: "Anonymous Q&A", vipOnly: false },
+          { title: "VIP Tool", icon: "💎", target: "vip-tool.html", subtitle: "Fitur Eksklusif", vipOnly: true }
         ];
       }
 
-      // Filter: hanya tampilkan item VIP jika user adalah VIP atau admin
+      // 🔹 FILTER: hanya tampilkan item VIP jika user adalah VIP atau admin
       const filteredItems = menuItems.filter(item => 
-        !item.vip || isVip || isAdmin
+        !item.vipOnly || isVip || isAdmin
       );
 
       // Bangun grid menu
       let gridHTML = '';
       filteredItems.forEach(item => {
-        const vipBadge = item.vip ? `<div style="position: absolute; top: 4px; right: 4px; background: gold; color: black; font-size: 8px; padding: 0 3px; border-radius: 3px; font-weight: bold;">VIP</div>` : '';
+        // 🔹 Tambahkan badge VIP jika item eksklusif
+        const vipBadge = item.vipOnly ? `<div style="position: absolute; top: 4px; right: 4px; background: gold; color: black; font-size: 8px; padding: 0 3px; border-radius: 3px; font-weight: bold;">VIP</div>` : '';
         gridHTML += `
           <div class="box" tabindex="0" data-target="${item.target}" style="position: relative;">
             ${vipBadge}

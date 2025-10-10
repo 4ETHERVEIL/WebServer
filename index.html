@@ -883,7 +883,7 @@
     function hideSplashScreen() {
       if (splashHidden) return;
       
-      const minDelay = 3000; // 1.5 detik
+      const minDelay = 10000; // 1.5 detik
       const loadTime = performance.now(); // Lebih akurat dari timing.navigationStart
       const remaining = Math.max(0, minDelay - loadTime);
       

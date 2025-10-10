@@ -573,6 +573,17 @@
 
       const vipBadge = isVip ? `<span style="color: gold; text-shadow: 0 0 4px yellow;">💎 VIP</span>` : '';
 
+      // 🔹 Jika user VIP, tambahkan countdown
+      let vipCountdown = '';
+      if (isVip) {
+        vipCountdown = `
+          <div style="margin: 8px 0; padding: 8px; background: rgba(255,215,0,0.1); border: 1px solid gold; border-radius: 4px; font-size: 8px; text-align: center;">
+            <strong style="color: gold;">⏳ SISA WAKTU VIP:</strong><br>
+            <span id="vipCountdown" style="color: #00ffff; font-size: 10px; text-shadow: 0 0 4px #00ffff;">Memuat...</span>
+          </div>
+        `;
+      }
+
       const popup = document.createElement("div");
       popup.id = "accountPopup";
       popup.innerHTML = `
@@ -586,6 +597,7 @@
             <h3>AKUN</h3>
             <p>ID: <strong>${uid9}</strong></p>
             <p>Status: ${vipBadge || "Biasa"}</p>
+            ${vipCountdown}
             <button id="copyBtn" style="background: var(--accent); border: none; padding: 4px 8px; color: black; border-radius: 4px; font-size: 9px; margin: 6px 0;">Salin UID</button><br>
             ${adminButton}
             <button onclick="auth.signOut().then(() => location.reload()); document.getElementById('accountPopup').remove();" 
@@ -599,6 +611,56 @@
         navigator.clipboard.writeText(uid9).then(() => {
           showCustomAlert("UID disalin!");
         });
+      });
+
+      // 🔹 Jika user VIP, mulai countdown
+      if (isVip) {
+        startVipCountdown();
+      }
+    }
+
+    // 🔹 Fungsi untuk hitung mundur waktu VIP (dengan bulan)
+    function startVipCountdown() {
+      const uid = auth.currentUser.uid;
+      db.collection("users").doc(uid).get().then(doc => {
+        const data = doc.data();
+        if (data.vipUntil) {
+          const now = new Date();
+          let timeLeft = Math.ceil((data.vipUntil.toDate() - now) / 1000);
+          
+          function updateCountdown() {
+            if (timeLeft <= 0) {
+              clearInterval(timer);
+              document.getElementById("vipCountdown").textContent = "VIP HABIS";
+              return;
+            }
+
+            // Hitung berdasarkan asumsi: 1 bulan = 30 hari
+            const totalSeconds = timeLeft;
+            const months = Math.floor(totalSeconds / (30 * 24 * 60 * 60));
+            const days = Math.floor((totalSeconds % (30 * 24 * 60 * 60)) / (24 * 60 * 60));
+            const hours = Math.floor((totalSeconds % (24 * 60 * 60)) / (60 * 60));
+            const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
+            const seconds = totalSeconds % 60;
+
+            // Format: B H J M D
+            let display = '';
+            if (months > 0) display += `${months}B `;
+            if (days > 0 || months > 0) display += `${days}H `;
+            if (hours > 0 || days > 0 || months > 0) display += `${hours}J `;
+            if (minutes > 0 || hours > 0 || days > 0 || months > 0) display += `${minutes}M `;
+            display += `${seconds}D`;
+
+            document.getElementById("vipCountdown").textContent = display.trim();
+            timeLeft--;
+          }
+
+          const timer = setInterval(updateCountdown, 1000);
+          updateCountdown();
+        }
+      }).catch(e => {
+        console.error("Gagal muat waktu VIP:", e);
+        document.getElementById("vipCountdown").textContent = "Error";
       });
     }
 

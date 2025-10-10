@@ -967,7 +967,7 @@
     function hideSplashScreen() {
       if (splashHidden) return;
       
-      const minDelay = 1500;
+      const minDelay = 10000;
       const loadTime = performance.now();
       const remaining = Math.max(0, minDelay - loadTime);
       

@@ -21,7 +21,7 @@
 
     body {
       font-family: "Press Start 2P", monospace;
-      background: url(' https://i.imgur.com/nvdnNzi.jpeg ') center/cover no-repeat fixed;
+      background: url('https://i.imgur.com/nvdnNzi.jpeg') center/cover no-repeat fixed;
       color: var(--muted);
       padding: 16px;
       display: flex;
@@ -193,9 +193,74 @@
       .box { height: 120px; padding: 10px; }
       .icon { font-size: 24px; }
     }
+
+    /* === Splash Screen === */
+    #splashScreen {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #0b1220;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      font-family: 'Press Start 2P', monospace;
+      color: #3ce0c3;
+      text-align: center;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+
+    #splashScreen.fade-out {
+      opacity: 0;
+    }
+
+    .splash-logo {
+      width: 70px;
+      height: 70px;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      margin-bottom: 16px;
+      filter: drop-shadow(0 0 8px #3ce0c3);
+    }
+
+    .splash-title {
+      font-size: clamp(18px, 6vw, 26px);
+      margin-bottom: 12px;
+      text-shadow: 0 0 10px #3ce0c3, 0 0 20px #3ce0c3;
+      letter-spacing: 2px;
+    }
+
+    .splash-subtitle {
+      font-size: clamp(8px, 3vw, 12px);
+      color: #7c5cff;
+      margin-bottom: 24px;
+    }
+
+    .splash-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid transparent;
+      border-top: 3px solid #3ce0c3;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
+
+  <!-- Splash Screen -->
+  <div id="splashScreen">
+    <img src="foto/foto.png" alt="NoxiusDev Logo" class="splash-logo">
+    <div class="splash-title">NOXIUSDEV</div>
+    <div class="splash-subtitle">LOADING SYSTEM...</div>
+    <div class="splash-spinner"></div>
+  </div>
 
   <div class="container" id="mainContainer">
     <!-- Akan diisi oleh JS -->
@@ -418,7 +483,6 @@
       updateCountdown();
     }
 
-    // ✅ POPUP CUSTOM YANG BENAR
     function showCustomAlert(message, callback = null) {
       const popup = document.createElement("div");
       popup.id = "customAlert";
@@ -573,7 +637,6 @@
 
       const vipBadge = isVip ? `<span style="color: gold; text-shadow: 0 0 4px yellow;">💎 VIP</span>` : '';
 
-      // 🔹 Jika user VIP, tambahkan countdown
       let vipCountdown = '';
       if (isVip) {
         vipCountdown = `
@@ -613,13 +676,11 @@
         });
       });
 
-      // 🔹 Jika user VIP, mulai countdown
       if (isVip) {
         startVipCountdown();
       }
     }
 
-    // 🔹 Fungsi untuk hitung mundur waktu VIP (dengan bulan)
     function startVipCountdown() {
       const uid = auth.currentUser.uid;
       db.collection("users").doc(uid).get().then(doc => {
@@ -635,7 +696,6 @@
               return;
             }
 
-            // Hitung berdasarkan asumsi: 1 bulan = 30 hari
             const totalSeconds = timeLeft;
             const months = Math.floor(totalSeconds / (30 * 24 * 60 * 60));
             const days = Math.floor((totalSeconds % (30 * 24 * 60 * 60)) / (24 * 60 * 60));
@@ -643,7 +703,6 @@
             const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
             const seconds = totalSeconds % 60;
 
-            // Format: B H J M D
             let display = '';
             if (months > 0) display += `${months}B `;
             if (days > 0 || months > 0) display += `${days}H `;
@@ -691,11 +750,9 @@
       `;
     }
 
-    // ✅ RENDER MENU DINAMIS DARI FIRESTORE (DIPERBARUI DENGAN VIP BOX)
     async function renderMenu(uid9, role, isVip = false) {
       const isAdmin = (role === "admin");
       
-      // Muat item menu dari Firestore
       let menuItems = [];
       try {
         const snapshot = await db.collection("menuItems").orderBy("createdAt", "asc").get();
@@ -704,7 +761,6 @@
         });
       } catch (e) {
         console.error("Gagal muat menu:", e);
-        // Fallback ke menu default jika error
         menuItems = [
           { title: "QR Generator", icon: "🗺️", target: "QR.html", subtitle: null, vipOnly: false },
           { title: "Fake Tweet", icon: "🐦", target: "fake-tweet.html", subtitle: null, vipOnly: false },
@@ -714,7 +770,6 @@
         ];
       }
 
-      // Bangun grid menu
       let gridHTML = '';
       menuItems.forEach(item => {
         const vipBadge = item.vipOnly ? `<div style="position: absolute; top: 4px; right: 4px; background: gold; color: black; font-size: 8px; padding: 0 3px; border-radius: 3px; font-weight: bold;">VIP</div>` : '';
@@ -750,7 +805,6 @@
         </div>
       `;
 
-      // Event untuk box
       document.querySelectorAll('.box').forEach(box => {
         box.addEventListener('click', () => {
           const t = box.dataset.target;
@@ -780,7 +834,6 @@
         });
       });
 
-      // Popup account
       document.getElementById("accountBtn").addEventListener("click", () => showAccountPopup(uid9, isAdmin, isVip));
     }
 
@@ -821,10 +874,22 @@
             showCustomAlert("Gagal kirim email: " + e.message);
           }
         },
-        () => {} // Batal
+        () => {}
       );
     }
 
+    // ✅ Fungsi untuk menyembunyikan splash screen
+    function hideSplashScreen() {
+      const splash = document.getElementById("splashScreen");
+      if (splash) {
+        splash.classList.add("fade-out");
+        setTimeout(() => {
+          if (splash.parentNode) splash.parentNode.removeChild(splash);
+        }, 300);
+      }
+    }
+
+    // 🔥 Tunggu status autentikasi selesai sebelum tampilkan konten
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         const userDoc = await db.collection("users").doc(user.uid).get();
@@ -832,12 +897,12 @@
           const data = userDoc.data();
           const bannedUntil = data.bannedUntil;
           if (bannedUntil && bannedUntil.toDate() > new Date()) {
+            hideSplashScreen();
             showBannedPopup(bannedUntil.toDate(), data.banNote);
             return;
           }
           const uid9 = await ensureUserUID(user);
           const role = data.role || "user";
-          // 🔹 Cek masa berlaku VIP
           const isVipActive = data.isVip === true && data.vipUntil && data.vipUntil.toDate() > new Date();
           renderMenu(uid9, role, isVipActive);
         } else {
@@ -847,9 +912,10 @@
       } else {
         renderLogin();
       }
+      hideSplashScreen(); // Pastikan splash disembunyikan
     });
 
-    renderLogin();
+    // ❌ JANGAN panggil renderLogin() di sini — biarkan onAuthStateChanged yang handle
   </script>
 </body>
 </html>

@@ -194,7 +194,7 @@
       .icon { font-size: 24px; }
     }
 
-    /* === Splash Screen === */
+    /* === Splash Screen Animations === */
     #splashScreen {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -208,7 +208,7 @@
       color: #3ce0c3;
       text-align: center;
       opacity: 1;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.4s ease;
     }
 
     #splashScreen.fade-out {
@@ -216,26 +216,35 @@
     }
 
     .splash-logo {
-      width: 80px;       /* ← UKURAN LOGO DI SINI */
+      width: 80px;
       height: 80px;
       image-rendering: pixelated;
       image-rendering: -moz-crisp-edges;
       image-rendering: crisp-edges;
       margin-bottom: 20px;
-      filter: drop-shadow(0 0 10px #3ce0c3);
+      opacity: 0;
+      transform: scale(0.5);
+      animation: logoPop 0.6s 0.2s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
     .splash-title {
       font-size: clamp(18px, 6vw, 26px);
       margin-bottom: 12px;
-      text-shadow: 0 0 10px #3ce0c3, 0 0 20px #3ce0c3;
-      letter-spacing: 2px;
+      text-shadow: 0 0 8px #3ce0c3;
+      opacity: 0;
+      animation: fadeInUp 0.5s 0.8s forwards;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 2px solid #3ce0c3;
+      width: 0;
     }
 
     .splash-subtitle {
       font-size: clamp(8px, 3vw, 12px);
       color: #7c5cff;
       margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeIn 0.5s 1.4s forwards;
     }
 
     .splash-spinner {
@@ -244,11 +253,35 @@
       border: 3px solid transparent;
       border-top: 3px solid #3ce0c3;
       border-radius: 50%;
-      animation: spin 1s linear infinite;
+      opacity: 0;
+      animation: spin 1s linear 1.6s infinite, fadeIn 0.4s 1.6s forwards;
+      filter: drop-shadow(0 0 6px #3ce0c3);
+    }
+
+    @keyframes logoPop {
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
   </style>
 </head>
@@ -257,7 +290,7 @@
   <!-- Splash Screen -->
   <div id="splashScreen">
     <img src="foto/foto.png" alt="NoxiusDev Logo" class="splash-logo">
-    <div class="splash-title">NOXIUSDEV</div>
+    <div class="splash-title" id="splashTitle">NOXIUSDEV</div>
     <div class="splash-subtitle">LOADING SYSTEM...</div>
     <div class="splash-spinner"></div>
   </div>
@@ -286,6 +319,33 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
+
+    // Efek typewriter untuk judul splash
+    function typeWriter(element, text, speed = 120) {
+      let i = 0;
+      element.style.width = '0';
+      const timer = setInterval(() => {
+        if (i < text.length) {
+          element.innerHTML += text.charAt(i);
+          element.style.width = (element.scrollWidth + 10) + 'px';
+          i++;
+        } else {
+          clearInterval(timer);
+          element.style.borderRight = 'none';
+        }
+      }, speed);
+    }
+
+    // Jalankan animasi teks setelah halaman siap
+    document.addEventListener('DOMContentLoaded', () => {
+      const titleEl = document.getElementById('splashTitle');
+      if (titleEl) {
+        // Delay kecil agar tidak bentrok dengan CSS animation
+        setTimeout(() => {
+          typeWriter(titleEl, "NOXIUSDEV", 100);
+        }, 800);
+      }
+    });
 
     function generate9DigitUID() {
       return Math.floor(100000000 + Math.random() * 900000000).toString();
@@ -883,8 +943,8 @@
     function hideSplashScreen() {
       if (splashHidden) return;
       
-      const minDelay = 15000; // 1.5 detik
-      const loadTime = performance.now(); // Lebih akurat dari timing.navigationStart
+      const minDelay = 10000; // 1.5 detik
+      const loadTime = performance.now();
       const remaining = Math.max(0, minDelay - loadTime);
       
       setTimeout(() => {
@@ -893,7 +953,7 @@
           splash.classList.add("fade-out");
           setTimeout(() => {
             if (splash.parentNode) splash.parentNode.removeChild(splash);
-          }, 300);
+          }, 400);
         }
         splashHidden = true;
       }, remaining);
@@ -923,8 +983,6 @@
       }
       hideSplashScreen();
     });
-
-    // Jangan panggil renderLogin() di sini
   </script>
 </body>
 </html>

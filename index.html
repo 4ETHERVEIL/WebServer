@@ -235,7 +235,8 @@
           email: user.email,
           uid9: customUID,
           role: "user",
-          isVip: false, // 🔹 DEFAULT BUKAN VIP
+          isVip: false,
+          vipUntil: null,
           bannedUntil: null,
           banNote: null,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -651,18 +652,12 @@
         ];
       }
 
-      // 🔹 FILTER: hanya tampilkan item VIP jika user adalah VIP atau admin
-      const filteredItems = menuItems.filter(item => 
-        !item.vipOnly || isVip || isAdmin
-      );
-
       // Bangun grid menu
       let gridHTML = '';
-      filteredItems.forEach(item => {
-        // 🔹 Tambahkan badge VIP jika item eksklusif
+      menuItems.forEach(item => {
         const vipBadge = item.vipOnly ? `<div style="position: absolute; top: 4px; right: 4px; background: gold; color: black; font-size: 8px; padding: 0 3px; border-radius: 3px; font-weight: bold;">VIP</div>` : '';
         gridHTML += `
-          <div class="box" tabindex="0" data-target="${item.target}" style="position: relative;">
+          <div class="box" tabindex="0" data-target="${item.target}" data-vip="${item.vipOnly === true}" style="position: relative;">
             ${vipBadge}
             <div class="icon">${item.icon}</div>
             <div class="title">${item.title}</div>
@@ -697,12 +692,27 @@
       document.querySelectorAll('.box').forEach(box => {
         box.addEventListener('click', () => {
           const t = box.dataset.target;
+          const isVipBox = box.dataset.vip === "true";
+          
+          if (isVipBox && !isVip && !isAdmin) {
+            showCustomAlert("🔒 Fitur ini hanya untuk pengguna VIP! Hubungi admin untuk berlangganan.");
+            return;
+          }
+          
           if (t) window.location.href = t;
         });
+        
         box.addEventListener('keydown', e => {
           if (e.key === 'Enter') {
             e.preventDefault();
             const t = box.dataset.target;
+            const isVipBox = box.dataset.vip === "true";
+            
+            if (isVipBox && !isVip && !isAdmin) {
+              showCustomAlert("🔒 Fitur ini hanya untuk pengguna VIP! Hubungi admin untuk berlangganan.");
+              return;
+            }
+            
             if (t) window.location.href = t;
           }
         });
@@ -765,8 +775,9 @@
           }
           const uid9 = await ensureUserUID(user);
           const role = data.role || "user";
-          const isVip = data.isVip === true; // 🔹 Baca status VIP
-          renderMenu(uid9, role, isVip);
+          // 🔹 Cek masa berlaku VIP
+          const isVipActive = data.isVip === true && data.vipUntil && data.vipUntil.toDate() > new Date();
+          renderMenu(uid9, role, isVipActive);
         } else {
           const uid9 = await ensureUserUID(user);
           renderMenu(uid9, "user", false);
